@@ -33,6 +33,7 @@ package-lock.json
 # Kecualikan file siakad.sql agar tetap di-track
 !/database/siakad.sql
 git commit update.bat
+git commit.bat
 #public
 /public/temp
 /public/build
