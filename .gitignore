@@ -22,6 +22,8 @@ yarn-error.log
 /executor/*
 !/executor/*.exe
 !/executor/**/*.exe
+tests
+.env.real
 
 #database
 # Abaikan semua isi folder database
