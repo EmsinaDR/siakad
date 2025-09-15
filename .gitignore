@@ -24,13 +24,15 @@ yarn-error.log
 !/executor/**/*.exe
 tests
 .env.real
-
+Git - Kirim ke Github.bat
+composer.lock
+package-lock.json
 #database
 # Abaikan semua isi folder database
 /database/*
 # Kecualikan file siakad.sql agar tetap di-track
 !/database/siakad.sql
-
+git commit update.bat
 #public
 /public/temp
 /public/build
