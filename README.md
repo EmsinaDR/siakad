@@ -7,17 +7,25 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## Tentang Siakad - Atad Digital
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Siakad Ata Digital (Siakad Edition)
+Copyright (c) 2025 Ata Digital
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Require :
+NodeJs
+Composer
+VCRuntime untuk Windows 64x
+Imagick Windows + PHP
+
+Stack :
+- Laragon 5.0 + Laravel 11 + Whatsapp WebJs
+- Admin (AdminLTE)
+- NSSM
+- Ngrok
+- gitBase (opsional)
+- PHP 8.3.10 + Apache 2.4.62-2407 + Mysql 8.3.0 + Redis 5.0.14.1
+
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
