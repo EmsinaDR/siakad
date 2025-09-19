@@ -87,6 +87,27 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                     "*File  :*\n{$result['success']}\n";
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
                 break;
+            case 'Update Whatsapp':
+                $result = run_bat("executor\whatsapp\update.bat");
+                $pesan =
+                    "*Path  :*\n{$result['path']}\n" .
+                    "*File  :*\n{$result['success']}\n";
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                break;
+            case 'Update Modul':
+                $result = run_bat("executor\siakad\contoh.bat");
+                $pesan =
+                    "*Path  :*\n{$result['path']}\n" .
+                    "*File  :*\n{$result['success']}\n";
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                break;
+            case 'Update Siakad':
+                $result = run_bat("executor\siakad\update.bat");
+                $pesan =
+                    "*Path  :*\n{$result['path']}\n" .
+                    "*File  :*\n{$result['success']}\n";
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                break;
 
             default:
                 return "Tidak ada kode pesan yang sesuai ";

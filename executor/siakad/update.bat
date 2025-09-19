@@ -23,7 +23,7 @@ echo Menunggu sebentar...
 timeout /t 10
 
 echo Hapus .git
-cd /d C:\laragon\www\siakad\update
+cd /d C:\laragon\www\siakad\update\siakad
 echo Menghapus folder .git ...
 rmdir /s /q .git
 timeout /t 10
