@@ -1,5 +1,5 @@
 @echo off
-SET UPDATE_DIR=C:\laragon\www\siakad\update
+SET UPDATE_DIR=C:\laragon\www\siakad\update\siakad
 SET DEST=C:\laragon\www\siakad\updatenew
 ::SET DEST=C:\laragon\www\siakad\updatenew : Dev
 ::SET DEST=C:\laragon\www\siakad : Real
