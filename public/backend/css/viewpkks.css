@@ -1,0 +1,199 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    text-align: center;
+    background: #f4f4f4;
+}
+
+.container {
+    width: 100%;
+    max-width: 18cm;
+    margin: 1cm auto;
+    padding: 1cm;
+    text-align: left;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.header-title {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+    font-size: 10pt;
+    word-wrap: break-word;
+}
+
+li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.page-break {
+    width: 100%;
+    height: 3px;
+    background: #000;
+    margin: 30px 0;
+    border-radius: 2px;
+    opacity: 0.6;
+}
+
+.page-number {
+    text-align: center;
+    font-size: 10pt;
+    font-style: italic;
+    color: gray;
+    margin-top: 10px;
+}
+
+/* Cover Container Styles */
+.cover-container {
+    width: 100%;
+    max-width: 21cm;
+    height: 29.7cm;
+    margin: auto;
+    padding: 2cm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+}
+
+.cover-container h1 {
+    font-size: 24pt;
+    margin-bottom: 10px;
+}
+
+.cover-container h2 {
+    font-size: 18pt;
+    margin-bottom: 5px;
+}
+
+.cover-container p {
+    font-size: 14pt;
+    margin-bottom: 5px;
+}
+
+.footer {
+    margin-top: 50px;
+    font-size: 14pt;
+}
+
+/* Styling untuk tabel tanpa border pada header */
+table > tr > #titler {
+    border-collapse: collapse;
+    border: none !important;
+}
+
+.no-border td, .no-border th, .no-border {
+        border: none !important;
+    }
+
+/* Print Media Queries */
+@media print {
+    @page {
+        size: legal portrait;
+        margin: 1cm;
+    }
+
+    body {
+        background: white;
+    }
+
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0.5cm auto;
+        padding: 0.5cm;
+        box-shadow: none;
+        page-break-inside: avoid; /* Hindari pemisahan di tengah */
+    }
+
+    .cover-container {
+        padding: 2cm;
+        height: 29.7cm;
+        width: 21cm;
+        box-sizing: border-box;
+    }
+
+    .page-break {
+        page-break-before: always;
+        display: block;
+        height: 0;
+        border: none;
+    }
+
+    /* Perbaikan cetakan */
+    .row {
+        display: flex;
+        align-items: start;
+    }
+
+    .col-xl-5,
+    .col-xl-7 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    table > #titler {
+        border-collapse: collapse;
+    }
+
+    /* table, th, td { */
+        /* border: 1px solid black !important; Pastikan border tetap ada */
+    /* } */
+
+    /* Warna tetap terlihat saat cetak */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .table-primary {
+        background-color: #9FCDFF !important;
+        color: black !important;
+    }
+
+    .table-primary th, .table-primary td {
+        background-color: #9FCDFF !important; /* Terapkan ulang agar tidak terhapus */
+    }
+
+    #idnumber {
+        width: 1% !important;
+        max-width: 5% !important;
+        white-space: nowrap;
+    }
+
+    #ttd {
+        width: 30% !important;
+        max-width: 30% !important;
+        white-space: nowrap;
+    }
+
+    .no-border td, .no-border th, .no-border {
+        border: none !important;
+    }
+}

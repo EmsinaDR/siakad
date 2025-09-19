@@ -1,0 +1,139 @@
+
+    .main-footer {
+        margin-top: 100px;
+    }
+
+    /* CSS Upload File */
+    .file-label {
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        display: inline-block;
+        text-align: center;
+    }
+
+    textarea {
+        resize: none,
+    }
+
+    .file-label i {
+        margin-right: 10px;
+    }
+
+    .btn-equal-width {
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .file-input {
+        opacity: 0;
+        /* Menyembunyikan input file */
+        position: absolute;
+        /* Memastikan input file tetap ada di layout */
+        z-index: -1;
+        /* Menempatkan input file di belakang label */
+        cursor: pointer;
+        width: 100%;
+        /* Memperbesar area klik sesuai ukuran label */
+        height: 100%;
+    }
+
+    .bg-brown {
+        background-color: #A52A2A !important;
+        color: white;
+    }
+
+    .table-aquamarine {
+        background-color: #7FFFD4 !important;
+        color: black;
+    }
+
+    .bg-aquamarine {
+        background-color: #7FFFD4 !important;
+        color: black !important;
+    }
+
+    .bg-cornflowerblue {
+        background-color: #6495ED !important;
+        color: white !important;
+    }
+
+    .btn-cornflowerblue {
+        background-color: #6495ED !important;
+        color: white;
+    }
+
+    .bg-cornflowerblue {
+        background-color: #6495ED !important;
+    }
+
+    .btn-cornflowerblue:hover {
+        background-color: #434b63 !important;
+        /* Warna sedikit lebih gelap untuk efek hover */
+        color: #f0f0f0 !important;
+        /* Warna teks bisa disesuaikan juga */
+    }
+
+    .table-chocolate {
+        background-color: #D2691E !important;
+        color: rgb(255, 255, 255) !important;
+    }
+
+    .bg-chocolate {
+        background-color: #D2691E !important;
+        color: white !important;
+    }
+
+    .btn-chocolate {
+        background-color: #D2691E !important;
+        color: white !important;
+    }
+
+    .btn-chocolate:hover {
+        background-color: #d2691e !important;
+        color: #f0f0f0 !important;
+        opacity: 0.8 !important;
+    }
+
+    .table-brown {
+        background-color: #A52A2A !important;
+        color: white !important;
+    }
+
+    .bg-brown {
+        background-color: #A52A2A !important;
+        color: white !important;
+    }
+
+    .btn-brown {
+        background-color: #A52A2A !important;
+        color: white !important;
+    }
+
+    .btn-brown:hover {
+        background-color: #A52A2A !important;
+        color: #f0f0f0 !important;
+    }
+
+    .table-lightyellow {
+        background-color: #FFFFE0 !important;
+        color: black !important;
+    }
+
+    .bg-lightyellow {
+        background-color: #FFFFE0 !important;
+        color: black !important;
+    }
+
+    .btn-lightyellow {
+        background-color: #FFFFE0 !important;
+        color: black !important;
+    }
+
+    .btn-lightyellow:hover {
+        background-color: #FFFFE0 !important;
+        color: black !important;
+        opacity: 0.8 !important;
+    }
