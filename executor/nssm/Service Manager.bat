@@ -2,7 +2,10 @@
 setlocal enabledelayedexpansion
 
 REM Path nssm.exe full
-set NSSM=C:\laragon\www\siakad\executor\nssm\win64\nssm.exe
+::set NSSM=C:\laragon\www\siakad\executor\nssm\win64\nssm.exe
+set "BASEDIR=%~dp0"
+set "NSSM=C:\laragon\www\siakad\executor\nssm\win64\nssm.exe"
+
 
 :MENU
 cls
@@ -151,9 +154,10 @@ echo Membuat ulang service LaravelSchedule...
 sc stop LaravelSchedule
 sc delete LaravelSchedule
 
-nssm install LaravelSchedule C:\Windows\System32\cmd.exe "/c C:\laragon\www\siakad\executor\siakad\schedule.bat"
-nssm set LaravelSchedule AppDirectory "C:\laragon\www\siakad\executor\siakad"
-nssm set LaravelSchedule AppExit Default Restart
+"%NSSM%" install LaravelSchedule "C:\laragon\bin\php\php-8.3.10-Win32-vs16-x64\php.exe" artisan schedule:work
+"%NSSM%" set LaravelSchedule AppDirectory "C:\laragon\www\siakad"
+"%NSSM%" set LaravelSchedule AppExit Default Restart
+
 sc start LaravelSchedule
 sc query LaravelSchedule
 pause
@@ -165,9 +169,9 @@ sc stop NgrokService
 sc delete NgrokService
 
 cd /d C:\laragon\www\siakad\executor\nssm\win64
-nssm install NgrokService "C:\laragon\www\siakad\executor\ngrok\ngrok_akses.exe"
-nssm set NgrokService AppDirectory "C:\laragon\www\siakad\executor\ngrok"
-nssm set NgrokService AppExit Default Restart
+"%NSSM%" install NgrokService "C:\laragon\www\siakad\executor\ngrok\ngrok_akses.exe"
+"%NSSM%" set NgrokService AppDirectory "C:\laragon\www\siakad\executor\ngrok"
+"%NSSM%" set NgrokService AppExit Default Restart
 
 sc start NgrokService
 sc query NgrokService
@@ -198,7 +202,8 @@ echo =======================================
 echo Command Server Aktif
 echo =======================================
 echo Menjalankan artisan start:ServerAktif...
-C:\laragon\bin\php\php-8.3.10-Win32-vs16-x64\php.exe artisan start:ServerAktif
+CD /d C:\laragon\www\siakad
+php artisan start:ServerAktif
 
 echo Mengecek endpoint /status...
 for /f %%i in ('curl -s -o nul -w "%%{http_code}" http://localhost:3000/status 2^>nul') do set status=%%i
@@ -290,14 +295,15 @@ sc stop TempCleaner >nul 2>&1
 sc delete TempCleaner >nul 2>&1
 
 cd /d C:\laragon\www\siakad\executor\nssm\win64
-REM nssm install LaravelSchedule C:\Windows\System32\cmd.exe "/c C:\laragon\www\siakad\executor\siakad\schedule.bat"
-nssm install TempCleaner C:\Windows\System32\cmd.exe "/c C:\laragon\www\siakad\executor\pc\TempCleaner.bat"
+REM "%NSSM%" install LaravelSchedule C:\Windows\System32\cmd.exe "/c C:\laragon\www\siakad\executor\siakad\schedule.bat"
+:: "%NSSM%" install TempCleaner C:\Windows\System32\cmd.exe "/c C:\laragon\www\siakad\executor\pc\TempCleaner.bat"
+"%NSSM%" install LaravelSchedule "C:\laragon\www\siakad\executor\siakad\schedule.bat"
 
-REM nssm install TempCleaner "C:\laragon\www\siakad\executor\ngrok\ngrok_akses.exe"
-REM nssm install TempCleaner "C:\laragon\www\siakad\executor\pc\TempCleaner.exe"
-nssm set TempCleaner AppDirectory "C:\laragon\www\siakad\executor\pc"
-nssm set TempCleaner AppExit Default Restart
-nssm set TempCleaner AppPauseMethod None
+REM "%NSSM%" install TempCleaner "C:\laragon\www\siakad\executor\ngrok\ngrok_akses.exe"
+REM "%NSSM%" install TempCleaner "C:\laragon\www\siakad\executor\pc\TempCleaner.exe"
+"%NSSM%" set TempCleaner AppDirectory "C:\laragon\www\siakad\executor\pc"
+"%NSSM%" set TempCleaner AppExit Default Restart
+"%NSSM%" set TempCleaner AppPauseMethod None
 
 sc start TempCleaner
 sc query TempCleaner
@@ -337,8 +343,8 @@ for /f "tokens=2*" %%b in ('sc qc "%svc%" ^| findstr /i "BINARY_PATH_NAME"') do 
 rem jika tidak ada binpath -> kembali
 if not defined binpath exit /b
 
-rem cek apakah binpath mengandung nssm.exe
-echo %binpath% | findstr /i "nssm.exe" >nul
+rem cek apakah binpath mengandung "%NSSM%".exe
+echo %binpath% | findstr /i ""%NSSM%".exe" >nul
 if errorlevel 1 exit /b
 
 rem tampilkan info dasar
