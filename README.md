@@ -96,6 +96,8 @@ Laravel memberikan aksesibilitas, fleksibilitas, dan tool yang kuat untuk aplika
 -   Generator CoCard Panitia
 -   Kompresi Gambar
 -   Perangkat Kelas (Nilai, Absensi, dll)
+-   Aplikasi Foto Digital
+-   Administrasi Tata Usaha
 
 ---
 
