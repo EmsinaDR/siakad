@@ -20,6 +20,7 @@ Copyright © 2025 Ata Digital
 
 ## Requirement Sistem
 
+- Tester Windows 10 64bit + RAM 8
 - Node.js  
 - Composer  
 - VCRuntime (Windows 64-bit)  
@@ -35,6 +36,7 @@ Copyright © 2025 Ata Digital
 - Ngrok  
 - gitBase (opsional)  
 - PHP 8.3.10 + Apache 2.4.62 + MySQL 8.3.0 + Redis 5.0.14.1  
+- Whatsapp WebJs v.1.33
 
 Laravel memberikan aksesibilitas, fleksibilitas, dan tool yang kuat untuk aplikasi skala besar.
 
@@ -48,12 +50,13 @@ Laravel memberikan aksesibilitas, fleksibilitas, dan tool yang kuat untuk aplika
 - Kelulusan  
 - Perpustakaan  
 - BK (Bimbingan Konseling)  
-- CBT + Bank Soal Digital  
+- CBT ( Computer Bassed Test ) + Bank Soal Digital  
 - Laboratorium  
 
 ### Komunikasi & Otomasi
 - Whatsapp Sender & AutoReply  
 - Sosialisasi digital via Whatsapp dengan penjadwalan pesan  
+- Sosialisasi PPDB
 - Autoreply Data
 
 ### Administrasi & Operasional Sekolah

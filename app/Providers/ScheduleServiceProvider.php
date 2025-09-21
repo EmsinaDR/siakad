@@ -257,6 +257,8 @@ class ScheduleServiceProvider extends ServiceProvider
                 */
             // Proses Coding
             $schedule->command('backup:database')->dailyAt('08:00'); //BackupDatabase
+            $schedule->command('update:SynGitHub')->weeklyOn(3, '11:00'); // Update Github
+
 
         });
 
