@@ -39,28 +39,28 @@ if (!function_exists('validateWhatsappAccess')) {
      * @param mixed $sessions     Session WA untuk kirim pesan
      * @return bool|\Illuminate\Http\JsonResponse
      */
-    function validateWhatsappAccess($NoRequest, $Guru)
-    {
-        $sessions = config('whatsappSession.IdWaUtama');
-        $DevNomor = config('whatsappSession.DevNomorTujuan');
-        $SekolahNoTujuan = config('whatsappSession.SekolahNoTujuan');
-        if ($NoRequest !== $DevNomor) { // Lolosakan Dev
-            if (!$Guru || $NoRequest !== $Guru->no_hp) {
-                // Kirim pesan kalau tidak diijinkan
-                \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan("❌ Informasi", "Maaf anda tidak berhak mengakses data ini!!!\n*NO HP tidak terdaftar*"));
-                $PesanKirim =
-                    "Di informasikan bahwa ada akses tidak sah dari :\n" .
-                    "No HP : {$NoRequest}\n" .
-                    "Berusaha mencoba akses data siswa :\n" .
-                    "Nama : {$Guru->nama_guru}\n" .
-                    "\n";
-                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $SekolahNoTujuan, format_pesan('⚠️ Informasi Warning ⚠️', $PesanKirim));
-                return false;
-            }
-        }
+    // function validateWhatsappAccess($NoRequest, $Guru)
+    // {
+    //     $sessions = config('whatsappSession.IdWaUtama');
+    //     $DevNomor = config('whatsappSession.DevNomorTujuan');
+    //     $SekolahNoTujuan = config('whatsappSession.SekolahNoTujuan');
+    //     if ($NoRequest !== $DevNomor) { // Lolosakan Dev
+    //         if (!$Guru || $NoRequest !== $Guru->no_hp) {
+    //             // Kirim pesan kalau tidak diijinkan
+    //             \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan("❌ Informasi", "Maaf anda tidak berhak mengakses data ini!!!\n*NO HP tidak terdaftar*"));
+    //             $PesanKirim =
+    //                 "Di informasikan bahwa ada akses tidak sah dari :\n" .
+    //                 "No HP : {$NoRequest}\n" .
+    //                 "Berusaha mencoba akses data siswa :\n" .
+    //                 "Nama : {$Guru->nama_guru}\n" .
+    //                 "\n";
+    //             $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $SekolahNoTujuan, format_pesan('⚠️ Informasi Warning ⚠️', $PesanKirim));
+    //             return false;
+    //         }
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 }
 
 if (!function_exists('Auto_reply_Data_Guru')) {

@@ -65,9 +65,8 @@ if (!function_exists('HelpPesan')) {
                     "Mohon maaf ada yang bisa dibantu???\n" .
                     "Silahkan tuliskan pesan sesuai format yang ditentukan\n" .
                     "*Terima Kasih*\n" .
-                    str_repeat("─", 20) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "\n";
+                return format_pesan('Jawaban', $pesanKiriman);
                 break;
             case 'Selamat Pagi':
                 $pesanKiriman =
@@ -75,45 +74,49 @@ if (!function_exists('HelpPesan')) {
                     "Mohon maaf ada yang bisa dibantu???\n" .
                     "Silahkan tuliskan pesan sesuai format yang ditentukan\n" .
                     "*Terima Kasih*\n" .
-                    str_repeat("─", 20) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "\n";
+                return format_pesan('Jawaban', $pesanKiriman);
                 break;
 
             case 'Help':
                 $pesanKiriman =  "" .
-                    "================================\n" .
-                    "📌 *INFORMASI HELP*\n" .
-                    "================================\n\n" .
                     "Informasi bantuan :\n" .
                     "- Help Guru\n" .
                     "- Help Siswa\n" .
                     "- Help Surat\n" .
                     "- Help Ijin\n" .
                     "- Help Dokumen\n" .
-                    "- Help Database\n" .
                     "- Help Pencarian\n" .
-                    "\n" . str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "- Help Control\n" .
+                    "- Help Kepala\n" .
+                    "- Help PPDB ( _Premium Only_ )\n" .
+                    "- Help BK ( _Premium Only_ )\n" .
+                    "- Help Perpustakaan ( _Premium Only_ )\n" .
+                    "\n";
+                return format_pesan('INFORMASI HELP', $pesanKiriman);
+                break;
+            case 'Help Kepala':
+                $pesanKiriman =  "" .
+                    "Informasi bantuan :\n" .
+                    "- Laporan Absensi/Kepala\n" .
+                    "- EAG/Kepala/Kode Guru/Bulan\n" .
+                    "- LABG/Kepala/Kode Guru/Bulan\n" .
+                    "\t\tLABG/Kepala/Kode Guru.\n\t\tArtinya bulan ini\n" .
+                    "\t\tBulan 1 -9\n" .
+                    "- aaa\n" .
+                    "\n";
+                return format_pesan('INFORMASI HELP KEPALA', $pesanKiriman);
                 break;
             case 'Help Database':
                 $pesanKiriman =  "" .
-                    "================================\n" .
-                    "📌 *INFORMASI HELP*\n" .
-                    "================================\n\n" .
                     "Informasi bantuan :\n" .
                     "- Save/nis/\n" .
-                    "\n" . str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "\n";
+                return format_pesan('INFORMASI HELP DATABASE', $pesanKiriman);
                 break;
             case 'Help Surat':
                 // FiturPaket($paket, $NoRequest);
                 $pesanKiriman =  "" .
-                    "================================\n" .
-                    "📌 *TERKAIT SURAT*\n" .
-                    "================================\n\n" .
                     "*Surat Aktif*\n" .
                     "Surat Aktif\t\t\t\t\t:Surat Aktif/Surat/nis/format/keperluan\n" .
                     "Contoh\t\t\t\t\t\t\t: Surat Aktif/Surat/nis/jpg/keperluan\n\n" .
@@ -145,9 +148,8 @@ if (!function_exists('HelpPesan')) {
                     "Surat Panggilant\t\t\t\t\t: Surat Panggilan/Surat/kode guru waka/kode wali kelas/NIS/keperluan/+Hari/Waktu/\n" .
                     "Contoh\t\t\t\t\t\t\t: Surat Panggilan/Surat/CA/CA/NIS/keperluan/+Hari/Waktu/\n" .
                     "Tanggal Datang : 2 artinya 2 hari kedepan\n" .
-                    "\n" . str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "\n";
+                return format_pesan('INFORMASI HELP SURAT', $pesanKiriman);
                 break;
             case 'Help Dokumen':
                 $pesanKiriman =  "" .
@@ -162,14 +164,11 @@ if (!function_exists('HelpPesan')) {
                     "- Undangan\n\n" .
                     "- Notulen : Blanko\n\n" .
                     "- Berita Acara : Blanko\n\n" .
-                    "\n" . str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
+                    "\n";
+                return format_pesan('INFORMASI TERKAIT DOKUMEN', $pesanKiriman);
                 break;
             case 'Help Ijin':
                 $pesanKiriman =  "" .
-                    "================================\n" .
-                    "📌 *TERKAIT IJIN DIGITAL*\n" .
-                    "================================\n\n" .
                     "*Ijin Siswa*\n" .
                     "Ijin Siswa\t\t\t\t\t: Ijin Siswa/Siswa/NIS/Sakit/Keterangan\n" .
                     "Contoh\t\t\t\t\t\t\t: Ijin Siswa/Siswa/2025001/Sakit/Demam\n\n" .
@@ -177,9 +176,8 @@ if (!function_exists('HelpPesan')) {
                     "*Ijin Guru*\n" .
                     "Ijin Siswa\t\t\t\t\t: Ijin Guru/Guru/Kode Guru/Sakit/Keterangan\n" .
                     "Contoh\t\t\t\t\t\t\t: Ijin Guru/Guru/JA/Sakit/Demam\n\n" .
-                    "\n" . str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "\n";
+                return format_pesan('INFORMASI TERKAIT IJIN DIGITAL', $pesanKiriman);
                 break;
 
             case 'Help Siswa':
@@ -248,11 +246,12 @@ if (!function_exists('HelpPesan')) {
                     "- *Data Sekolah* : Data Sekolah/Guru/Kode_Guru\n" .
                     "- *Kontak Sekolah* : Kontak Sekolah/Guru/Kode Guru\n" .
                     "- *Kontak Kosong* : Kontak Kosong/Guru/Kode Guru\n" .
+                    "- *Cek Server* : Cek Server/Guru/Kode Guru\n" .
+                    // "- *Registrasi Guru* : Registrasi Guru/Guru/Kode Guru ( Belum Tersedia )\n" .
                     "\n" . str_repeat("─", 25) . "\n" .
                     "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
                 return $pesanKiriman;
                 break;
-
             case 'Kode Guru':
                 $pesanKiriman = KodeGuru(); // fungsi langsung, tidak perlu teks
                 return $pesanKiriman;
@@ -260,34 +259,48 @@ if (!function_exists('HelpPesan')) {
             case 'Help Control':
                 // Auto_Reply_ControlHelper
                 $pesanKiriman =  "" .
-                    "================================\n" .
-                    "📌 *INFORMASI HELP*\n" .
-                    "================================\n\n" .
                     "Informasi bantuan :\n" .
-                    "- Restart Service\Help Control\n" .
-                    "- Restart PC\Help Control\n" .
-                    "- Shutdown Service\Help Control\n" .
-                    "- Shutdown PC\Help Control\n" .
-                    "- Help Pencarian\n" .
-                    "\n" . str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "- Restart Service/Control\n" .
+                    "- Restart PC/Control\n" .
+                    "- Shutdown Service/Control\n" .
+                    "- Shutdown PC/Control\n" .
+                    "\n";
+                return format_pesan('INFORMASI HELP CONTROL*', $pesanKiriman);
+                break;
+            case 'Help Media':
+                //  Auto_Reply_VendorHelper
+                $pesanKiriman =  "" .
+                    "Pada bagian ini bapak / ibu bisa menyimpan file / dokumen untuk data dokumentasi sekolah sesuai keterangan / folder masing masing\n" .
+                    "Penggunaan nya kirim media dengan caption text\n" .
+                    "*Contoh Caption:*\n" .
+                    "PPDB/Sosialisasi/SDN 1 Banjarharjo\n\n" .
+                    "Semua terdiri dari 3 folder, jadi garis */* merupakan folder yang akan dibuat\n" .
+                    "Jika penulisan PPDB, artinya 1 folder saja dan \n" .
+                    "- Shutdown Service\Help Control\n";
+                return format_pesan("Penyimpanan Media", $pesanKiriman);
                 break;
             case 'Help Vendor':
                 //  Auto_Reply_VendorHelper
                 $pesanKiriman =  "" .
-                    "================================\n" .
-                    "📌 *INFORMASI HELP*\n" .
-                    "================================\n\n" .
                     "Informasi bantuan :\n" .
-                    "- Restart Service\Help Control\n" .
-                    "- Restart PC\Help Control\n" .
-                    "- Shutdown Service\Help Control\n" .
-                    "- Shutdown PC\Help Control\n" .
-                    "- Help Pencarian\n" .
-                    "\n" . str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "*Data Vendor*\n" .
+                    "- Data Vendor/Vendor\n" .
+                    "- Fitur Aplikasi/Vendor\n" .
+                    "- Teruskan/Vendor\n\n" .
+                    "*Service dan PC Control*\n" .
+                    "- Cek Service/Vendor\n" .
+                    "- Restart Service/Vendor\n" .
+                    "- Restart PC/Vendor\n" .
+                    "- Shutdown Service/Vendor\n" .
+                    "- Shutdown PC/Vendor\n" .
+                    "- Update Whatsapp/Vendor\n" .
+                    "- Update Modul/Vendor\n" .
+                    "- Update Siakad/Vendor\n" .
+                    "*Database*\n" .
+                    "- Siswa/Vendor\n" .
+                    "- Guru/Vendor\n" .
+                    "\n";
+                return format_pesan('INFORMASI HELP VENDOR*', $pesanKiriman);
                 break;
             case 'Media File':
                 //  Auto_Reply_VendorHelper
@@ -296,28 +309,13 @@ if (!function_exists('HelpPesan')) {
                     "\n\n";
                 return format_pesan("Penyimpanan Media", $pesanKiriman);
                 break;
-            case 'Help Media':
-                //  Auto_Reply_VendorHelper
-                $pesanKiriman =  "" .
-                    "Pada bagian ini bapa ibu bisa menyimpan file / dokumen untuk data dokumentasi sekolah sesuai keterangan / folder masing masing\n" .
-                    "Penggunaan nya kirim media dengan caption text\n" .
-                    "Contoh Caption:\n" .
-                    "PPDB/Sosialisasi/SDN 1 Banjarharjo\n" .
-                    "Semua terdiri dari 3 folder, jadi garis */* merupakan folder yang akan dibuat\n" .
-                    "Jika penulisan PPDB, artinya 1 folder saja dan \n" .
-                    "- Shutdown Service\Help Control\n";
-                return format_pesan("Penyimpanan Media", $pesanKiriman);
-                break;
             default:
-                $pesanKiriman = "================================\n" .
-                    "📌 *INFORMASI*\n" .
-                    "================================\n\n" .
+                $pesanKiriman =
                     "Mohon maaf tidak ada referensi terkait ' *$message* '?\n" .
                     "Silahkan gunakan *format dan data* yang sesuai\n\n" .
                     "Terima Kasih\n" .
-                    str_repeat("─", 25) . "\n" .
-                    "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
-                return $pesanKiriman;
+                    "\n";
+                return format_pesan('INFORMASI HELP', $pesanKiriman);
                 break;
         }
     }

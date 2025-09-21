@@ -531,7 +531,7 @@ app.use(cors()); // izinkan semua origin
                     Auto_reply_BK($Kode, $Siswa, $NoRequest, $message);
                 } elseif ($Part1 === 'PPDB') {
                     // handling cek guru
-                    // FiturPaket($paket, $NoRequest);
+                    FiturPaket($paket, $NoRequest);
                     Auto_Reply_PPDBHelper($Kode, $Siswa, $NoRequest, $message);
                 } elseif ($Part1 === 'Database') {
                     // handling cek guru
@@ -542,7 +542,7 @@ app.use(cors()); // izinkan semua origin
                     // FiturPaket($paket, $NoRequest);
                     Auto_Reply_VendorHelper($Kode, $NoRequest, $message, config('whatsappSession.IdWaUtama'));
                     // Auto_Reply_Database($Kode, $Siswa, $NoRequest, $message);
-                } elseif ($Part1 === 'Help Control') {
+                } elseif ($Part1 === 'Control') {
                     // handling cek guru
                     // FiturPaket($paket, $NoRequest);
                     Auto_Reply_ControlHelper($Kode, $NoRequest, $message);

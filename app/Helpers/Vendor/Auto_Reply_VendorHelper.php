@@ -34,7 +34,7 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                     "\n";
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
                 break;
-            case 'Fitur Aplikas':
+            case 'Fitur Aplikasi':
                 $pesan =
                     "- Absensi\n" .
                     "- PPDB\n" .
@@ -63,7 +63,7 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                     "isiCode\n";
                 return $pesan;
                 break;
-            // Data Siswa Uji Coba  
+            // Data Siswa Uji Coba
             case 'Field Data Siswa':
                 $pesan =
                     "Data Siswa\nuser_id:\nppdb_id:\nstatus_siswa:\nnis:\nnisn:\nnama_siswa:\nnama_panggilan:\nnik:\nnokk:\nhobi:\ncita_cita:\njenis_kelamin:\ntempat_lahir:\ntanggal_lahir:\nnohp_siswa:\nagama:\nkewarganegaraan:\nanak_ke:\njml_saudara:\njumlah_saudara_tiri:\njumlah_saudara_angkat:\nstatus_anak:\nstatus_yatim_piatu:\nbahasa:\nalamat_siswa:\njalan:\nrt:\nrw:\ndesa:\nkecamatan:\nkabupaten:\nprovinsi:\nkode_pos:\ntinggal_bersama:\njarak_sekolah:\ngolongan_darah:\nriwayat_penyakit:\nkelainan_jasmani:\ntinggi_badan:\nberat_badan:\nnamasek_asal:\nalamatsek_asal:\ntanggal_ijazah_sd:\nnomor_ijazah_sd:\nlama_belajar:\nasal_pindahan:\nalasan_pindahan:\nkelas_penerimaan:\nkelompok_penerimaan:\njurusan_penerimaan:\ntanggal_penerimaan:\ntahun_masuk:\ntahun_lulus:\ntingkat_id:\nkelas_id:\njabatan_kelas:\npiket_kelas:\npetugas_upacara:\nayah_nama:\nayah_keadaan:\nayah_agama:\nayah_kewarganegaraan:\nayah_pendidikan:\nayah_pekerjaan:\nayah_penghasilan:\nayah_alamat:\nayah_rt:\nayah_rw:\nayah_desa:\nayah_kecamatan:\nayah_kabupaten:\nayah_provinsi:\nayah_kodepos:\nayah_nohp:\nibu_nama:\nibu_keadaan:\nibu_agama:\nibu_kewarganegaraan:\nibu_pendidikan:\nibu_pekerjaan:\nibu_penghasilan:\nibu_alamat:\nibu_rt:\nibu_rw:\nibu_desa:\nibu_kecamatan:\nibu_kabupaten:\nibu_provinsi:\nibu_kodepos:\nibu_nohp:\nwali_nama:\nwali_keadaan:\nwali_agama:\nwali_kewarganegaraan:\nwali_pendidikan:\nwali_pekerjaan:\nwali_penghasilan:\nwali_alamat:\nwali_rt:\nwali_rw:\nwali_desa:\nwali_kecamatan:\nwali_kabupaten:\nwali_provinsi:\nwali_kodepos:\nwali_nohp:\n";

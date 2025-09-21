@@ -106,9 +106,11 @@ if (!function_exists('exportlaporan')) {
     function exportlaporan($kode, $bulan)
     {
         //Isi Fungsi
+        $tapel = tapel();
         $DataGuru = Detailguru::where('kode_guru', $kode)->first();
         // Ambil semua absensi guru tanggal tersebut, eager load guru
         $AbsGurus = EabsenGuru::with('guru')
+            ->where('tapel_id', $tapel->id)
             ->where('detailguru_id', $DataGuru->id)
             ->whereMonth('created_at', $bulan)
             ->orderBy('created_at', 'ASC')
@@ -123,10 +125,13 @@ if (!function_exists('absensi_guru_bulanan')) {
     function absensi_guru_bulanan($kode_guru, $bulan)
     {
         // $tanggal = $bulan ? Carbon::parse($bulan)->toDateString() : now()->toDateString();
-
+        $tapel = tapel();
+        //$tapel->id
+        //where('tapel_id', $tapel->id)->
         $DataGuru = Detailguru::where('kode_guru', $kode_guru)->first();
         // Ambil semua absensi guru tanggal tersebut, eager load guru
         $AbsGurus = EabsenGuru::with('guru')
+            ->where('tapel_id', $tapel->id)
             ->where('detailguru_id', $DataGuru->id)
             ->whereMonth('created_at', $bulan)
             ->OrderBy('created_at', 'DESC')
