@@ -64,3 +64,4 @@ require_once __DIR__ . '/System/ControllPCHelper.php';
 
 require_once __DIR__ . '/Auto_Reply_ControlHelper.php';
 require_once __DIR__ . '/System/DokumenHelper.php';
+require_once __DIR__ . '/System/ReaderDeviceHelper.php';

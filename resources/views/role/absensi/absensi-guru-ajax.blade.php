@@ -6,7 +6,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Absensi QR AJAX</title>
+    <title>Absensi Guru QR AJAX </title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+    <!-- atau ICO -->
+    {{-- <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"> --}}
     <script src="https://unpkg.com/html5-qrcode" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
     <!-- Bootstrap CSS -->
@@ -68,8 +72,35 @@
     <div class="row">
         <div class="col-md-4">
             <h2>Scan QR Absensi</h2>
+            IP : {{ getIp() }}<br>
             <div id="reader"></div>
             <div id="result" class="p-4 mt-3"></div>
+            {{-- <input type="hidden" id="ip" name="ip" value='{{ getIp() }}' readonly> <br>
+            <input type="hidden" id="Agent" name="Agent" value='{{ getUserAgent() }}' readonly> <br>
+            <input type="hidden" id="getDeviceName" name="getDeviceName" value='{{ getDeviceName() }}' readonly> <br> --}}
+            {{-- User Agent : {{ getUserAgent() }} <br>
+            Device : {{ getDeviceName() }}<br>
+            Map :<br>
+            Lat : <input type="text" id="lat" name="lat" readonly>
+            Long: <input type="text" id="lng" name="lng" readonly> --}}
+
+            <script>
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        let lat = position.coords.latitude;
+                        let lng = position.coords.longitude;
+
+                        console.log("Lat:", lat, "Lng:", lng);
+
+                        // contoh kirim ke Laravel via hidden input
+                        document.getElementById("lat").value = lat;
+                        document.getElementById("lng").value = lng;
+                    });
+                } else {
+                    alert("Browser tidak support geolocation.");
+                }
+            </script>
+
         </div>
         <div class="col-md-8">
             <h2>Daftar Absensi Guru {{ Carbon::now()->translatedformat('l, d F Y') }}</h2>
@@ -103,6 +134,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             const resultDiv = document.getElementById("result");
             const absenList = document.getElementById("absenList");
+            // const lat = document.getElementById("lat").value;
+            // const lng = document.getElementById("lng").value;
 
             const html5QrCode = new Html5Qrcode("reader");
             const config = {
@@ -116,7 +149,10 @@
                 resultDiv.className = "";
 
                 axios.post("{{ route('absensi.store.guru.ajax') }}", {
-                        kode_guru: decodedText
+                        kode_guru: decodedText,
+                        lat: lat, // Untuk map lat
+                        lng: lng, // Untuk map long
+
                     })
                     .then(response => {
                         const res = response.data;

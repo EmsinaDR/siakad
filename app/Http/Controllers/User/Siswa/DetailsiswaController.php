@@ -129,12 +129,13 @@ class DetailsiswaController extends Controller
             return Redirect::back()->with('Title', 'Gagal')->with('gagal', 'Gagal tidak dikenali');
         }
     }
-    public function destroy($id)
+    public function destroy($data)
     {
         // try {
-        $VarDetailsiswa = User::findOrFail($id);
+        $VarDetailsiswa = User::findOrFail($data);
         $VarDetailsiswa->delete();
         HapusCacheDenganTag('Chace_DataList');
+        HapusCacheDenganTag('Cache_DataSiswa');
         return redirect()->back()->with('Title', 'Berhasil !!!')->with('Success', 'Data  datahaps Berhasil dihapus dari databse');
     }
     public function store(Request $request)

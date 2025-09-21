@@ -210,12 +210,12 @@ class EabsenGuruController extends Controller
             ],
         ]);
     }
-    public function ExportAbsensiGuru()
-    {
-        //dd($request->all());
-        // Export Data Absen
-        $pesan = json_encode(getAbsensiPivot('2025-09', 'AS'));
-    }
+    // public function ExportAbsensiGuru()
+    // {
+    //     //dd($request->all());
+    //     // Export Data Absen
+    //     $pesan = json_encode(getAbsensiPivot('2025-09', 'AS'));
+    // }
 
     public function create()
     {

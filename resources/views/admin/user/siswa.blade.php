@@ -59,11 +59,11 @@
                                                     </button>
                                                 </a>
                                                 <!-- Form untuk menghapus -->
-                                                <form id='delete-form-{{ $data->id }}' action='{{ route('siswa.destroy', $data->id) }}' method='POST' style='display: inline-block;'>
+                                                <form id='delete-form-{{ $data->user_id }}' action='{{ route('siswa.destroy', $data->user_id) }}' method='POST' style='display: inline-block;'>
                                                     @csrf
                                                     @method('DELETE')
                                                 </form>
-                                                <button type='button' class='btn btn-danger btn-sm btn-equal-width' onclick='confirmDelete({{ $data->id }})'> <i class='fa fa-trash'></i>  </button>
+                                                <button type='button' class='btn btn-danger btn-sm btn-equal-width' onclick='confirmDelete({{ $data->user_id }})'> <i class='fa fa-trash'></i>  </button>
                                             </div>
                                         </td>
                                             {{-- blade-formatter-enable --}}

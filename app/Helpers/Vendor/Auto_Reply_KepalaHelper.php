@@ -35,6 +35,41 @@ if (!function_exists('Auto_Reply_KepalaHelper')) {
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, "6285329860005", format_pesan('Laporan Absensi', $PesanKirim));
                 // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, format_pesan('Laporan Absensi', $PesanKirim));
                 break;
+            case 'EAG':
+                /*
+                EAG ( Eksport Absensi Guru )
+                EAG/Kepala/Kode Guru/Bulan
+                */
+                # code...
+                $kode_guru = $pesan[2];
+                $bulan = $pesan[3] ?? null;
+                $DataAbsen = exportlaporan($kode_guru, $bulan);
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, "6285329860005", format_pesan('Laporan Absensi', json_encode($DataAbsen)));
+                $dataTambahan = [
+                    'data' => '$DataAbsen'
+                ];
+                $dataIdentitas = DataIdentitas();
+                $data = array_merge($dataTambahan, [
+                    'DataAbsen' => $DataAbsen
+                ], $dataIdentitas);
+
+                $folder = public_path('temp/export/absensi');
+                $view = 'role.absensi.eabsenguru.export-excel-absensi-guru'; // Contoh = role.program.surat.siswa.surat-pindah-sekolah
+                $filename = 'Rekap Absensi - ' . bulanIndo($bulan);
+                $hasil = DomExport($filename, $data, $view, $folder);
+                $respon = CopyFileWa($filename . '.pdf', 'temp/export/absensi');
+                // $output = laporan_absensi_guru();
+                // $hasil = json_encode($respon);
+                $PesanKirim =
+                    "hasil \n" .
+                    "\n";
+
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, "6285329860005", format_pesan('Laporan Absensi', json_encode($filename)));
+                return [
+                    'filename' => $filename . '.pdf',
+                ];
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, format_pesan('Laporan Absensi', $PesanKirim));
+                break;
             case 'LABG':
                 # code...
                 // LABG / Kepala / Kode Guru / Bulan
@@ -55,6 +90,7 @@ if (!function_exists('Auto_Reply_KepalaHelper')) {
                 $PesanKirim =
                     "$output \n" .
                     "\n";
+
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, "6285329860005", format_pesan('Laporan Absensi', $PesanKirim));
                 // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, format_pesan('Laporan Absensi', $PesanKirim));
                 break;
@@ -66,6 +102,22 @@ if (!function_exists('Auto_Reply_KepalaHelper')) {
     }
 }
 
+if (!function_exists('exportlaporan')) {
+    function exportlaporan($kode, $bulan)
+    {
+        //Isi Fungsi
+        $DataGuru = Detailguru::where('kode_guru', $kode)->first();
+        // Ambil semua absensi guru tanggal tersebut, eager load guru
+        $AbsGurus = EabsenGuru::with('guru')
+            ->where('detailguru_id', $DataGuru->id)
+            ->whereMonth('created_at', $bulan)
+            ->orderBy('created_at', 'ASC')
+            ->get()
+            ->groupBy('waktu_absen'); // pakai field waktu_absen biar lebih pas
+
+        return $AbsGurus;
+    }
+}
 
 if (!function_exists('absensi_guru_bulanan')) {
     function absensi_guru_bulanan($kode_guru, $bulan)

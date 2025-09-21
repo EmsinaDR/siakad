@@ -30,10 +30,24 @@
 
 {{-- Pengecekan Versi Gratis, Basic, Trial, Premium --}}
 <!-- Data Header -->
-<link rel="icon" type="image/x-icon" href="{{ asset('img/logo.ico') }}/">
+<link rel="icon" type="image/x-icon" href="{{ secure_asset('img/logo.ico') }}">
+
 
 <x-property-header>{{ $slot }}</x-property-header>
 <!-- / Data Header -->
+<style>
+    .offcanvas,
+    .right-sidebar {
+        position: fixed !important;
+        top: 0;
+        right: 0;
+        height: 100vh !important;
+        z-index: 1050 !important;
+        visibility: visible !important;
+        transform: none !important;
+        /* pastikan tidak tersembunyi */
+    }
+</style>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     {{-- @stack('scripts') --}}

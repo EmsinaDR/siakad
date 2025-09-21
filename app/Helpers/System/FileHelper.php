@@ -37,11 +37,11 @@ if (!function_exists('CopyFileWa')) {
      */
     function CopyFileWa(string $namaFile, $folder = 'temp'): array
     {
-        $sourcePath = public_path($folder . '/' . $namaFile);
-        $targetPath = base_path('whatsapp/uploads/' . $namaFile);
+        $sourcePath = public_path($folder . '/' . $namaFile);  // sumber
+        $targetPath = base_path('whatsapp/uploads/' . $namaFile); // target
 
         if (!file_exists($sourcePath)) {
-            return ['status' => 'error', 'message' => "File '$namaFile' tidak ditemukan di public/temp"];
+            return ['status' => 'error', 'message' => "File '$namaFile' tidak ditemukan di $folder"];
         }
 
         if (!is_dir(dirname($targetPath))) {

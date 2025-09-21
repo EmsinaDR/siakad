@@ -107,10 +107,10 @@ Lisensi Kerjasama Tahunan dari **Ata Digital**.
 
 ---
 
-## License
+## Minat
 
-Formulir Kerjasama : [Formulir](https://forms.gle/vpRecuRHuUeehZuM6) <br>
-Proposal : [Formulir](https://forms.gle/vpRecuRHuUeehZuM6)
+Formulir Kerjasama : [lihat](https://forms.gle/vpRecuRHuUeehZuM6) <br>
+Proposal : [Lihat](https://forms.gle/vpRecuRHuUeehZuM6)
 
 ---
 

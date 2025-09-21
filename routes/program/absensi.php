@@ -87,5 +87,6 @@ Route::middleware(['web', 'auth'])->name('absensi.')->prefix('absensi')->group(f
     Route::GET('absen-guru-ajax', [App\Http\Controllers\Absensi\EabsenGuruController::class, 'IndexGuruAjax'])->name('absensi.guru.index.ajax');
     // Route::POST('store-guru-ajax-in', [App\Http\Controllers\Absensi\EabsenGuruController::class, 'storeGuruAjax'])->name('absensi.storex.guru.ajax');
     Route::resource('pulang-cepat', \App\Http\Controllers\Absensi\PulangCepatController::class)->middleware(['auth', 'verified']); //
-    Route::get('export-absensi-guru', [\App\Http\Controllers\Absensi\EabsenGuruController::class, 'ExportAbsensiGuru'])->name('export.absensi.guru');
+    // via Dompdf
+    // Route::get('export-absensi-guru', [\App\Http\Controllers\Absensi\EabsenGuruController::class, 'ExportAbsensiGuru'])->name('export.absensi.guru');
 });

@@ -36,7 +36,7 @@ class ScheduleServiceProviderClient extends ServiceProvider
             \App\Console\Commands\Absensi\RekapAbsensiSiswaBulananCommand::class,
             \App\Console\Commands\Whatsapp\ValidasiKontakCommand::class,
             \App\Console\Commands\System\CekRegistrasiCommand::class,
-            \App\Console\Commands\System\SynGitHubCommandClient::class,
+            \App\Console\Commands\System\SynGitHubClientCommand::class,
 
 
 

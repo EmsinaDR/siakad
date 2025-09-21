@@ -36,7 +36,12 @@ $urlroot = app('request')->root();
             <div class="image">
                 <a href="{{ route('profile.edit') }}">
                     {{-- blade-formatter-disable --}}
-                                <img style="width:45px" src="{{ optional($UserDetailguru)->foto ? $urlroot . '/img/guru/' . $UserDetailguru->foto : $urlroot . '/img/guru/user-guru.png' }}" class="img-circle elevation-2" alt="User Image" />
+                                <img style="width:45px"
+     src="{{ optional($UserDetailguru)->foto 
+             ? secure_url('img/guru/' . $UserDetailguru->foto) 
+             : secure_url('img/guru/user-guru.png') }}"
+     class="img-circle elevation-2" alt="User Image" />
+
 
                     {{-- blade-formatter-enable --}}
                 </a>

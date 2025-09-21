@@ -4,7 +4,7 @@ namespace App\Console\Commands\System;
 
 use Illuminate\Console\Command;
 
-class SynGitHubCommandClient extends Command
+class SynGitHubCommand extends Command
 {
     protected $signature = 'update:SynGitHub';
     protected $description = 'Sinkron kode dari GitHub ke local (cek update dulu, pull jika ada)';

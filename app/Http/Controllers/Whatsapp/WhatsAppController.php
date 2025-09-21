@@ -549,7 +549,12 @@ app.use(cors()); // izinkan semua origin
                 } elseif ($Part1 === 'Kepala') {
                     // handling cek guru
                     // FiturPaket($paket, $NoRequest);
-                    Auto_Reply_KepalaHelper($Kode, $NoRequest, $message);
+                    $dataFile = Auto_Reply_KepalaHelper($Kode, $NoRequest, $message);
+                    return response()->json([
+                        'status' => 'success',
+                        'reply' => "Dokumen siap - " . $dataFile['filename'],
+                        'file' => 'uploads/' . $dataFile['filename'], //Jika ingin kirim via Whatsapp harus simpan di folder upload whatsapp,
+                    ]);
                 } elseif ($Part1 === 'Rapat') {
                     // handling cek guru
                     switch ($Kode) {
