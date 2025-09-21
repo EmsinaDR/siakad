@@ -644,7 +644,7 @@ BLADE;
 
         foreach ($explode as $stringdata) {
             $key = trim($stringdata);
-            $hasil .= "'{$key}' => '{$key}'," . PHP_EOL;
+            $hasil .= "'{$key}' => null," . PHP_EOL;
         }
 
         return "[" . $hasil . "],";
@@ -854,6 +854,83 @@ PHP;
         $this->warn("ℹ️ Command '{$className}' sudah ada di Kernel.php.");
     }
 })->describe('Membuat file command baru');
+/*
+    |--------------------------------------------------------------------------
+    | 📌 Seeder :
+    |--------------------------------------------------------------------------
+    |
+    | Fitur :
+    | - xxxxxxxxxxx
+    | - xxxxxxxxxxx
+    |
+    | Tujuan :
+    | - xxxxxxxxxxx
+    |
+    |
+    | Penggunaan :
+    | - php artisan make:custom-seeder Vendor/DataVendor vendor "id:token:paket:trial_ends_at:nama_vendor" --force
+
+    |
+    */
+// Proses Coding
+Artisan::command('make:custom-seeder {name} {db} {fillable} {--force}', function ($name, $db, $fillable) {
+    $force = $this->option('force');
+
+    // --- Handle subfolder ---
+    $name = str_replace('\\', '/', $name);
+    $parts = explode('/', $name);
+    $className = ucfirst(array_pop($parts)) . 'Seeder';
+    $subPath = implode('/', array_map('ucfirst', $parts));
+    $fillableAdd = explode(":", $fillable);
+    $addFill = "";
+    foreach ($fillableAdd as $add) {
+        $addFill .= "'{$add}' => 'xxxxxxxxx',";
+    }
+    // $fillableAdd
+    $namespace = 'Database\\Seeders' . ($subPath ? '\\' . str_replace('/', '\\', $subPath) : '');
+    $filePath = database_path("seeders" . ($subPath ? "/$subPath" : '') . "/{$className}.php");
+
+    // --- Cegah overwrite ---
+    if (File::exists($filePath) && !$force) {
+        $this->error("❌ File '{$className}.php' sudah ada. Gunakan --force untuk menimpa.");
+        return;
+    }
+    if ($force) $this->warn("⚠️ Menimpa file '{$className}.php' karena --force dipakai.");
+
+    // --- Template file seeder ---
+    $template = <<<PHP
+<?php
+
+namespace {$namespace};
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class {$className} extends Seeder
+{
+    public function run()
+    {
+        // TODO: tambahkan data seed di sini
+        // Contoh:
+        DB::table('{$db}')->insert([
+        //     'nama_vendor' => 'Contoh Vendor',
+        //     'alamat' => 'Jl. Contoh No.1',
+        //     'kontak' => '08123456789',
+        {$addFill}
+        //     'status' => 'aktif',
+        //     'created_at' => now(),
+        //     'updated_at' => now(),
+         ]);
+
+        \$this->command->info("Seeder '{$className}' berhasil dijalankan.");
+    }
+}
+PHP;
+
+    File::ensureDirectoryExists(dirname($filePath));
+    File::put($filePath, $template);
+    $this->info("✅ Custom seeder '{$className}' berhasil dibuat di: {$filePath}");
+})->describe('Membuat file seeder baru secara custom');
 /*
     |--------------------------------------------------------------------------
     | 📌 Helpers :
@@ -2229,3 +2306,78 @@ PHP
         }
     }
 })->describe('Membuat custom seeder di folder yang ditentukan dengan sub-namespace otomatis, termasuk RealUserAdminSeeder & RealGuruSeeder');
+
+/*
+    |--------------------------------------------------------------------------
+    | 📌 Migrasi :
+    |--------------------------------------------------------------------------
+    |
+    | Fitur :
+    | - xxxxxxxxxxx
+    | - xxxxxxxxxxx
+    |
+    | Tujuan :
+    | - xxxxxxxxxxx
+    |
+    |
+    | Penggunaan :
+    | - xxxxxxxxxxx
+    |
+    */
+// Proses Coding
+Artisan::command('make:custom-migration {name} {namaapps} {--force}', function ($name, $namaapps) {
+    $force = $this->option('force');
+
+    // --- Handle Subfolder ---
+    $name = str_replace('\\', '/', $name);
+    $parts = explode('/', $name);
+    $classBaseName = ucfirst(array_pop($parts));
+    $subPath = implode('/', array_map('ucfirst', $parts));
+
+    $timestamp = date('Y_m_d_His');
+    $fileName = $timestamp . '_' . Str::snake($classBaseName) . '.php';
+    $dirPath = database_path("migrations" . ($subPath ? "/$subPath" : ''));
+
+    $filePath = $dirPath . '/' . $fileName;
+
+    // --- Cegah overwrite ---
+    if (File::exists($filePath) && !$force) {
+        $this->error("❌ File migration '{$fileName}' sudah ada. Gunakan --force untuk menimpa.");
+        return;
+    }
+    if ($force) $this->warn("⚠️ Menimpa file migration '{$fileName}' karena --force dipakai.");
+
+    // --- Template file migration ---
+    $className = $classBaseName . 'Table';
+    $namespace = $subPath ? 'Database\\Migrations\\' . str_replace('/', '\\', $subPath) : 'Database\\Migrations';
+
+    $template = <<<PHP
+<?php
+
+namespace {$namespace};
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class {$className} extends Migration
+{
+    public function up()
+    {
+        Schema::create('{$classBaseName}', function (Blueprint \$table) {
+            \$table->id();
+            \$table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('{$classBaseName}');
+    }
+}
+PHP;
+
+    File::ensureDirectoryExists($dirPath);
+    File::put($filePath, $template);
+    $this->info("✅ Custom migration '{$className}' berhasil dibuat di: {$filePath}");
+})->describe('Membuat file migration baru dengan subfolder custom');

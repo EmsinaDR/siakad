@@ -11,7 +11,12 @@ class KritikSaran extends Model
 
     protected $fillable = [
         // Tentukan field yang bisa diisi
-        'detailsiswa_id','detailguru_id','nohp','bidang','kritik','saran'
+        'detailsiswa_id',
+        'detailguru_id',
+        'nohp',
+        'bidang',
+        'kritik',
+        'saran'
     ];
 
     protected $table = 'kritik_saran';  // Misalkan model ini menggunakan nama tabel khusus

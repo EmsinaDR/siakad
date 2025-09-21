@@ -1082,3 +1082,46 @@ if (!function_exists('cek_hitung_selisih')) {
         ];
     }
 }
+/*
+    |--------------------------------------------------------------------------
+    | 📌 Format Pesan :
+    |--------------------------------------------------------------------------
+    |
+    | Fitur :
+    | - xxxxxxxxxxx
+    | - xxxxxxxxxxx
+    |
+    | Tujuan :
+    | - xxxxxxxxxxx
+    |
+    |
+    | Penggunaan :
+    | - xxxxxxxxxxx
+    |
+    */
+// Proses Coding
+if (!function_exists('string_to_array')) {
+    /**
+     * Ubah string "key:value/key2:value2" jadi array associatif
+     *
+     * @param string $data
+     * @param string $itemSeparator Separator tiap item, default '/'
+     * @param string $keyValueSeparator Separator key/value, default ':'
+     * @return array
+     */
+    /*
+    $data = "nama_siswa:danyrpseta/alamat:dede";
+    $array = string_to_assoc($data);
+    */
+    function string_to_array(string $data, string $itemSeparator = '/', string $keyValueSeparator = ':'): array
+    {
+        $result = [];
+        foreach (explode($itemSeparator, $data) as $item) {
+            if (str_contains($item, $keyValueSeparator)) {
+                [$key, $value] = explode($keyValueSeparator, $item, 2);
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+}

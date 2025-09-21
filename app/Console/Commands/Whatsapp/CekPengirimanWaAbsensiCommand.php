@@ -17,6 +17,9 @@ class CekPengirimanWaAbsensiCommand extends Command
 
         foreach ($CekWaAbsensi as $kirimWa) {
             $siswa = Detailsiswa::find($kirimWa->detailsiswa_id);
+            $nama = $kirimWa->detailsiswa->nama_siswa;
+            $jam = \Carbon\Carbon::parse($kirimWa->created_at)->translatedFormat('H:i:s');
+            $tanggal = \Carbon\Carbon::parse($kirimWa->created_at)->translatedFormat('l, d F Y');
             if (!config('whatsappSession.WhatsappDev')) {
                 //$sessions = getWaSession($siswa->tingkat_id); // by tingkat ada di dalamnya
                 //$sessions = config('whatsappSession.IdWaUtama');
@@ -34,8 +37,18 @@ class CekPengirimanWaAbsensiCommand extends Command
                 'pulang_cepat'   => $kirimWa->pulang_cepat,
                 'pulang_telat'   => $kirimWa->pulang_telat,
             ];
+
+            $isi =
+                "Informasi untuk Bp / Ibu, kami sampaikan terkait dengan absensi kehadiran ananda {$nama} sebagai berikut : \n\n" .
+                "📝 Nama\t\t: {$nama}\n" .
+                "🏫 Kelas\t\t: {$siswa->kelas->kelas}\n" .
+                "📅 Tanggal\t: {$tanggal}\n" .
+                "⏰ Jam\t\t\t: {$jam}\n" .
+                "\n" . str_repeat("─", 25) . "\n" .
+                "Kami sampaikan mohon maaf keterlambatan pengiriman pesan ini. Semoga ananda {$nama} tetap selalu disiplin dan menaati aturan.\n Terima Kasih\n\n";
+            $message = format_pesan('LAPORAN ABSENSI HARI INI', $isi);
             // $ResponWa = kirimPesanAbsensi($siswa->id, $data);
-            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, PesanAbsensi($siswa->id));
+            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, $message);
             // langsung update field whatsapp_response
             Eabsen::where('id', $kirimWa->id)->update([
                 'whatsapp_response' => $result['status'] ?? null,

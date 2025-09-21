@@ -309,7 +309,7 @@ if (!function_exists('format_pesan')) {
             "*Assalamu'alaikum Wr.Wb.*\n" .
             $isi .
             "\n\n" .
-            "*Wasssalamu'alaikum Wr.Wb.*\n" .
+            "*Wassalamu'alaikum Wr.Wb.*\n" .
             "\n" . str_repeat("─", 25) . "\n" .
             "✍️ Dikirim oleh:\n" .
             "*Boot Assistant Pelayanan {$Identitas->namasek}*";

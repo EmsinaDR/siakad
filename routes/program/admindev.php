@@ -30,5 +30,7 @@ Route::middleware(['web', 'auth', 'CekDataSekolah', 'verified', 'is_admindev'])-
     Route::resource('modul-app', \App\Http\Controllers\AdminDev\ModulController::class)->middleware(['auth', 'CekDataSekolah', 'verified']); //Belum
     Route::post('modul-ubah-masal', [ModulController::class, 'ModulUbahMasal'])->name('modul.ubah.masal');
     Route::resource('sosialisasi-vendor', \App\Http\Controllers\AdminDev\SosialisasiAdminDevController::class)->middleware(['auth', 'verified']); //Belum
+    Route::resource('data-vendor', \App\Http\Controllers\AdminDev\DataVendorController::class)->middleware(['auth', 'verified']); //Belum
     
+
 });

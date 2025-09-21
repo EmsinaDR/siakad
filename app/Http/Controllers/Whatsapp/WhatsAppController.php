@@ -417,15 +417,36 @@ app.use(cors()); // izinkan semua origin
         $nosessionNo = $nosession[0];
         $number = $request->query('number');
         $message = $request->query('message');
+        if (!$message) {
+            $message =  'Media File';
+        }
+        // Kode Pesan masuk ada gambar ( file pathnya ga )
+        $filePath = $request->query('filePath');
+        $newFilePath = null;
+        // Kalau ada filePath, pindahkan ke folder basepath Laravel
+        if ($filePath && file_exists($filePath)) {
+            $filename = basename($filePath);
+            $reply = "Balasan otomatis dari Laravel";
+            $destination = storage_path('app/public/uploads/' . $filename);
+            // Pindahkan file dari NodeJS WA server ke storage Laravel
+            copy($filePath, $destination); // bisa pakai move() kalau mau hapus file lama
+            $newFilePath = $destination;
+            return response()->json([
+                'reply' => $filePath,
+                // 'file' => $newFilePath
+            ]);
+            // $message = 'Media File';
+            return $message;
+        }
 
         // Cek single Session tidak
         if (!config('whatsappSession.SingleSession')) {
             // Pengecekan sesi yang digunakan
             if ($nosessionNo === config('whatsappSession.DevNoHPLogin')) {
-                $sessions = config('whatsappSession.IdWaUtama');
+                $sessions = config('whatsappSession.IdWaUtama'); // untuk dev syarat dev harus login
             } else {
                 $cekSession = WhatsAppSession::where('no_hp', $nosessionNo)->first();
-                $sessions = $cekSession->akun_id;
+                $sessions = $cekSession->akun_id; // untuk umum
             }
         } else {
             $sessions = config('whatsappSession.IdWaUtama');

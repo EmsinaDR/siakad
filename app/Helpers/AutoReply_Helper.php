@@ -289,6 +289,25 @@ if (!function_exists('HelpPesan')) {
                     "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
                 return $pesanKiriman;
                 break;
+            case 'Media File':
+                //  Auto_Reply_VendorHelper
+                $pesanKiriman =  "" .
+                    "Media telah tersimpan di server\n" .
+                    "\n\n";
+                return format_pesan("Penyimpanan Media", $pesanKiriman);
+                break;
+            case 'Help Media':
+                //  Auto_Reply_VendorHelper
+                $pesanKiriman =  "" .
+                    "Pada bagian ini bapa ibu bisa menyimpan file / dokumen untuk data dokumentasi sekolah sesuai keterangan / folder masing masing\n" .
+                    "Penggunaan nya kirim media dengan caption text\n" .
+                    "Contoh Caption:\n" .
+                    "PPDB/Sosialisasi/SDN 1 Banjarharjo\n" .
+                    "Semua terdiri dari 3 folder, jadi garis */* merupakan folder yang akan dibuat\n" .
+                    "Jika penulisan PPDB, artinya 1 folder saja dan \n" .
+                    "- Shutdown Service\Help Control\n";
+                return format_pesan("Penyimpanan Media", $pesanKiriman);
+                break;
             default:
                 $pesanKiriman = "================================\n" .
                     "📌 *INFORMASI*\n" .

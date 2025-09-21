@@ -1,22 +1,20 @@
 <?php
 
-namespace App\Models\Program\Tips;
+namespace App\Models\AdminDev;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TipsSiswa extends Model
+class DataVendor extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         // Tentukan field yang bisa diisi
-        'judul',
-        'content',
-        'tag'
+        'fillable'
     ];
 
-    protected $table = 'tips_siswa';  // Misalkan model ini menggunakan nama tabel khusus
+    protected $table = 'data_vendor';  // Misalkan model ini menggunakan nama tabel khusus
 
     protected $primaryKey = 'id';  // Sesuaikan dengan primary key yang kamu gunakan
 

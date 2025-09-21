@@ -13,12 +13,16 @@ class LaporanAbsensiGuruCommand extends Command
 
     public function handle()
     {
-        $pesan = laporan_absensi_guru();
-        $catatan =
-            "*Catatan* \n" .
-            "*Format Baca* : \nKode Guru / Waktu Absensi / Selisih \n" .
-            "*Waktu absen* \t\t\t: 07:00 WIB \n" .
-            "*Toleransi* \t\t\t\t\t: 5 Menit";
+        $pesan = laporan_absensi_guru(); //'2025-09-19'
+        $pesan = laporan_absensi_guru('2025-09-19');
+        $pesan = json_encode(getAbsensiPivot('2025-09', 'AS'));
+        $dataTambahan = [
+            'variabel' => 'xxxx'
+        ];
+        $folder = public_path('namafolder');
+        $view = 'fileview'; // Contoh = role.program.surat.siswa.surat-pindah-sekolah
+        $filename = 'namafile';
+        DomExport($filename, $dataTambahan, $view, $folder);
         // $pesan .= "{$AbsGuru->guru->nama_guru} : {$waktu} / {$AbsGuru->telat}\n";
         // // $JumlahHadir;
 
@@ -29,9 +33,7 @@ class LaporanAbsensiGuruCommand extends Command
             $NoTujuan = config('whatsappSession.DevNomorTujuan');
         }
         $PesanKirim =
-            "Berikut ini informasi laporan kehadiran guru : \n" .
             "{$pesan} \n" .
-            "{$catatan} \n" .
             "\n";
 
         $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, format_pesan('Laporan Absensi Guru', $PesanKirim));

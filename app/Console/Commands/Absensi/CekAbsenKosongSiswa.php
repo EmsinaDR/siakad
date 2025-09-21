@@ -24,7 +24,7 @@ class CekAbsenKosongSiswa extends Command
         $jamBatasPulang  = '13:00';
         // dd($jamBatasMasuk);
 
-        if ($jamSekarang >= '06:00' && $jamSekarang < '10:00') {
+        if ($jamSekarang >= '01:00' && $jamSekarang < '10:00') {
             // Sudah lewat jam masuk, belum waktu pulang
             $this->prosesAbsen('masuk');
         }
@@ -92,14 +92,15 @@ class CekAbsenKosongSiswa extends Command
                 $sessions = config('whatsappSession.IdWaUtama');
                 $NoTujuan = config('whatsappSession.DevNomorTujuan');
             }
-            // Pesan Ke Ortu
-            // $pesanKiriman = format_pesan('Laporan Absensi', $message);
-            // $ResponWa = WhatsApp::sendMessage($sessions, $NoTujuan, $pesanKiriman);
-            // // langsung update field whatsapp_response
-            // $Absen->update([
-            //     'whatsapp_response' => $ResponWa['status'] ?? null,
-            // ]);
+            // Kirim Ke ortu : Pesan Ke Ortu
+            $pesanKiriman = format_pesan('Laporan Absensi', $message);
+            $ResponWa = WhatsApp::sendMessage($sessions, $NoTujuan, $pesanKiriman);
+            // langsung update field whatsapp_response
+            $Absen->update([
+                'whatsapp_response' => $ResponWa['status'] ?? null,
+            ]);
         }
+        // Rekap semua Kelas
         $jumlahSiswa = count($siswaBelumAbsen);
         $kelasList = Ekelas::where('tapel_id', $etapels->id)->get();
         $SiswaKelas = '';
@@ -122,17 +123,19 @@ class CekAbsenKosongSiswa extends Command
             ->groupBy('kelas_id', 'absen')
             ->get();
 
+        // Tujuan Kepala
         // Ambil daftar kelas sekaligus, supaya bisa dipanggil nama kelasnya
         $kelasList = Ekelas::where('tapel_id', $etapels->id ?? null)->get()->keyBy('id');
 
         $pesanKelas = "\n\n\n";
 
         foreach ($kelasList as $kelas) {
-            $siswaAlfaSystem = Detailsiswa::whereNotIn('id', $sudahAbsen)->where('kelas_id', $kelas->id)->get();
+            // $siswaAlfaSystem = Detailsiswa::whereNotIn('id', $sudahAbsen)->where('kelas_id', $kelas->id)->get();
+            $DataEabsen = Eabsen::where('absen', 'alfa')->where('kelas_id', $kelas->id)->get();
             // dd($siswaAlfaSystem);
             $daftarNama = '';
-            foreach ($siswaAlfaSystem as $index => $siswaNotAbsen) {
-                $daftarNama .= $index + 1 . "." . $siswaNotAbsen->nama_siswa . "\n";
+            foreach ($DataEabsen as $index => $siswaNotAbsen) {
+                $daftarNama .= $index + 1 . "." . $siswaNotAbsen->detailsiswa->nama_siswa . "\n";
             }
             // Filter hasil rekap sesuai kelas ini
             $dataKelas = $rekapPerKelas->where('kelas_id', $kelas->id);
@@ -143,12 +146,11 @@ class CekAbsenKosongSiswa extends Command
             foreach ($dataKelas as $item) {
                 $status[strtolower($item->absen)] = $item->total;
             }
-
             $pesanKelas .= "==============================\n";
             $pesanKelas .= "🏫 *Rekap Absensi Kelas {$kelas->kelas}*\n";
             $pesanKelas .= "==============================\n\n";
             $pesanKelas .= "✅ Hadir \t\t\t\t\t\t: {$status['hadir']}\n";
-            $pesanKelas .= "❌ Alfa  \t\t\t\t\t\t\t: {$status['alfa']}\n";
+            $pesanKelas .= "❌ Alfa  \t\t\t\t\t\t\t: {$DataEabsen->count()}\n";
             $pesanKelas .= "📝 Ijin  \t\t\t\t\t\t\t: {$status['ijin']}\n";
             $pesanKelas .= "🤒 Sakit \t\t\t\t\t\t: {$status['sakit']}\n\n";
             $pesanKelas .= "Berikut Daftar Nama Siswa Alfa melalui Sistem :\n";
@@ -160,11 +162,11 @@ class CekAbsenKosongSiswa extends Command
         $pesan = $pesanAlfa . $pesanKelas . $footerPesan;
 
         if (!config('whatsappSession.WhatsappDev')) {
-            $NoPenerima = $Identitas->phone;
+            $NoPenerima = config('whatsappSession.SekolahNoTujuan');
         } else {
             $NoPenerima = config('whatsappSession.DevNomorTujuan');
         }
-
+        // Kirim Ke kepala
         \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, config('whatsappSession.NoKepala'), $pesan);
         /*
             |--------------------------------------------------------------------------
@@ -179,12 +181,11 @@ class CekAbsenKosongSiswa extends Command
         $pesanWaliKelas = "\n\n\n";
 
         foreach ($kelasList as $kelas) {
-
-            $siswaAlfaSystem = Detailsiswa::whereNotIn('id', $sudahAbsen)->where('kelas_id', $kelas->id)->get();
+            $DataEabsen = Eabsen::where('absen', 'alfa')->where('kelas_id', $kelas->id)->get();
             // dd($siswaAlfaSystem);
             $daftarNama = '';
-            foreach ($siswaAlfaSystem as $index => $siswaNotAbsen) {
-                $daftarNama .= $index + 1 . "." . $siswaNotAbsen->nama_siswa . "\n";
+            foreach ($DataEabsen as $index => $siswaNotAbsen) {
+                $daftarNama .= $index + 1 . "." . $siswaNotAbsen->detailsiswa->nama_siswa . "\n";
             }
             // Filter hasil rekap sesuai kelas ini
             $dataKelas = $rekapPerKelas->where('kelas_id', $kelas->id);

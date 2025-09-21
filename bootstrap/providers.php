@@ -1,5 +1,5 @@
 <?php
-if (config('session.dev')) {
+if (config('session.client_server')) {
 
     return [
         // Default Absensi dan Normalisasi

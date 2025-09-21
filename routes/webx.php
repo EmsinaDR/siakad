@@ -569,6 +569,7 @@ Route::prefix('program')->middleware(['auth', 'CekDataSekolah', 'token.check', '
             }
         );
         Route::resource('pesan-tips', \App\Http\Controllers\Program\Tips\TipsSiswaController::class)->middleware(['auth', 'verified']);
+        Route::resource('kritik-saran', \App\Http\Controllers\Tools\KirikdanSaran\KritikSaranController::class)->middleware(['auth', 'verified']);
     }
 );
 Route::get('/program/pkks/data-view-pkks/{id}', [\App\Http\Controllers\Program\StrukturSekolah\DataStrukturSekolahController::class, 'getStrukturData'])->middleware(['auth', 'CekDataSekolah', 'token.check', 'verified']);
@@ -1071,4 +1072,3 @@ Route::get('/debug-session', function () {
         'session' => session()->all()
     ]);
 });
-Route::resource('kritik-saran', \App\Http\Controllers\Tools\KirikdanSaran\KritikSaranController::class)->middleware(['auth', 'verified']);

@@ -348,6 +348,7 @@ class EabsenController extends Controller
     public function storeSiswaAjax(Request $request)
     {
         $request->validate(['nis' => 'required']);
+        // $datasiswa = Detailsiswa::with('Detailsiswatokelas')->where('nis', $request->datanis)->first();
         $siswa = Detailsiswa::with('Detailsiswatokelas')->where('nis', $request->nis)->first();
 
         if (!$siswa) {
@@ -358,58 +359,44 @@ class EabsenController extends Controller
         }
 
         $jamSekarang    = now();
-        $jamBatasMasuk  = Carbon::today()->setTimeFromTimeString('07:05');  // jam batas masuk
+        // $jamBatasMasuk  = Carbon::today()->setTimeFromTimeString('07:05');  // ikut tanggal hari ini
+        // $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');  // ikut tanggal hari ini
 
-        // Tentukan jam pulang sesuai hari
+
+        $jamBatasMasuk  = Carbon::today()->setTimeFromTimeString('07:05');  // ikut tanggal hari ini
+
         if (is_day('sabtu')) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');  // ikut tanggal hari ini
         } elseif (is_day("jum'at")) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');  // ikut tanggal hari ini
         } else {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');  // ikut tanggal hari ini
         }
 
         // ==========================
-        // 1. Cek sudah absen hari ini
+        // 1. Tentukan jenis absen
         // ==========================
-        $sudahAbsenMasuk = Eabsen::whereDate('created_at', today())
-            ->where('detailsiswa_id', $siswa->id)
-            ->where('jenis_absen', 'masuk')
-            ->exists();
-
-        $sudahAbsenPulang = Eabsen::whereDate('created_at', today())
-            ->where('detailsiswa_id', $siswa->id)
-            ->where('jenis_absen', 'pulang')
-            ->exists();
-
-        // ==========================
-        // 2. Tentukan jenis absen
-        // ==========================
-        if (!$sudahAbsenMasuk) {
+        if ($jamSekarang->lessThan($jamBatasPulang)) {
+            // Kalau masih sebelum jam pulang → anggap absen masuk
             $jenisAbsen = 'masuk';
-        } elseif (!$sudahAbsenPulang) {
-            $jenisAbsen = 'pulang';
         } else {
+            // Kalau sudah lewat jam pulang → anggap absen pulang
+            $jenisAbsen = 'pulang';
+        }
+
+        // ==========================
+        // 2. Cek sudah absen belum
+        // ==========================
+        $sudahAbsen = Eabsen::whereDate('created_at', today())
+            ->where('detailsiswa_id', $siswa->id)
+            ->where('jenis_absen', $jenisAbsen)
+            ->exists();
+
+        if ($sudahAbsen) {
             return response()->json([
                 'error'   => false,
-                'message' => "⚠️ Sudah absen hari ini!",
+                'message' => "⚠️ Sudah absen $jenisAbsen hari ini!",
             ]);
-        }
-        if ($jenisAbsen === 'masuk') {
-            // Simpan seperti biasa
-        } else { // pulang
-            $absenMasuk = Eabsen::whereDate('created_at', today())
-                ->where('detailsiswa_id', $siswa->id)
-                ->where('jenis_absen', 'masuk')
-                ->first();
-
-            $diff = $absenMasuk->waktu_absen->diffInMinutes(now());
-            if ($diff < 240) { // 4 jam = 240 menit
-                return response()->json([
-                    'error' => true,
-                    'message' => "⚠️ Belum waktunya pulang, tunggu minimal 4 jam sejak absen masuk!",
-                ]);
-            }
         }
 
         // ==========================
@@ -423,26 +410,29 @@ class EabsenController extends Controller
             if ($jamSekarang->greaterThan($jamBatasMasuk)) {
                 $telatMenit = $jamBatasMasuk->diffInMinutes($jamSekarang);
             }
-        } else { // pulang
+        } else {
             if ($jamSekarang->lessThan($jamBatasPulang)) {
-                $pulangCepat = $jamBatasPulang->diffInMinutes($jamSekarang);
+                $pulangCepat = $jamSekarang->diffInMinutes($jamBatasPulang);
             } elseif ($jamSekarang->greaterThan($jamBatasPulang)) {
-                $pulangTelat = $jamSekarang->diffInMinutes($jamBatasPulang);
+                $pulangTelat = $jamBatasPulang->diffInMinutes($jamSekarang);
             }
         }
 
         // ==========================
         // 4. Simpan ke database
+        // Pastikan model Eabsen punya $fillable untuk 'telat', 'pulang_cepat', 'pulang_telat'
+        // dan di-cast sebagai integer, bukan boolean
         // ==========================
         $etapels = Etapel::where('aktiv', 'Y')->first();
 
         $data = [
-            'jenisAbsen' => $jenisAbsen,
-            'telat' => $telatMenit,
+        'jenisAbsen' => $jenisAbsen,
+            'telat' => number_format($telatMenit, 0),
             'waktu' => $jenisAbsen === 'masuk' ? 'Pagi' : 'Siang',
-            'pulang_cepat' => $pulangCepat,
-            'pulang_telat' => $pulangTelat,
+            'pulang_cepat'   => $pulangCepat,
+            'pulang_telat'   => $pulangTelat,
         ];
+
 
         $absen = Eabsen::create([
             'detailsiswa_id' => $siswa->id,
@@ -456,16 +446,15 @@ class EabsenController extends Controller
             'pulang_cepat'   => $pulangCepat,
             'pulang_telat'   => $pulangTelat,
         ]);
-
         $ResponWa = kirimPesanAbsensi($siswa->id, $data);
-
+        // langsung update field whatsapp_response
         $absen->update([
             'whatsapp_response' => $ResponWa['status'] ?? null,
         ]);
+        // $result = \App\Models\Whatsapp\WhatsApp::sendMessage(config('whatsappSession.IdWaUtama'), '6285329860005', $pulangCepat . ' - ' . $pulangTelat);
 
         HapusCacheDenganTag('chace_AbsensiHaraIni');
         HapusCacheDenganTag('chacprosesabsen');
-
         return response()->json([
             'success' => true,
             'message' => "✅ Absen $jenisAbsen berhasil!",

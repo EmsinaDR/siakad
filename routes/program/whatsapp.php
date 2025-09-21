@@ -26,6 +26,7 @@ Route::middleware(['web'])->post('/restart-wa-server', [\App\Http\Controllers\Wh
 Route::middleware(['web'])->post('/hapus-sesi-wa', [\App\Http\Controllers\Whatsapp\WhatsAppSessionController::class, 'hapusSession'])->name('whatsapp.hapussession'); // Menghapus sesi
 Route::middleware(['web'])->post('membuat-akun-baru', [\App\Http\Controllers\Whatsapp\WhatsAppSessionController::class, 'AkaunBaru'])->name('AkaunBaru'); // Menghapus sesi
 Route::middleware('web')->get('/whatsapp/auto-reply', [\App\Http\Controllers\Whatsapp\WhatsAppController::class, 'testAutoReply'])->name('whatsapp.autoreply');
+Route::middleware('web')->post('/whatsapp/auto-reply-post', [\App\Http\Controllers\Whatsapp\WhatsAppController::class, 'testAutoReply'])->name('whatsapp.autoreply.post');
 // Route::middleware(['web'])->resource('whatsapp/penjadwalan', \App\Http\Controllers\Whatsapp\PenjadwalanPesanController::class); // Penjadwalan internal
 Route::middleware(['web'])->resource('whatsapp/penjadwalan-ppdb', \App\Http\Controllers\Whatsapp\PenjadwalanWhatsappPPDBController::class); // Penjadwalan Sosialisasi
 // Route untuk ambil data siswa via AJAX (berdasarkan NIS)

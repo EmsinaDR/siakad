@@ -35,9 +35,9 @@ if (!function_exists('Auto_Reply_KepalaHelper')) {
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, "6285329860005", format_pesan('Laporan Absensi', $PesanKirim));
                 // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, format_pesan('Laporan Absensi', $PesanKirim));
                 break;
-            case 'LBKG':
+            case 'LABG':
                 # code...
-                // LBKG / Kepala / Kode Guru / Bulan
+                // LABG / Kepala / Kode Guru / Bulan
                 /*
                     $kode_guru = $pesan[2];  -> xxxxxxxxxxxx
                     $bulan = $pesan[3];  -> xxxxxxxxxxxx
@@ -50,7 +50,7 @@ if (!function_exists('Auto_Reply_KepalaHelper')) {
                     $xxxxxxx = $pesan[10];  -> xxxxxxxxxxxx
                 */
                 $kode_guru = $pesan[2];
-                $bulan = $pesan[3];
+                $bulan = $pesan[3] ?? null;
                 $output = absensi_guru_bulanan($kode_guru, $bulan);
                 $PesanKirim =
                     "$output \n" .
@@ -88,15 +88,29 @@ if (!function_exists('absensi_guru_bulanan')) {
             ->whereMonth('created_at', $bulan)
             ->OrderBy('created_at', 'DESC')
             ->sum('telat');
+        $RekapPulangCepat = EabsenGuru::with('guru')
+            ->where('detailguru_id', $DataGuru->id)
+            ->whereMonth('created_at', $bulan)
+            ->OrderBy('created_at', 'DESC')
+            ->sum('pulang_cepat');
+        $RekapPulangTelat = (EabsenGuru::with('guru')
+            ->where('detailguru_id', $DataGuru->id)
+            ->whereMonth('created_at', $bulan)
+            ->OrderBy('created_at', 'DESC')
+            ->sum('pulang_telat')) * -1;
         $namaBulan = bulanIndo($bulan);
         $jam = number_format($RekapTelat / 60, 2);
+        $jamPulangCepat = number_format($RekapPulangCepat / 60, 2);
+        $jamPulangTelat = number_format($RekapPulangTelat / 60, 2);
         $HitunganTelat =
-            "*Akumulasi Waktu Telat :*\n" .
-            "Akumulasi telat dalam bulan $namaBulan : \n{$RekapTelat} Menit / {$jam} Jam \n" .
+            "*Akumulasi Waktu bulan $namaBulan :*\n" .
+            "*Telat* : \n{$RekapTelat} Menit / {$jam} Jam \n" .
+            "*Pulang Cepat* : \n{$RekapPulangCepat} Menit / {$jamPulangCepat} Jam \n" .
+            "*Pulang Telat* : \n{$RekapPulangTelat} Menit / {$jamPulangTelat} Jam \n" .
             "\n" . str_repeat("─", 25) . "\n";
         $pesan = '';
         $pesan .= "\n" . str_repeat("_", 35) . "\n";
-        $pesan .= "Nama Guru : *{$DataGuru->nama_guru}, {$DataGuru->gelar}*\n";
+        $pesan .= "👨‍🏫 Nama Guru : *{$DataGuru->nama_guru}, {$DataGuru->gelar}*\n";
         $pesan .= str_repeat("_", 35) . "\n";
 
         foreach ($AbsGurus as $tanggal => $listAbsensi) {
@@ -120,10 +134,10 @@ if (!function_exists('absensi_guru_bulanan')) {
                         $berangkatAwal = "\n\t\t\t🏆 Lebih Cepat {$waktucepat} m (*MC*)";
                         $keterangan = "{$berangkatAwal}";
                     } elseif ($selisihMenit > 25) {
-                        $icon = $AbsGuru->telat > 0 ? "⚠️" : "✅";
+                        $icon = $selisihMenit > 25 ? "✅" : "⚠️";
                         $keterangan = "{$selisihMenit} m (*MN*)";
                     } elseif ($selisihMenit >= 0) {
-                        $icon = $AbsGuru->telat > 0 ? "✅" : "⚠️";
+                        $icon = $selisihMenit > 0 ? "✅" : "⚠️";
                         $keterangan = "{$selisihMenit} m (*MN*)";
                     } else {
                         $icon = $AbsGuru->telat > 0 ?  "✅" : "⚠️";
@@ -133,12 +147,12 @@ if (!function_exists('absensi_guru_bulanan')) {
                     $absenTimePulang = Carbon::parse($AbsGuru->created_at);
                     $batasWaktuPulang = Carbon::parse($AbsGuru->created_at)->setTime(13, 15);
                     $selisihMenit = (int) round($absenTime->diffInMinutes($batasWaktuPulang, false));
-                    if ($AbsGuru->pulang_telat >= 60) {
-                        $icon = $AbsGuru->pulang_telat >= 60 ? "🏆 " : "⚠️";
+                    if ($AbsGuru->pulang_telat >= -60) {
+                        $icon = $AbsGuru->pulang_telat >= -60 ? "✅ " : "⚠️";
                         $datatelat = $AbsGuru->pulang_telat - 60;
                         $lembur = "\n\t\t\t🏆 Lembur {$datatelat} *(L)*";
                         $keterangan = "{$lembur} / {$AbsGuru->datatelat} ";
-                    } elseif ($AbsGuru->pulang_telat > 0) {
+                    } elseif ($AbsGuru->pulang_telat >= 0) {
                         $icon = $AbsGuru->pulang_telat > 0 ? "✅" : "⚠️";
                         $lembur = "Pulang cepat";
                         $keterangan = "{$AbsGuru->pulang_telat} *(PN)*";
@@ -153,10 +167,9 @@ if (!function_exists('absensi_guru_bulanan')) {
             }
         }
 
-
         $catatan =
-            "*Catatan :* \n" .
-            "*- Format Baca* : \nKode Guru / Waktu Absensi / Selisih \n" .
+            "📝 *Catatan :* \n" .
+            // "*- Format Baca* : \nKode Guru / Waktu Absensi / Selisih \n" .
             "*- Waktu absen Masuk* \t\t\t: 07:00 WIB \n" .
             "*- Waktu absen Pulang* \t\t\t: 13:00 WIB \n" .
             "*- Toleransi* \t\t\t\t\t\t\t\t\t\t: 5 Menit\n" .
@@ -165,8 +178,9 @@ if (!function_exists('absensi_guru_bulanan')) {
             "⚠️ \t\t\t\t\t: Telat\n" .
             "(*MN*): Masuk Normal\n" .
             "(*MT*): Masuk Telat\n" .
-            "(*PC*): Pulang Cepat\n";
-        "(*PN*): Pulang Normal\n";
+            "(*PC*): Pulang Cepat\n" .
+            "(*PN*): Pulang Normal\n" .
+            "_Waktu selisih dalam detik_.\n";
 
         $sessions = config('whatsappSession.IdWaUtama');
         $NoTujuan = !config('whatsappSession.WhatsappDev')
@@ -183,6 +197,7 @@ if (!function_exists('absensi_guru_bulanan')) {
         return $PesanKirim;
     }
 }
+// Tanggal kosong brrt hari ini All Guru
 if (!function_exists('laporan_absensi_guru')) {
     function laporan_absensi_guru($tanggal = null)
     {
@@ -192,37 +207,115 @@ if (!function_exists('laporan_absensi_guru')) {
         $AbsGurus = EabsenGuru::with('guru')
             ->whereDate('created_at', $tanggal)
             ->get();
+        if (!$AbsGurus || $AbsGurus->empty()) {
+            $PesanKirim =
+                "\nMohon maaf untuk saat ini *Belum Ada Data Tersedia* \n" .
+                "\n\n";
+        } else {
+            $pesan = '';
+            foreach ($AbsGurus as $AbsGuru) {
+                $waktu = Carbon::parse($AbsGuru->created_at)->format('H:i');
+                $jenis_absen = ucfirst($AbsGuru->jenis_absen);
+                $absenTime = Carbon::parse($waktu);
+                $batasWaktu = Carbon::parse('07:05');
 
-        $pesan = '';
-        foreach ($AbsGurus as $AbsGuru) {
-            $waktu = Carbon::parse($AbsGuru->created_at)->format('H:i');
-            $jenis_absen = ucfirst($AbsGuru->jenis_absen);
-            $absenTime = Carbon::parse($waktu);
-            $batasWaktu = Carbon::parse('07:05');
+                $selisihMenit = $absenTime->diffInMinutes($batasWaktu, false);
+                // false supaya bisa negatif jika datang lebih awal
 
-            $selisihMenit = $absenTime->diffInMinutes($batasWaktu, false);
-            // false supaya bisa negatif jika datang lebih awal
+                $pesan .= "{$AbsGuru->guru->kode_guru} \t\t\t: {$jenis_absen} / {$waktu} WIB / {$selisihMenit} m\n";
+            }
 
-            $pesan .= "{$AbsGuru->guru->kode_guru} \t\t\t: {$jenis_absen} / {$waktu} WIB / {$selisihMenit} m\n";
+
+            $catatan =
+                "*Catatan* \n" .
+                "*Format Baca* : \nKode Guru / Waktu Absensi / Selisih \n" .
+                "*Waktu Absen Masuk* \t\t\t: 07:00 WIB \n" .
+                "*Waktu Absen Pulang* \t\t\t: \n" .
+                "Masuk \t\t\t\t\t\t\t: 07:00 WIB \n" .
+                "Pulang \t\t\t\t\t\t: 13:00 WIB \n" .
+                "Jum'at \t\t\t\t\t\t\t: 11:15 WIB \n" .
+                "Sabtu \t\t\t\t\t\t\t: 12:30 WIB \n" .
+                "*Toleransi* \t\t\t\t\t: 5 Menit";
+            // $sessions = config('whatsappSession.IdWaUtama');
+            // $NoTujuan = !config('whatsappSession.WhatsappDev') ? config('whatsappSession.NoKepala') config('whatsappSession.DevNomorTujuan');
+            $PesanKirim =
+                "Berikut ini informasi laporan kehadiran guru : \n" .
+                "{$pesan} \n" .
+                "{$catatan} \n\n";
         }
-
-        $catatan =
-            "*Catatan* \n" .
-            "*Format Baca* : \nKode Guru / Waktu Absensi / Selisih \n" .
-            "*Waktu absen* \t\t\t: 07:00 WIB \n" .
-            "*Toleransi* \t\t\t\t\t: 5 Menit";
-
-        $sessions = config('whatsappSession.IdWaUtama');
-        $NoTujuan = !config('whatsappSession.WhatsappDev')
-            ? config('whatsappSession.NoKepala')
-            : config('whatsappSession.DevNomorTujuan');
-
-        $PesanKirim =
-            "Berikut ini informasi laporan kehadiran guru : \n" .
-            "{$pesan} \n" .
-            "{$catatan} \n\n";
-
         // Kirim pesan WA
         return $PesanKirim;
+    }
+}
+/*
+    |--------------------------------------------------------------------------
+    | 📌 Rekap Absensi :
+    |--------------------------------------------------------------------------
+    |
+    | Fitur :
+    | - xxxxxxxxxxx
+    | - xxxxxxxxxxx
+    |
+    | Tujuan :
+    | - xxxxxxxxxxx
+    |
+    |
+    | Penggunaan :
+    | - xxxxxxxxxxx
+    |
+    // Semua guru bulan September 2025
+$data = getAbsensiPivot('2025-09');
+
+// Hanya guru dengan kode GR001
+$dataGuru = getAbsensiPivot('2025-09', 'GR001');
+    */
+// Proses Coding
+// Array absensi guru
+
+if (! function_exists('getAbsensiPivot')) {
+    /**
+     * Ambil data absensi guru dalam format pivot
+     *
+     * @param  string  $month   Format: YYYY-MM
+     * @param  string|null  $kodeGuru   Kode guru, default null (semua)
+     * @return array
+     */
+    function getAbsensiPivot($month, $kodeGuru = null)
+    {
+        $query = EabsenGuru::with('guru')
+            ->whereMonth('created_at', date('m', strtotime($month)))
+            ->whereYear('created_at', date('Y', strtotime($month)));
+
+        if ($kodeGuru) {
+            $query->whereHas('guru', function ($q) use ($kodeGuru) {
+                $q->where('kode_guru', $kodeGuru);
+            });
+        }
+
+        $AbsGurus = $query->orderBy('created_at')->get();
+
+        $pivotData = $AbsGurus->groupBy(function ($abs) {
+            return $abs->created_at->format('Y-m-d'); // group per tanggal
+        })->map(function ($itemsByDate) {
+            return $itemsByDate->groupBy(function ($abs) {
+                return $abs->guru->kode ?? 'NA'; // group per kode guru
+            })->map(function ($itemsByGuru) {
+                $record = $itemsByGuru->first(); // ambil record pertama per hari
+
+                return [
+                    'tanggal'        => $record->created_at->format('Y-m-d'),
+                    'kode_guru'      => $record->guru->kode ?? '-',
+                    'nama_guru'      => $record->guru->nama ?? '-',
+                    'masuk'          => $record->masuk ?? '-',
+                    'telat'          => $record->telat ?? '-',
+                    'pulang'         => $record->pulang ?? '-',
+                    'pulang_cepat'   => $record->pulang_cepat ?? '-',
+                    'pulang_telat'   => $record->pulang_telat ?? '-',
+                    'absen_status'   => $record->status_absen ?? '-',
+                ];
+            });
+        });
+
+        return $pivotData->toArray();
     }
 }

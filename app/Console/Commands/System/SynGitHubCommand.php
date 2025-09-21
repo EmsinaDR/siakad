@@ -70,9 +70,11 @@ class SynGitHubCommand extends Command
         $NoRequest = config('whatsappSession.IdWaUtama');
         $pesan =
             "System update otomatisa telah dijalankan";
+        $update = ["executor\whatsapp\update.exe", "executor\siakad\update.exe"];
+        foreach ($update as $stack):
+            $result = run_bat($stack);
+        endforeach;
 
-        $result = run_bat("executor\whatsapp\update.bat");
-        $result = run_bat("executor\siakad\update.bat");
         $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
     }
 }

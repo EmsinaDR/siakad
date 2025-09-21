@@ -16,6 +16,14 @@ if (!function_exists('DomExport')) {
      * @param string|null $folder Lokasi penyimpanan (default: base_path('whatsapp/uploads'))
      * @return string Path file yang dihasilkan
      */
+    /*
+    Sampel = AutoReply_SuratHelper baris ke 83
+    $view = 'role.program.surat.siswa.surat-pindah-sekolah';
+    $data = array_merge($dataSurat, $dataIdentitas, $DataSIswa);
+    $filename = $Kode . ' - ' . $nis;
+    DomExport($filename, $data, $view, $folder = null);
+    DomExport($filename, $data, $view);
+    */
     function DomExport($filename, $data, $view, $folder = null)
     {
         // 📂 Lokasi simpan PDF

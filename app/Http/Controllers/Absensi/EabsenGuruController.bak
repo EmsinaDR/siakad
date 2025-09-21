@@ -82,85 +82,70 @@ class EabsenGuruController extends Controller
                 'message' => '❌ Kode Guru tidak ditemukan',
             ]);
         }
+        $jamSekarang    = now();
+        // $jamBatasMasuk  = Carbon::today()->setTimeFromTimeString('07:05');  // ikut tanggal hari ini
+        // $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');  // ikut tanggal hari ini
 
-        $jamSekarang = now();
-        $jamBatasMasuk  = Carbon::today()->setTimeFromTimeString('07:05');
+        $jamBatasMasuk  = Carbon::today()->setTimeFromTimeString('07:05');  // ikut tanggal hari ini
 
-        // Tentukan jam pulang sesuai hari
         if (is_day('sabtu')) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');  // ikut tanggal hari ini
         } elseif (is_day("jum'at")) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');  // ikut tanggal hari ini
         } else {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');  // ikut tanggal hari ini
         }
 
         // ==========================
-        // 1. Cek riwayat absen hari ini
+        // 1. Tentukan jenis absen
         // ==========================
-        $absenMasuk = EabsenGuru::whereDate('created_at', today())
-            ->where('detailguru_id', $guru->id)
-            ->where('jenis_absen', 'masuk')
-            ->first();
-
-        $absenPulang = EabsenGuru::whereDate('created_at', today())
-            ->where('detailguru_id', $guru->id)
-            ->where('jenis_absen', 'pulang')
-            ->first();
-
-        // ==========================
-        // 2. Tentukan jenis absen + cek interval minimal untuk pulang
-        // ==========================
-        if (!$absenMasuk) {
+        if ($jamSekarang->lessThan($jamBatasPulang)) {
+            // Kalau masih sebelum jam pulang → anggap absen masuk
             $jenisAbsen = 'masuk';
-        } elseif (!$absenPulang) {
-            $diff = $absenMasuk->waktu_absen->diffInMinutes($jamSekarang);
-            if ($diff < 240) { // minimal 4 jam
-                return response()->json([
-                    'error' => true,
-                    'message' => "⚠️ Belum waktunya pulang, tunggu minimal 4 jam sejak absen masuk!",
-                ]);
-            }
-            $jenisAbsen = 'pulang';
         } else {
+            // Kalau sudah lewat jam pulang → anggap absen pulang
+            $jenisAbsen = 'pulang';
+        }
+
+
+        $sudahAbsen = EabsenGuru::whereDate('created_at', today())
+            ->where('detailguru_id', $guru->id)
+            ->where('jenis_absen', $jenisAbsen)
+            ->exists();
+
+        if ($sudahAbsen) {
             return response()->json([
                 'error' => false,
-                'message' => "⚠️ Sudah absen hari ini!",
+                'message' => "⚠️ Sudah absen $jenisAbsen hari ini!",
             ]);
         }
 
-        // ==========================
-        // 3. Hitung telat / pulang cepat / pulang telat
-        // ==========================
         $telatMenit = 0;
         $pulangCepat = 0;
         $pulangTelat = 0;
 
         if ($jenisAbsen === 'masuk') {
-            if ($jamSekarang->greaterThan($jamBatasMasuk)) {
-                $telatMenit = $jamBatasMasuk->diffInMinutes($jamSekarang);
+            $jamBatas = Carbon::createFromTimeString($jamBatasMasuk);
+            if ($jamSekarang->greaterThan($jamBatas)) {
+                $telatMenit = $jamBatas->diffInMinutes($jamSekarang);
             }
-        } else { // pulang
-            if ($jamSekarang->lessThan($jamBatasPulang)) {
-                $pulangCepat = $jamBatasPulang->diffInMinutes($jamSekarang);
-            } elseif ($jamSekarang->greaterThan($jamBatasPulang)) {
-                $pulangTelat = $jamSekarang->diffInMinutes($jamBatasPulang);
+        } else {
+            $jamBatas = Carbon::createFromTimeString($jamBatasPulang);
+            if ($jamSekarang->lessThan($jamBatas)) {
+                $pulangCepat = $jamSekarang->diffInMinutes($jamBatas);
+            } elseif ($jamSekarang->greaterThan($jamBatas)) {
+                $pulangTelat = $jamBatas->diffInMinutes($jamSekarang);
             }
         }
 
-        // ==========================
-        // 4. Simpan ke database
-        // ==========================
         $etapels = Etapel::where('aktiv', 'Y')->first();
-
         $data = [
             'jenisAbsen' => $jenisAbsen,
-            'telat' => $telatMenit,
+            'telat' => number_format($telatMenit, 0),
             'waktu' => $jenisAbsen === 'masuk' ? 'Pagi' : 'Siang',
-            'pulang_cepat' => $pulangCepat,
-            'pulang_telat' => $pulangTelat,
+            'pulang_cepat'   => $pulangCepat,
+            'pulang_telat'   => $pulangTelat,
         ];
-
         $absen = EabsenGuru::create([
             'detailguru_id' => $guru->id,
             'tapel_id'       => $etapels->id ?? null,
@@ -172,29 +157,28 @@ class EabsenGuruController extends Controller
             'pulang_cepat'   => $pulangCepat,
             'pulang_telat'   => $pulangTelat,
         ]);
-
-        // Kirim WA (optional)
+        // kirimPesanAbsensi($guru->id, $data);
+        HapusCacheDenganTag('chace_AbsensiHaraIni');
+        HapusCacheDenganTag('chacprosesabsen');
+        $sessions = config('whatsappSession.IdWaUtama');
+        $waktuabsen = $jenisAbsen <= 'masuk' ? 'Pagi' : 'Siang';
+        $telat = number_format($telatMenit, 0);
         if ($guru->no_hp) {
-            $waktuabsen = $jenisAbsen === 'masuk' ? 'Pagi' : 'Siang';
             $IsiPesan =
                 "🌞 Selamat {$waktuabsen} Bapak/Ibu *{$guru->nama_guru}, {$guru->gelar}*\n" .
                 "📋 Berikut rekap data yang masuk:\n" .
                 "⏰ Waktu Absen\t: {$jamSekarang->format('H:i')}\n" .
-                "⏱ Telat\t\t\t\t: {$telatMenit} menit\n\n" .
-                "✨ Semoga hari ini berjalan lancar dan tugas bisa dilaksanakan maksimal.\n" .
-                "🙏 Terima kasih atas partisipasi dalam kegiatan KBM.\n";
+                "⏱ Telat\t\t\t\t\t\t\t: {$telat} menit\n" .
+                "\n" .
+                "✨ Semoga hari ini berjalan lancar dan tugas bisa dilaksanakan dengan maksimal. Terus semangat dalam mendidik putra putri dikelas.\n" .
+                "🙏 Terima kasih atas partisipasi dalam kegiatan, khususnya *Kegiatan Belajar Mengajar*.\n" .
+                "\n";
 
             $PesanKirim = format_pesan('Informasi Kehadiran Guru', $IsiPesan);
-            $NoTujuan = config('whatsappSession.WhatsappDev')
-                ? config('whatsappSession.DevNomorTujuan')
-                : $guru->no_hp;
+            $NoTujuan = config('whatsappSession.WhatsappDev') ? config('whatsappSession.DevNomorTujuan')  : $guru->no_hp;
 
-            $sessions = config('whatsappSession.IdWaUtama');
-            \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, $PesanKirim);
+            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, $PesanKirim);
         }
-
-        HapusCacheDenganTag('chace_AbsensiHaraIni');
-        HapusCacheDenganTag('chacprosesabsen');
 
         return response()->json([
             'success' => true,
@@ -209,12 +193,6 @@ class EabsenGuruController extends Controller
                 'pulang_telat' => $pulangTelat ? "$pulangTelat menit" : null,
             ],
         ]);
-    }
-    public function ExportAbsensiGuru()
-    {
-        //dd($request->all());
-        // Export Data Absen
-        $pesan = json_encode(getAbsensiPivot('2025-09', 'AS'));
     }
 
     public function create()

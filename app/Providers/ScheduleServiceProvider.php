@@ -59,7 +59,7 @@ class ScheduleServiceProvider extends ServiceProvider
             }
 
             $schedule->command('maintenance:clear-all')
-                ->dailyAt('02:00')
+                ->dailyAt('08:15')
                 ->withoutOverlapping()
                 ->appendOutputTo(storage_path('logs/clear_all_cache.log'));
 

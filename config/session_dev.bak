@@ -212,7 +212,7 @@ return [
     | when flagged "secure" and the Same-Site attribute is set to "none".
     |
     */
-    'dev' => false, // config('session.dev');
+    'client_server' => false, // config('session.dev');
     'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
     'domain' => env('SESSION_DOMAIN', null),
     'path' => env('SESSION_PATH', '/'),

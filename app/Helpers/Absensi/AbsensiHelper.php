@@ -214,3 +214,9 @@ if (!function_exists('PesanAbsensiTahunan')) {
         return $message;
     }
 }
+if (!function_exists('ExportAbsensiGuru')) {
+   function ExportAbsensiGuru($kode){
+   //Isi Fungsi
+   }
+
+}

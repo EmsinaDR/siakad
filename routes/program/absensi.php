@@ -86,44 +86,6 @@ Route::middleware(['web', 'auth'])->name('absensi.')->prefix('absensi')->group(f
     Route::resource('absen-guru', \App\Http\Controllers\Absensi\EabsenGuruController::class)->middleware(['auth', 'verified']);
     Route::GET('absen-guru-ajax', [App\Http\Controllers\Absensi\EabsenGuruController::class, 'IndexGuruAjax'])->name('absensi.guru.index.ajax');
     // Route::POST('store-guru-ajax-in', [App\Http\Controllers\Absensi\EabsenGuruController::class, 'storeGuruAjax'])->name('absensi.storex.guru.ajax');
-    Route::resource('pulang-cepat', \App\Http\Controllers\Absensi\PulangCepatController::class)->middleware(['auth', 'verified']); //Belum
-    //
-    // Route::get('/list', function () {
-    //     $absensi = \App\Models\Absensi\Eabsen::with('detailsiswa')
-    //         ->whereDate('created_at', Carbon::today()) // ✅ Filter hari ini saja
-    //         ->orderByDesc('created_at')
-    //         ->take(10) // atau semua
-    //         ->get()
-    //         ->map(function ($item) {
-    //             return [
-    //                 'nama' => $item->detailsiswa->nama_siswa ?? '-',
-    //                 'nis' => $item->detailsiswa->nis ?? '-',
-    //                 'waktu' => $item->created_at->format('Y-m-d H:i:s'),
-    //             ];
-    //         });
-
-    //     return response()->json($absensi);
-    // })->name('absensi.list');
-    // Route::get('/list-guru', function () {
-    //     $absensi = \App\Models\Absensi\EabsenGuru::with('guru')
-    //         ->whereDate('created_at', Carbon::today()) // ✅ Filter hari ini saja
-    //         ->orderByDesc('created_at')
-    //         ->get()
-    //         ->map(function ($item) {
-    //             $jamMasuk = Carbon::parse($item->created_at->format('Y-m-d') . ' 07:00:00');
-    //             $waktuAbsen = $item->created_at;
-    //             $terlambat = $waktuAbsen->greaterThan($jamMasuk)
-    //                 ? $waktuAbsen->diff($jamMasuk)->format('%H:%I:%S')
-    //                 : null;
-
-    //             return [
-    //                 'nama_guru'  => $item->guru->nama_guru ?? '-',
-    //                 'kode_guru'  => $item->guru->kode_guru ?? '-',
-    //                 'waktu'      => $waktuAbsen->format('Y-m-d H:i:s'),
-    //                 'terlambat'  => $terlambat ?? 'Tepat Waktu',
-    //             ];
-    //         });
-
-    //     return response()->json($absensi);
-    // })->name('absensi.list.guru');
+    Route::resource('pulang-cepat', \App\Http\Controllers\Absensi\PulangCepatController::class)->middleware(['auth', 'verified']); //
+    Route::get('export-absensi-guru', [\App\Http\Controllers\Absensi\EabsenGuruController::class, 'ExportAbsensiGuru'])->name('export.absensi.guru');
 });

@@ -20,7 +20,6 @@ class SosialisasiAdminDev extends Model
         'tanggal',
         'keterangan',
         'jumlah_terkirim',
-        ''
     ];
 
     protected $table = 'sosialisasi_admin_dev';  // Misalkan model ini menggunakan nama tabel khusus
