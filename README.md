@@ -107,7 +107,11 @@ Lisensi Kerjasama Tahunan dari **Ata Digital**.
 
 ---
 
+Formulir Kerjasama : [Formulir](https://forms.gle/vpRecuRHuUeehZuM6)
+Proposal : [Formulir](https://forms.gle/vpRecuRHuUeehZuM6)
+
 <p align="center">
   Made with ❤️ using Laravel and Ata Digital Stack <br>
-  Melayani dengan data, Membimbing dengan digital
+  Melayani dengan data, Membimbing dengan digital<br>
+  Ata Digital - 628532860005
 </p>
