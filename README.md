@@ -107,8 +107,12 @@ Lisensi Kerjasama Tahunan dari **Ata Digital**.
 
 ---
 
-Formulir Kerjasama : [Formulir](https://forms.gle/vpRecuRHuUeehZuM6)
+## License
+
+Formulir Kerjasama : [Formulir](https://forms.gle/vpRecuRHuUeehZuM6) <br>
 Proposal : [Formulir](https://forms.gle/vpRecuRHuUeehZuM6)
+
+---
 
 <p align="center">
   Made with ❤️ using Laravel and Ata Digital Stack <br>
