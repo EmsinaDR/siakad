@@ -7,11 +7,10 @@ if (config('session.dev')) {
         App\Providers\Program\FrontServiceProvider::class,
         App\Providers\RouteProviders::class,
         // Penjadwalan Pesan
-        App\Providers\ScheduleServiceProvider::class,
+        App\Providers\ScheduleServiceProviderClient::class,
     ];
 } else {
     return [
         App\Providers\AppServiceProvider::class,
-        // App\Providers\ScheduleServiceProvider::class,
     ];
 }

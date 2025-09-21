@@ -4,7 +4,7 @@ namespace App\Console\Commands\System;
 
 use Illuminate\Console\Command;
 
-class EksekusiMiggrationCommandCommand extends Command
+class EksekusiMiggrationComman extends Command
 {
     protected $signature = 'Sinc:EksekusiMigration';
     protected $description = 'Menjalankan migrasi yang tersedia';

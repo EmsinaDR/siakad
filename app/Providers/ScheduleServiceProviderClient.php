@@ -6,7 +6,7 @@ use App\Models\Admin\Identitas;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule; // <-- Ini yang penting bro!
 
-class ScheduleServiceProvider extends ServiceProvider
+class ScheduleServiceProviderClient extends ServiceProvider
 {
     /**
      * Register services.
@@ -36,6 +36,7 @@ class ScheduleServiceProvider extends ServiceProvider
             \App\Console\Commands\Absensi\RekapAbsensiSiswaBulananCommand::class,
             \App\Console\Commands\Whatsapp\ValidasiKontakCommand::class,
             \App\Console\Commands\System\CekRegistrasiCommand::class,
+            \App\Console\Commands\System\SynGitHubCommandClient::class,
 
 
 
