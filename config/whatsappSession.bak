@@ -16,6 +16,7 @@ return [
     //6282324399566
     'DevNoHPLogin' => '6285329860005',
     // config('whatsappSession.DevNomorTujuan');
+    // 6285329860005
     'DevNomorTujuan' => '6285329860005',
 
     // Data Sekolah

@@ -212,7 +212,6 @@ class CekAbsenKosongSiswa extends Command
             $pesanWaliKelas .= "❌ Alfa  \t\t\t\t\t\t\t: {$status['alfa']}\n";
             $pesanWaliKelas .= "📝 Ijin  \t\t\t\t\t\t\t: {$status['ijin']}\n";
             $pesanWaliKelas .= "🤒 Sakit \t\t\t\t\t\t: {$status['sakit']}\n\n";
-            $pesanWaliKelas .= "Berikut Daftar Nama Siswa Alfa System\n";
             $pesanWaliKelas .= "Berikut Daftar Nama Siswa Alfa melalui Sistem :\n";
             $pesanWaliKelas .= "{$daftarNama}\n";
 

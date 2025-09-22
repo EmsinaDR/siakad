@@ -6,6 +6,9 @@
     |----------------------------------------------------------------------
     |
 */
+
+use App\Models\AdminDev\DataVendor;
+
 if (!function_exists('cekVendor')) {
     function cekVendor($NoRequest, $sessions)
     {
@@ -13,7 +16,7 @@ if (!function_exists('cekVendor')) {
             return \App\Models\Whatsapp\WhatsApp::sendMessage(
                 $sessions,
                 $NoRequest,
-                'Maaf, akses ini hanya untuk vendor'
+                "Maaf, akses ini hanya untuk vendor"
             );
         }
 
@@ -24,12 +27,31 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
     function Auto_Reply_VendorHelper($Kode, $NoRequest, $message, $sessions)
     {
         cekVendor($NoRequest, $sessions);
+        $Vendor = DataVendor::first();
         $Kontak = config('whatsappSession.DevNomorTujuan');
+        // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, "{$Kode}{$NoRequest}{$message}{$sessions}");
         switch ($Kode) {
             case 'Data Vendor':
                 $pesan =
-                    "Vendor : Ata Digital\n" .
-                    "Kontak : {$Kontak}\n" .
+                    "Vendor :\n Ata Digital\n" .
+                    "Kontak :\n {$Kontak}\n" .
+                    "Twiter :\n {$Vendor->twiter}\n" .
+                    // "Youtube :\n {$Vendor->youtube}\n" .
+                    "Instagram :\n {$Vendor->instagram}\n" .
+                    "Whatsapp Comunity :\n {$Vendor->whatsap_komunitas}\n" .
+                    "Facebook FP :\n {$Vendor->facebook_fanspage}\n" .
+                    "Facebook User :\n {$Vendor->facebook_user}\n" .
+                    "Youtube :\n {$Vendor->github}\n" .
+                    "Alamat :\n Jln. Makensi Desa Banjarharjo Kecamatan Banjarharjo, Kabupaten Brebes Kode POS : 52265\n" .
+                    "\n";
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                break;
+            case 'Full Vendor':
+                $pesan =
+                    "Vendor :\n Ata Digital\n" .
+                    "Gihub :\n {$Vendor->github}\n" .
+                    "Facebook FP :\n {$Vendor->facebook_fanspage}\n" .
+                    "Facebook User :\n {$Vendor->facebook_user}\n" .
                     "Alamat : Jln. Makensi Desa Banjarharjo Kecamatan Banjarharjo, Kabupaten Brebes Kode POS : 52265\n" .
                     "\n";
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
