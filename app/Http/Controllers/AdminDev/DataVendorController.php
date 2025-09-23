@@ -16,32 +16,33 @@ use Exception;
 class DataVendorController extends Controller
 {
     public function index()
-{
-    // Mendapatkan judul halaman sesuai dengan nama kelas
-    $title = 'AdminDev';
-    $breadcrumb = 'AdminDev / Data Vendor';
+    {
+        // Mendapatkan judul halaman sesuai dengan nama kelas
+        $title = 'AdminDev';
+        $breadcrumb = 'AdminDev / Data Vendor';
         $titleviewModal = 'Lihat AdminDev';
         $titleeditModal = 'Edit AdminDev';
         $titlecreateModal = 'Buat AdminDev';
-    $arr_ths = [
+        $arr_ths = [
             'Fillable',
 
         ];
 
-    // Mendapatkan data dari tabel Etapel yang sedang aktif
-    $etapels = Etapel::where('aktiv', 'Y')->first();
+        // Mendapatkan data dari tabel Etapel yang sedang aktif
+        $etapels = Etapel::where('aktiv', 'Y')->first();
 
-    // Mengambil data dari model terkait dengan tapel_id
-    // addHours addMinutes
-    $DataVendor = Cache::tags(['Chace_DataVendor'])->remember(
-        'Remember_DataVendor',
-        now()->addMinutes(30),
-        fn () => DataVendor::where('tapel_id', $etapels->id)->get()
-    );
+        // Mengambil data dari model terkait dengan tapel_id
+        // addHours addMinutes
+        $DataVendor = Cache::tags(['Chace_DataVendor'])->remember(
+            'Remember_DataVendor',
+            now()->addMinutes(30),
+            fn() => DataVendor::where('tapel_id', $etapels->id)->get()
+        );
 
 
-    // Mengarahkan ke view sesuai dengan folder dan nama yang sudah disusun
-    return view('role.admindev.datavendor.data-vendor', compact('title',
+        // Mengarahkan ke view sesuai dengan folder dan nama yang sudah disusun
+        return view('role.admindev.datavendor.data-vendor', compact(
+            'title',
             'title',
             'arr_ths',
             'DataVendor',
@@ -49,125 +50,135 @@ class DataVendorController extends Controller
             'titleviewModal',
             'titleeditModal',
             'titlecreateModal',
-     ));
-}
-
-public function create()
-{
-    // Judul halaman
-    $title = 'Tambah Data AdminDev';
-    $breadcrumb = 'Create AdminDev / Data Vendor';
-
-    // Breadcrumb (jika diperlukan)
-
-    return view('role.admindev.datavendor.data-vendor-create', compact(
-        'title',
-        'breadcrumb',
         ));
-}
+    }
+    public function DataKarpel()
+    {
+        //dd($request->all());
+        //  data-karpel
+        $title = "Data Karpel";
+        $breadcrumb = "Admin Dev / Data Karpel";
 
-public function store(Request $request)
-{
-    // Mendapatkan data Etapel yang aktif
-    $etapels = Etapel::where('aktiv', 'Y')->first();
-    $request->merge(['tapel_id' => $etapels->id]);
+        return view('AdminDev.karpel.data.karpel', compact(
+            'title',
+            'breadcrumb',
+        ));
+    }
+    public function create()
+    {
+        // Judul halaman
+        $title = 'Tambah Data AdminDev';
+        $breadcrumb = 'Create AdminDev / Data Vendor';
 
-    // Validasi input
-    $validator = Validator::make($request->all(), [
-        // Tambahkan validasi sesuai kebutuhan
-        'tapel_id' => 'required|numeric|min:1|max:100',
-        'fillable' => 'required|string|min:3|max:255',
+        // Breadcrumb (jika diperlukan)
 
-    ]);
-
-    // Jika validasi gagal, kembalikan dengan pesan error
-    if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
+        return view('role.admindev.datavendor.data-vendor-create', compact(
+            'title',
+            'breadcrumb',
+        ));
     }
 
-    // Membuat entri baru berdasarkan validasi
-    DataVendor::create($validator->validated());
+    public function store(Request $request)
+    {
+        // Mendapatkan data Etapel yang aktif
+        $etapels = Etapel::where('aktiv', 'Y')->first();
+        $request->merge(['tapel_id' => $etapels->id]);
 
-    HapusCacheDenganTag('Chace_DataVendor');
-    // Menyimpan pesan sukses di session
-    Session::flash('success', 'Data berhasil disimpan');
-    // Mengarahkan kembali ke halaman sebelumnya
-    return Redirect::back();
-}
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            // Tambahkan validasi sesuai kebutuhan
+            'tapel_id' => 'required|numeric|min:1|max:100',
+            'fillable' => 'required|string|min:3|max:255',
 
-public function show($id)
-{
-    // Menemukan data berdasarkan ID
-    $title = 'Lihat Detail AdminDev';
-    $breadcrumb = 'Lihat AdminDev / Data Vendor';
-    $data = DataVendor::findOrFail($id);
+        ]);
 
-    return view('role.admindev.datavendor.data-vendor-single', compact(
-        'title',
-     'breadcrumb',
-      'data',
-      ));
-}
-public function edit($id)
-{
-    // Menemukan data berdasarkan ID
-    $title = 'Edit AdminDev';
-    $breadcrumb = 'xxxxxxxxxxxx / AdminDev / Edit';
-    $data = DataVendor::findOrFail($id);
+        // Jika validasi gagal, kembalikan dengan pesan error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
+        // Membuat entri baru berdasarkan validasi
+        DataVendor::create($validator->validated());
 
-    return view('role.admindev.datavendor.data-vendor-edit', compact(
-        'title',
-        'breadcrumb',
-        'data',
-    ));
-}
-
-public function update(Request $request, $id)
-{
-    // Menemukan data yang akan diupdate berdasarkan ID
-    $data = DataVendor::findOrFail($id);
-
-    // Validasi input
-    $validator = Validator::make($request->all(), [
-        // Tambahkan validasi sesuai kebutuhan
-        'tapel_id' => 'required|numeric|min:1|max:100',
-        'fillable' => 'required|string|min:3|max:255',
-
-    ]);
-
-    // Jika validasi gagal, kembalikan dengan pesan error
-    if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
+        HapusCacheDenganTag('Chace_DataVendor');
+        // Menyimpan pesan sukses di session
+        Session::flash('success', 'Data berhasil disimpan');
+        // Mengarahkan kembali ke halaman sebelumnya
+        return Redirect::back();
     }
 
-    // Update data yang ditemukan berdasarkan hasil validasi
-    $data->update($validator->validated());
+    public function show($id)
+    {
+        // Menemukan data berdasarkan ID
+        $title = 'Lihat Detail AdminDev';
+        $breadcrumb = 'Lihat AdminDev / Data Vendor';
+        $data = DataVendor::findOrFail($id);
+
+        return view('role.admindev.datavendor.data-vendor-single', compact(
+            'title',
+            'breadcrumb',
+            'data',
+        ));
+    }
+    public function edit($id)
+    {
+        // Menemukan data berdasarkan ID
+        $title = 'Edit AdminDev';
+        $breadcrumb = 'xxxxxxxxxxxx / AdminDev / Edit';
+        $data = DataVendor::findOrFail($id);
 
 
-    HapusCacheDenganTag('Chace_DataVendor');
-    // Menyimpan pesan sukses di session
-    Session::flash('success', 'Data berhasil diperbarui');
+        return view('role.admindev.datavendor.data-vendor-edit', compact(
+            'title',
+            'breadcrumb',
+            'data',
+        ));
+    }
 
-    // Mengarahkan kembali ke halaman sebelumnya
-    return Redirect::back();
-}
+    public function update(Request $request, $id)
+    {
+        // Menemukan data yang akan diupdate berdasarkan ID
+        $data = DataVendor::findOrFail($id);
 
-public function destroy($id)
-{
-    // Menemukan data yang akan dihapus berdasarkan ID
-    $data = DataVendor::findOrFail($id);
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            // Tambahkan validasi sesuai kebutuhan
+            'tapel_id' => 'required|numeric|min:1|max:100',
+            'fillable' => 'required|string|min:3|max:255',
 
-    // Menghapus data
-    $data->delete();
+        ]);
 
-    HapusCacheDenganTag('Chace_DataVendor');
+        // Jika validasi gagal, kembalikan dengan pesan error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-    // Menyimpan pesan sukses di session
-    Session::flash('success', 'Data berhasil dihapus');
+        // Update data yang ditemukan berdasarkan hasil validasi
+        $data->update($validator->validated());
 
-    // Mengarahkan kembali ke halaman sebelumnya
-    return Redirect::back();
-}
 
+        HapusCacheDenganTag('Chace_DataVendor');
+        // Menyimpan pesan sukses di session
+        Session::flash('success', 'Data berhasil diperbarui');
+
+        // Mengarahkan kembali ke halaman sebelumnya
+        return Redirect::back();
+    }
+
+    public function destroy($id)
+    {
+        // Menemukan data yang akan dihapus berdasarkan ID
+        $data = DataVendor::findOrFail($id);
+
+        // Menghapus data
+        $data->delete();
+
+        HapusCacheDenganTag('Chace_DataVendor');
+
+        // Menyimpan pesan sukses di session
+        Session::flash('success', 'Data berhasil dihapus');
+
+        // Mengarahkan kembali ke halaman sebelumnya
+        return Redirect::back();
+    }
 }

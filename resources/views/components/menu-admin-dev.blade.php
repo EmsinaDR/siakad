@@ -39,13 +39,13 @@
     </a>
     <ul class="nav nav-treeview pl-2">
         <li class="nav-item">
-            <a href="{{ route('tokenapp.index') }}" class="nav-link">
-                <p>🏅 Kartu Absensi</p>
+            <a href="{{ route('data.kartu') }}" class="nav-link">
+                <p>🏅 Data Kartu</p>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('tokenapp.index') }}" class="nav-link">
-                <p>🏅 Karpel</p>
+                <p>🏅 Sosialisasi Vendor</p>
             </a>
         </li>
         <li class="nav-item">
@@ -59,14 +59,14 @@
     <a href="#" class="nav-link">
         {{-- <i class="nav-icon fa fa-users"></i> --}}
         <p>
-            📝 Control Menu
+            📝 Control
             <i class="fas fa-angle-left right"></i>
         </p>
     </a>
     <ul class="nav nav-treeview pl-2">
         <li class="nav-item">
             <a href="{{ route('control-program.index') }}" class="nav-link">
-                <p>🏅 Control</p>
+                <p>🏅 Program</p>
             </a>
         </li>
         <li class="nav-item">

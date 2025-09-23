@@ -127,7 +127,7 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
                 break;
             case 'Update Whatsapp':
-                $result = run_bat("executor\whatsapp\update.bat");
+                $result = UpdateWhatsapp();
                 $pesan =
                     "*Path  :*\n{$result['path']}\n" .
                     "*File  :*\n{$result['success']}\n";
@@ -141,6 +141,13 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
                 break;
             case 'Update Siakad':
+                $result = UpdateSiakad();
+                $pesan =
+                    "*Path  :*\n{$result['path']}\n" .
+                    "*File  :*\n{$result['success']}\n";
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                break;
+            case 'Aktivasi Modul':
                 $result = run_bat("executor\siakad\update.bat");
                 $pesan =
                     "*Path  :*\n{$result['path']}\n" .

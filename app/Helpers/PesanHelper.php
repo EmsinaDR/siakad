@@ -488,7 +488,7 @@ if (!function_exists('registerNoHp')) {
             $HpAyah   = format_no_hp($DataHp[1]);
             $HpIbu    = format_no_hp($DataHp[2]);
 
-            // Hanya update kalau kosong/null
+            // Hanya update kalau kosong/null kalau sudah ada isinya tidak akan berubah
             $DataSiswa->update([
                 'nohp_siswa' => $DataSiswa->nohp_siswa ?: $HpSiswa,
                 'ayah_nohp'  => $DataSiswa->ayah_nohp  ?: $HpAyah,

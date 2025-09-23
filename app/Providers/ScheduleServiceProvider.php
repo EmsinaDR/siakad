@@ -217,7 +217,9 @@ class ScheduleServiceProvider extends ServiceProvider
                 })
                 ->at('09:30')
                 ->runInBackground();
-
+            // WhatsappSessionCek
+            // Whatsapp Cek Akun tidak aktif
+            $schedule->command('siakad:KirimSesiWhatsapp')->everyTenMinutes();
             // Shalat Berjamaah
             /*
                 |--------------------------------------------------------------------------
@@ -257,7 +259,7 @@ class ScheduleServiceProvider extends ServiceProvider
                 */
             // Proses Coding
             $schedule->command('backup:database')->dailyAt('08:00'); //BackupDatabase
-            
+
 
         });
 

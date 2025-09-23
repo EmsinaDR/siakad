@@ -18,9 +18,12 @@ Route::middleware(['web', 'auth', 'CekDataSekolah', 'verified', 'is_admindev'])-
     Route::resource('progres-aplikasi', \App\Http\Controllers\AdminDev\ProgresAplikasiController::class)->middleware(['auth', 'verified']);
     Route::get('copy-fitur/{progres_aplikasi}', [\App\Http\Controllers\AdminDev\ProgresAplikasiController::class, 'CopyData'])->name('copy-fitur');
     Route::resource('svg-to-png', \App\Http\Controllers\AdminDev\SvgPngController::class)->middleware(['auth', 'verified']);
-    Route::get('generate-karpel', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateKarpel'])->name('generate.karpel');
+    Route::post('all-in-kartu', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'AllInKartu'])->name('all.in.kartu');
+    Route::post('generate-karpel', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateKarpel'])->name('generate.karpel');
+    Route::post('generate-kartu-guru', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateKartuGuru'])->name('generate.kartu.guru');
     Route::get('generate-nisn', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateNisn'])->name('generate.nisn');
     Route::get('generate-nisn-array', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateNisnArray'])->name('generate.nisn.array');
+    Route::get('generate-kartu-pembayaran', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateKartuPembayaran'])->name('generate.kartu.pembayaran.array');
     Route::get('generate-cocard', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateCoCard'])->name('generate.cocard');
     Route::get('generate-sertifikat', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateSertifikat'])->name('generate.sertifikat');
 
@@ -31,6 +34,5 @@ Route::middleware(['web', 'auth', 'CekDataSekolah', 'verified', 'is_admindev'])-
     Route::post('modul-ubah-masal', [ModulController::class, 'ModulUbahMasal'])->name('modul.ubah.masal');
     Route::resource('sosialisasi-vendor', \App\Http\Controllers\AdminDev\SosialisasiAdminDevController::class)->middleware(['auth', 'verified']); //Belum
     Route::resource('data-vendor', \App\Http\Controllers\AdminDev\DataVendorController::class)->middleware(['auth', 'verified']); //Belum
-    
-
+    Route::get('data-kartu', [\App\Http\Controllers\AdminDev\DataVendorController::class, 'DataKarpel'])->name('data.kartu')->middleware(['auth', 'CekDataSekolah', 'verified']);
 });

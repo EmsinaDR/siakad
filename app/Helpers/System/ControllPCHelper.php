@@ -57,3 +57,31 @@ if (!function_exists('RestartServices')) {
         // return "Helper ControllPC dijalankan dengan param: ";
     }
 }
+if (!function_exists('UpdateSiakad')) {
+    function UpdateSiakad()
+    {
+        $result = run_bat("executor\\siakad\\update.exe");
+        $pesan =
+            "*Path  :*\n{$result['path']}\n" .
+            "*File  :*\n{$result['success']}\n";
+        return $pesan;
+
+        // return $pesan;
+        // kirim ke WhatsApp
+        // return "Helper ControllPC dijalankan dengan param: ";
+    }
+}
+if (!function_exists('UpdateWhatsapp')) {
+    function UpdateWhatsapp()
+    {
+        $result = run_bat("executor\\siakad\\update.exe");
+        $pesan =
+            "*Path  :*\n{$result['path']}\n" .
+            "*File  :*\n{$result['success']}\n";
+        return $pesan;
+
+        // return $pesan;
+        // kirim ke WhatsApp
+        // return "Helper ControllPC dijalankan dengan param: ";
+    }
+}

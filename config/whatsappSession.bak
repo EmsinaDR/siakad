@@ -23,7 +23,7 @@ return [
     // config('whatsappSession.SekolahNoTujuan');
     'SekolahNoTujuan' => '6285329860005',
     // config('whatsappSession.NoKepala');
-    'NoKepala' => '6285329860005',
+    'NoKepala' => ' ',
     //config('whatsappSession.DevId');
     // nanti akan diisi dinamis dari DB lewat AppServiceProvider
     'NoSekolah' => null,
@@ -35,7 +35,4 @@ return [
     'ngRok' => true,
     //config('whatsappSession.vendor');
     'vendor' => true,
-    // 'NoSekolah' => $Identias->phone, //config('whatsappSession.NoSekolah');
-    // 'NoYayasn' => $Identias->phone, //config('whatsappSession.NoYayasn');
-    // 'NoPengawas' => $Identias->phone, //config('whatsappSession.NoPengawas');
 ];

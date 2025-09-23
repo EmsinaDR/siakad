@@ -45,7 +45,7 @@ class SosialisasiAdminDevController extends Controller
         $SosialisasiAdminDev = Cache::tags(['Chace_SosialisasiAdminDev'])->remember(
             'Remember_SosialisasiAdminDev',
             now()->addMinutes(30),
-            fn() => SosialisasiAdminDev::where('tapel_id', $etapels->id)->get()
+            fn() => SosialisasiAdminDev::get()
         );
 
 

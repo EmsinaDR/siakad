@@ -57,7 +57,7 @@ class TokenController extends Controller
             'titlecreateModal',
         ));
     }
-
+    
     public function create()
     {
         // Judul halaman

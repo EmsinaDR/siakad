@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Admin\Etapel;
 use App\Http\Controllers\Controller;
+use App\Models\User\Guru\Detailguru;
 use App\Models\User\Siswa\Detailsiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -56,14 +57,29 @@ class SvgPngController extends Controller
     }
     public function GenerateKarpel(Request $request)
     {
-        $nama = $request->input('nama', 'Dany Rosepta Ata F');
+
+        // dd($request->all());
+
+        $idsiswas = explode(",", $request->input('halaman_siswa'));
         // id siswa, dan kode karpel
-        $idsiswas = [1, 2, 3, 4, 5];
-        $kodeKarpel = 8;
+        // $idsiswas = [1, 2, 3, 4, 5];
+        $kodeKarpel = 11;
         $folder = 'img/template/karpel';
-        $Siswa = Detailsiswa::whereIn('id', [1, 2, 3, 4, 5])->pluck('id');
+        $Siswa = Detailsiswa::whereIn('id',  $idsiswas)->pluck('id');
         foreach ($idsiswas as $IdSiswa) {
             $result = generatekarpel_depan($IdSiswa, $kodeKarpel, $folder);
+            // $result = generatekarpel_belakang($IdSiswa, $kodeKarpel, $folder);
+        }
+        // return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Seluruh siswa telah dibuat menjadi karpel');
+    }
+    public function GenerateKartuGuru(Request $request)
+    {
+        $idGurus = explode(",", $request->input('halaman_guru'));
+        $kodeKarpel = 8;
+        $folder = 'img/template/karpel';
+        $Siswa = Detailguru::whereIn('id', [1, 2, 3, 4, 5])->pluck('id');
+        foreach ($idGurus as $idGuru) {
+            $result = generatekarpel_depan($idGuru, $kodeKarpel, $folder);
             // $result = generatekarpel_belakang($IdSiswa, $kodeKarpel, $folder);
         }
         // return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Seluruh siswa telah dibuat menjadi karpel');
@@ -71,15 +87,63 @@ class SvgPngController extends Controller
 
     public function GenerateNisn(Request $request)
     {
-        $nama = $request->input('nama', 'Dany Rosepta Ata F');
+        $idsiswas = explode(",", $request->input('halaman_siswa'));
         // id siswa, dan kode karpel
-        $idsiswas = [1, 2, 3, 4, 5];
-        $kodeKarpel = 10;
-        $folder = 'img/template/nisn';
-        $Siswa = Detailsiswa::whereIn('id', [1, 2, 3, 4, 5])->pluck('id');
+        // $idsiswas = [1, 2, 3, 4, 5];
+        $kodeKarpel = 11;
+        $folder = 'img/template/karpel';
+        $Siswa = Detailsiswa::whereIn('id',  $idsiswas)->pluck('id');
         foreach ($idsiswas as $IdSiswa) {
             $result = generatekarpel_depan($IdSiswa, $kodeKarpel, $folder);
             $result = generatekarpel_belakang($IdSiswa, $kodeKarpel, $folder);
+        }
+        return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Pembuatan kartu NISN telah selesai');
+    }
+    public function AllInKartu(Request $request)
+    {
+        // dd($request->all());
+        $idsiswas = explode(",", $request->input('halaman_siswa'));
+        $jenis_kartu = $request->input('jenis_kartu');
+        // id siswa, dan kode karpel
+        // $idsiswas = [1, 2, 3, 4, 5];
+        $template_id = $request->input('template_id');
+        $Siswa = Detailsiswa::whereIn('id',  $idsiswas)->pluck('id');
+        foreach ($idsiswas as $IdSiswa) {
+            if ($jenis_kartu === 'Kartu Pelajar') {
+                $folder = 'img/template/karpel';
+                $template_id = 11;
+                $result = generatekarpel_depan($IdSiswa, $template_id, $folder);
+                $result = generatekarpel_belakang($IdSiswa, $template_id, $folder);
+            } elseif ($jenis_kartu === 'Kartu NISN') {
+                $folder = 'img/template/karpel';
+                $result = generateNisn($IdSiswa, $template_id, $folder);
+                $result = generateNisnBelakang($IdSiswa, $template_id, $folder);
+            } elseif ($jenis_kartu === 'Kartu Pembayaran') {
+                // dd($request->all());
+                $folder = 'img/template/pembayaran';
+                $result = KartuPembayaran($IdSiswa, $template_id, $folder);
+                // $result = generateNisnBelakang($dataSiswa, $kodeKarpel, $folder);
+            } elseif ($jenis_kartu === 'Kartu Perpustakaan') {
+                $folder = 'img/template/kartu-perpustakaan';
+                $result = generateNisn($IdSiswa, $template_id, $folder);
+                $result = generateNisnBelakang($IdSiswa, $template_id, $folder);
+            } else {
+                // return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Anda belum memilih kartu');
+            }
+        }
+        // return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Pembuatan kartu NISN telah selesai');
+    }
+    public function GenerateKartuPembayaran(Request $request)
+    {
+        $nama = $request->input('nama', 'Dany Rosepta Ata F');
+        // id siswa, dan kode karpel
+        $idsiswas = [1, 2, 3, 4, 5];
+        $kodeKarpel = 2;
+        $folder = 'img/template/pembayaran';
+        $Siswa = Detailsiswa::whereIn('id', [1, 2, 3, 4, 5])->pluck('id');
+        foreach ($idsiswas as $IdSiswa) {
+            $result = KartuPembayaran($IdSiswa, $kodeKarpel, $folder);
+            // $result = generatekarpel_belakang($IdSiswa, $kodeKarpel, $folder);
         }
     }
 
@@ -104,272 +168,6 @@ class SvgPngController extends Controller
                 'tempat_lahir' => 'Brebes',
                 'tanggal_lahir' => '09 Februari 2014',
                 'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0145221920',
-                'nama_siswa' => 'Afriza Asqi',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '21 Desember 2014',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3136802239',
-                'nama_siswa' => 'Afwah Mumtazah',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '22 Juli 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3139073805',
-                'nama_siswa' => 'Ahmad Muachid Chasbulloh',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '25 Oktober 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3137207662',
-                'nama_siswa' => 'Aisyah Fairuz Salsabila',
-                'tempat_lahir' => 'Boyolali',
-                'tanggal_lahir' => '29 Oktober 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3137459804',
-                'nama_siswa' => 'Al Fira Ainunnisa',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '21 Agustus 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3142752902',
-                'nama_siswa' => 'Alya Zakiya Zahra',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '06 Februari 2014',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0147163193',
-                'nama_siswa' => 'Arjuna Wirasatya Hendriansyah',
-                'tempat_lahir' => 'Jakarta',
-                'tanggal_lahir' => '04 Februari 2014',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3132162926',
-                'nama_siswa' => 'Aulia Izzatun Nisa',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '24 Oktober 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3139343633',
-                'nama_siswa' => 'Aulia Wulan Fitriani',
-                'tempat_lahir' => 'Tegal',
-                'tanggal_lahir' => '28 Desember 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3134664738',
-                'nama_siswa' => 'Bintang Deanova Zahir',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '05 November 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3133170321',
-                'nama_siswa' => 'Ciko Novriyansa',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '05 November 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3141981549',
-                'nama_siswa' => 'Daffa Zaki Hanafi',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '05 Januari 2014',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '0137103022',
-                'nama_siswa' => 'Diaz Hardianto',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '08 November 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3138569138',
-                'nama_siswa' => 'Elsha Sarifahtul Nikmah',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '26 September 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3137450534',
-                'nama_siswa' => 'Fahmi Alfandi Yusuf',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '15 Mei 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3134509750',
-                'nama_siswa' => 'Fakhira Salwa Nabila',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '09 November 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3135580904',
-                'nama_siswa' => 'Gerald Derby Eldira',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '01 Mei 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3138072309',
-                'nama_siswa' => 'Ghifari Alif Ardiyan',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '03 September 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '0145002915',
-                'nama_siswa' => 'Hasby Muzayin Faqih',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '03 Mei 2014',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '0145247568',
-                'nama_siswa' => 'Ikhwan Bukhori',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '05 Maret 2014',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '0136569287',
-                'nama_siswa' => 'Kenji Ovta Jefriwan',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '07 Desember 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '0145333559',
-                'nama_siswa' => 'Khanifa Putri Riyadi',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '01 Maret 2014',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0148611820',
-                'nama_siswa' => 'Kharis Novyan',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '01 Januari 2014',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3124889975',
-                'nama_siswa' => 'Linda Nurhidayat',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '18 September 2012',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3130719155',
-                'nama_siswa' => 'Lintang Aalimah',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '21 Mei 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0146736230',
-                'nama_siswa' => 'Maliha Assyabiya Rafifa',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '29 Mei 2014',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0139119289',
-                'nama_siswa' => 'Muhamad Aufar Habibi',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '17 Desember 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3136733666',
-                'nama_siswa' => 'Muhamad Habibi',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '17 Juli 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '0134617202',
-                'nama_siswa' => 'Muhammad AL Farizi',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '11 Agustus 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3143785043',
-                'nama_siswa' => 'Nadia A\'inun Syafira',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '23 April 2014',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0145421950',
-                'nama_siswa' => 'Naila Azzahra',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '09 April 2014',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3133898959',
-                'nama_siswa' => 'Shafira Ashifa',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '27 Januari 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0132551057',
-                'nama_siswa' => 'Sultan Muhammad Al Fatih',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '19 Mei 2013',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3148023704',
-                'nama_siswa' => 'Yudha Ahmad Fadhil',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '24 Maret 2014',
-                'jenis_kelamin' => 'Laki - laki',
-            ],
-            [
-                'nisn' => '3148807455',
-                'nama_siswa' => 'Yumna Aulia Izzatunnissa',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '30 Mei 2014',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3136455279',
-                'nama_siswa' => 'Yumna Fariha Azmi',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '21 September 2013',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '3145480737',
-                'nama_siswa' => 'Zahra Febriyana',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '27 Mei 2014',
-                'jenis_kelamin' => 'Perempuan',
-            ],
-            [
-                'nisn' => '0139685959',
-                'nama_siswa' => 'Zaky Fauzy Naher',
-                'tempat_lahir' => 'Brebes',
-                'tanggal_lahir' => '31 Oktober 2013',
-                'jenis_kelamin' => 'Laki - laki',
             ],
 
         ];

@@ -185,7 +185,7 @@ use Illuminate\Support\Carbon;
             <div class='row m-2'>
                 {{-- blade-formatter-disable --}}
                 <div class='col-xl-2'>
-                    <button type='button' class='btn btn-block btn-default bg-primary btn-md' onclick='TambahData()'><i class='fa fa-plus'></i> Tambah Data</button>
+                    <button type='button' class='btn btn-block btn-default bg-primary btn-md' data-toggle='modal' data-target='#TambahData'><i class='fa fa-plus'></i> Tambah Data</button>
                 </div>
                 {{-- blade-formatter-enable --}}
                 <div class='col-xl-10'></div>
@@ -235,7 +235,7 @@ use Illuminate\Support\Carbon;
                                                  @csrf
                                                  @method('PATCH')
 
-                                                    contentEdit
+                                                    {formInputEdit}
 
                                                  <button id='kirim' type='submit' class='btn float-right btn-default bg-primary btn-xl mt-4'> Kirim</button>
                                              </form>
@@ -273,6 +273,40 @@ use Illuminate\Support\Carbon;
         </div>
     </section>
 </x-layout>
+<button type='button' class='btn btn-block btn-default bg-primary btn-md' data-toggle='modal' data-target='#TambahData'><i class='fa fa-plus'></i> Tambah Data</button>
+
+{{-- Modal Edit Data Awal --}}
+<div class='modal fade' id='TambahData' tabindex='-1' aria-labelledby='LabelTambahData' aria-hidden='true'>
+    <div class='modal-dialog modal-lg'>
+           <div class='modal-content'>
+               <div class='modal-header bg-primary'>
+                   <h5 class='modal-title' id='LabelTambahData'>
+                       Tambah Data Baru
+                   </h5>
+                   <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                       <span aria-hidden='true'>&times;</span>
+                   </button>
+               </div>
+               <div class='modal-body'>
+
+                   <form id='TambahData-form' action='{{route('{routename}.store')}}' method='POST'>
+                          @csrf
+                          @method('POST')
+                         {formInputCreate}
+
+                           {{-- blade-formatter-disable --}}
+                           <div class='modal-footer'>
+                               <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+                               <button type='submit' class='btn btn-primary'><i class='fa fa-save'></i> Simpan</button>
+                           </div>
+                           {{-- blade-formatter-enable --}}
+                   </form>
+           </div>
+
+            </div>
+    </div>
+
+</div>
 BLADE;
                     break;
 
@@ -385,7 +419,7 @@ use Illuminate\Support\Carbon;
                         <form id='#id' action='{{route('{routename}.update', $data->id)}}' method='POST'>
                             @csrf
                             @method('PATCH')
-                            content_form
+                            {formInputEdit}
                             <button type='submit' class='btn btn-block btn-default bg-primary btn-md float-right'></button>
                         </form>
                     </div>
@@ -398,7 +432,7 @@ BLADE;
                     break;
                 case 'create':
                     // ============================
-                    // Konten khusus untuk EDIT
+                    // Konten khusus untuk Create
                     // ============================
                     $content = <<<'BLADE'
 @php
@@ -447,7 +481,7 @@ use Illuminate\Support\Carbon;
                         <form id='#id' action='{{route('{routename}.store', $data->id)}}' method='POST'>
                             @csrf
                             @method('POST')
-                            content_form
+                            {formInputCreate}
                             {{-- blade-formatter-disable --}}
                             <button type='submit' class='btn btn-block btn-default bg-primary btn-md float-right'></button>
                             {{-- blade-formatter-enable --}}
@@ -462,7 +496,7 @@ BLADE;
                     break;
                 case 'cetak':
                     // ============================
-                    // Konten khusus untuk EDIT
+                    // Konten khusus untuk Cetak
                     // ============================
                     $content = <<<'BLADE'
                     @php
@@ -550,12 +584,29 @@ BLADE;
             foreach ($dataFIlLable as $datafil) {
                 $hasilFill .=  "<td class='text-center'> {{ \$data->$datafil}}</td>";
             }
+            $formInputCreate = '';
+            foreach ($dataFIlLable as $datafil) {
+                $formInputCreate .=  "<div class='form-group'>" .
+                    "    <label for='{{datafill}}'></label>" .
+                    "    <input type='text' class='form-control' id='{{datafill}}' name='{{datafill}}' placeholder='placeholder' required>" .
+                    "</div>";
+            }
+            $formInputEdit = '';
+            foreach ($dataFIlLable as $datafil) {
+                $formInputEdit .=  "<div class='form-group'>" .
+                    "    <label for='{{datafill}}'></label>" .
+                    "    <input type='text' class='form-control' id='{{datafill}}' name='{{datafill}}' placeholder='placeholder' value='{{ \$data->$datafil}}' required>" .
+                    "</div>";
+            }
+
             // Ganti placeholder sekaligus pakai array
             $replacements = [
                 '{routename}' => $routename,
                 '{modename}' => $modelName,
                 '{filable}' => $fillablin,
                 '{varfillable}' => $hasilFill,
+                '{formInputCreate}' => $formInputCreate,
+                '{formInputEdit}' => $formInputEdit,
             ];
 
             $content = str_replace(array_keys($replacements), array_values($replacements), $content);

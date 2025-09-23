@@ -425,14 +425,14 @@ app.use(cors()); // izinkan semua origin
         $newFilePath = null;
         // Kalau ada filePath, pindahkan ke folder basepath Laravel
         if ($filePath && file_exists($filePath)) {
-            $filename = basename($filePath);
+            $filename = basename($filePath); // Nama File
             $reply = "Balasan otomatis dari Laravel";
-            $destination = storage_path('app/public/uploads/' . $filename);
+            $destination = storage_path('app/public/uploads/' . $filename); // Folder dilaravel
             // Pindahkan file dari NodeJS WA server ke storage Laravel
             copy($filePath, $destination); // bisa pakai move() kalau mau hapus file lama
             $newFilePath = $destination;
             return response()->json([
-                'reply' => $filePath,
+                'reply' => $newFilePath,
                 // 'file' => $newFilePath
             ]);
             // $message = 'Media File';
@@ -442,7 +442,7 @@ app.use(cors()); // izinkan semua origin
         // Cek single Session tidak
         if (!config('whatsappSession.SingleSession')) {
             // Pengecekan sesi yang digunakan
-            if ($nosessionNo === config('whatsappSession.DevNoHPLogin')) {
+            if ($nosessionNo === config('whatsappSession.DevNomorTujuan')) {
                 $sessions = config('whatsappSession.IdWaUtama'); // untuk dev syarat dev harus login
             } else {
                 $cekSession = WhatsAppSession::where('no_hp', $nosessionNo)->first();

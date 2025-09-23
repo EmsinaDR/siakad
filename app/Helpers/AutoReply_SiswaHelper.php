@@ -129,6 +129,7 @@ if (!function_exists('Auto_reply_SiswaKode')) {
             case 'Register':
                 // Register/Siswa/nis/nosiswa:noayah:noibu
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, registerNoHp($Siswa, $message, $NoRequest));
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $Siswa->nama_siswa);
                 break;
             case 'Sample':
                 // Register/Siswa/nis/nosiswa:noayah:noibu

@@ -52,6 +52,12 @@
                 <p> Co Card</p>
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{{ route('cocard.index') }}" class="nav-link {{ !$IsPaketAktif ? 'disabled' : '' }}">
+                <i class="fas fa-book nav-icon ml-2 text-primary"></i>
+                <p> Kartu Pembayaran</p>
+            </a>
+        </li>
     </ul>
 </li>
 <li class="nav-item">

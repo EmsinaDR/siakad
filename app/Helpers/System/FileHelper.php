@@ -865,3 +865,77 @@ if (!function_exists('get_disk_serials')) {
         return !empty($serials) ? implode(' - ', $serials) : null;
     }
 }
+/*
+    |--------------------------------------------------------------------------
+    | 📌 Zip :
+    |--------------------------------------------------------------------------
+    |
+    | Fitur :
+    | - xxxxxxxxxxx
+    | - xxxxxxxxxxx
+    |
+    | Tujuan :
+    | - xxxxxxxxxxx
+    |
+    |
+    | Penggunaan :
+    | - xxxxxxxxxxx
+    |
+
+        // Contoh penggunaan
+       // Zip semua PNG di folder default
+        $zipFile = zipFolder();
+
+        // Zip semua JPG di folder custom
+        $zipFile = zipFolder('foto_siswa.zip', base_path('public/img/foto-siswa'), 'jpg');
+
+    */
+// Proses Coding
+if (!function_exists('zipFolder')) {
+    /**
+     * Zip semua file di folder tertentu
+     *
+     * @param string|null $zipName Nama file zip, default YYYY-MM-DD.zip
+     * @param string|null $folderPath Path folder yang ingin di-zip, default base_path('public/img/kartu-pembarayan')
+     * @param string $extension Hanya zip file dengan ekstensi tertentu (misal 'png'), default semua
+     * @return string|false Path file zip yang dibuat, false jika gagal
+     */
+    function zipFolder($zipName = null, $folderPath = null, $extension = '*')
+    {
+        $folderPath = $folderPath ?? base_path('public/img/kartu-pembarayan');
+        $zipName = $zipName ?? date('Y-m-d') . '.zip';
+        $zipPath = $folderPath . '/' . $zipName;
+
+        $files = glob($folderPath . "/*.$extension");
+        if (!$files) return false;
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            return false;
+        }
+
+        foreach ($files as $file) {
+            $zip->addFile($file, basename($file));
+        }
+
+        $zip->close();
+
+        return $zipPath;
+    }
+}
+// SVG To Base64
+if (!function_exists('svgtobase64')) {
+    /**
+     * Convert SVG file or string to Base64
+     *
+     * @param string $svgPathOrContent File path or raw SVG content
+     * @param bool $isFile Set true if parameter is file path
+     * @return string
+     */
+    function svgtobase64(string $svgPathOrContent, bool $isFile = true): string
+    {
+        $svgContent = $isFile ? file_get_contents($svgPathOrContent) : $svgPathOrContent;
+        $base64 = base64_encode($svgContent);
+        return 'data:image/svg+xml;base64,' . $base64;
+    }
+}
