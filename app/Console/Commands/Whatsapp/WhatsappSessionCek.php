@@ -78,13 +78,13 @@ class WhatsappSessionCek extends Command
                 $PesanKirim .= "- {$r['akun_id']} : {$r['status']} → {$r['keterangan']}\n";
             }
 
-            // // Kirim pesan ke admin/dev
-            // $result = \App\Models\Whatsapp\WhatsApp::sendMessage(
-            //     $sesiPengirim['akun_id'],
-            //     $NoTujuan,
-            //     format_pesan("Informasi Akun Whatsapp", $PesanKirim)
+            // Kirim pesan ke admin/dev
+            $result = \App\Models\Whatsapp\WhatsApp::sendMessage(
+                $sesiPengirim['akun_id'],
+                $NoTujuan,
+                format_pesan("Informasi Akun Whatsapp", $PesanKirim)
 
-            // );
+            );
 
             $this->info("Pesan berhasil dikirim.");
 

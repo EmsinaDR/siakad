@@ -28,43 +28,6 @@ use App\Models\Absensi\DataIjinDigital;
         |
     */
 
-// Proses Coding
-if (!function_exists('cek_data_ortu')) {
-    function cek_data_ortu($NoRequest, $Nis)
-    {
-        //Isi Fungsi
-        $DataSiswa = Detailsiswa::with('kelas')->where('nis', $Nis)->first();
-        $ceksiswa = $DataSiswa->where('ayah_nohp', $NoRequest)->orWhere('ibu_nohp', $NoRequest)->first();
-        $kelas = $DataSiswa->kelas->kelas;
-        $nama = $DataSiswa->nama_siswa;
-        if (!config('whatsappSession.WhatsappDev')) {
-            $sessions = getWaSession(); // by tingkat ada di dalamnya
-        } else {
-            $sessions = config('whatsappSession.IdWaUtama');
-            $SekolahNoTujuan = config('whatsappSession.SekolahNoTujuan');
-        }
-        if (!$ceksiswa) {
-            // Ijin akses dev
-            if ($NoRequest === config('whatsappSession.DevNomorTujuan')) {
-                return true;
-            }
-            // info ke yang request
-            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan("❌ Informasi", "Maaf anda tidak berhak mengakses data ini!!!\n*NO HP tidak terdaftar*"));
-            // Warning ke pihak sekolah
-            $PesanKirim =
-                "Di informasikan bahwa ada akses tidak sah dari :\n" .
-                "No HP : {$NoRequest}\n" .
-                "Berusaha mencoba akses data siswa :\n" .
-                "Nama : {$nama}\n" .
-                "Kelas : {$kelas}\n" .
-                "\n";
-
-            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $SekolahNoTujuan, format_pesan('⚠️ Informasi Warning ⚠️', $PesanKirim));
-            return false;
-        }
-        return true;
-    }
-}
 if (!function_exists('Auto_reply_SiswaKode')) {
     function Auto_reply_SiswaKode($Siswa, $NoRequest, $message)
     {
@@ -84,7 +47,7 @@ if (!function_exists('Auto_reply_SiswaKode')) {
         Log::info("Request received: Number - $NoRequest, Nis - $Nis dan Kode = $Kode");
         WhatsappLog::LogWhatsapp($NoRequest, $message);
 
-        if (!cek_data_ortu($NoRequest, $Nis)) {
+        if (!valdiateOrtu($NoRequest, $Nis)) {
             return;
         };
         // TODO: Implement your helper logic here

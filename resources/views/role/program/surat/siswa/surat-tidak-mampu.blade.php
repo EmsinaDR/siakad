@@ -64,7 +64,7 @@
             <td>: <strong>{{ $nama_siswa ?? '....................' }}</strong></td>
         </tr>
         <tr>
-            <td>NISN</td>
+            <td>NIS</td>
             <td>: {{ $nis ?? '....................' }}</td>
         </tr>
         <tr>

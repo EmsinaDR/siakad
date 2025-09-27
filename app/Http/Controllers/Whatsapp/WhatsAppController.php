@@ -415,8 +415,10 @@ app.use(cors()); // izinkan semua origin
         $paket = $Identitas->paket;
         $nosession  = explode('@', $request->query('nosession')); // nomor tujuan / session WA
         $nosessionNo = $nosession[0];
+        $pecahNo = explode('@', $request->query('number'));
+        $NoRequest = $pecahNo[0];
         $number = $request->query('number');
-        $message = $request->query('message');
+        $message = str_replace(' / ', '/', $request->query('message'));
         if (!$message) {
             $message =  'Media File';
         }
@@ -442,11 +444,14 @@ app.use(cors()); // izinkan semua origin
         // Cek single Session tidak
         if (!config('whatsappSession.SingleSession')) {
             // Pengecekan sesi yang digunakan
-            if ($nosessionNo === config('whatsappSession.DevNomorTujuan')) {
+            if ($NoRequest === config('whatsappSession.DevNomorTujuan')) {
                 $sessions = config('whatsappSession.IdWaUtama'); // untuk dev syarat dev harus login
             } else {
                 $cekSession = WhatsAppSession::where('no_hp', $nosessionNo)->first();
-                $sessions = $cekSession->akun_id; // untuk umum
+                // $inisession = json_encode($cekSession);
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage('GuruId', '6285329860005', config('whatsappSession.DevNomorTujuan') . "/ dev wa / {$inisession} / " . $nosessionNo);
+                $sessions = $cekSession ? $cekSession->akun_id : config('whatsappSession.IdWaUtama');
+                // $sessions = $cekSession->akun_id; // untuk umum
             }
         } else {
             $sessions = config('whatsappSession.IdWaUtama');
@@ -456,11 +461,10 @@ app.use(cors()); // izinkan semua origin
         // $baris = preg_split("/\r\n|\n|\r/", $message);
         $baris = preg_replace("/\r\n|\n|\r/", "/", $message);
         // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, '6285329860005', $baris);
+        // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, '6285329860005', config('whatsappSession.DevNomorTujuan') . "/ dev wa / " . $nosessionNo);
         // return false;
 
         if (in_array($paket, ['Kerjasama', 'Premium'])) {
-            $pecahNo = explode('@', $request->query('number'));
-            $NoRequest = $pecahNo[0];
             $newpesan = explode('/', $message);
             $jmlhpesan = count($newpesan);
             if (count($newpesan) === 1) {
@@ -499,23 +503,26 @@ app.use(cors()); // izinkan semua origin
             } else {
                 $Kode = ucfirst($newpesan[0]); //Pembayaran, BK, Absensi Contoh : Pembayaran/02091989
                 $Part0 = ucfirst($newpesan[0]); //xxx/Guru or Siswa/xxxx
-                $Part1 = ucfirst($newpesan[1]); //xxx/Guru or Siswa/xxxx
+                $Part1 = ucfirst($newpesan[1]); //
                 $Part2 = $newpesan[2] ?? Null; //xxx/xxxx/nis or kode guru
                 $Siswa = \App\Models\User\Siswa\Detailsiswa::with('KelasOne')->where('nis', $Part2)->first();
                 $Guru = Detailguru::where('kode_guru', $Part2)->first();
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, '6285329860005', config('whatsappSession.DevNomorTujuan') . "/ dev wa / " . $nosessionNo);
+                // return false;
                 if ($Part1 === 'Siswa') {
                     if (!$Siswa) {
                         $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, "Data siswa tidak ditemukan.");
                         return;
                     }
                     Auto_reply_SiswaKode($Siswa, $NoRequest, $message);
+                    return false;
                 } elseif ($Part1 === 'Surat') {
                     $isi = SuratKode($NoRequest, $message);
-                    return response()->json([
-                        'status' => 'success',
-                        'reply' => $isi['pesan'],
-                        'file' => 'uploads/' . $isi['nama_file'], //Jika ingin kirim via Whatsapp harus simpan di folder upload whatsapp,
-                    ]);
+                    // return response()->json([
+                    //     'status' => 'success',
+                    //     'reply' => $isi['pesan'],
+                    //     'file' => 'uploads/' . $isi['nama_file'], //Jika ingin kirim via Whatsapp harus simpan di folder upload whatsapp,
+                    // ]);
                 } elseif ($Part1 === 'Guru') {
                     Auto_reply_Data_Guru($Kode, $NoRequest, $message, $sessions);
                 } elseif ($Part1 === 'Cari') {
@@ -546,15 +553,19 @@ app.use(cors()); // izinkan semua origin
                     // handling cek guru
                     // FiturPaket($paket, $NoRequest);
                     Auto_Reply_ControlHelper($Kode, $NoRequest, $message);
+                } elseif ($Part1 === 'Operator') {
+                    // handling cek guru
+                    // FiturPaket($paket, $NoRequest);
+                    Auto_Reply_OperatorHelper($Kode, $NoRequest, $message);
                 } elseif ($Part1 === 'Kepala') {
                     // handling cek guru
                     // FiturPaket($paket, $NoRequest);
                     $dataFile = Auto_Reply_KepalaHelper($Kode, $NoRequest, $message);
-                    return response()->json([
-                        'status' => 'success',
-                        'reply' => "Dokumen siap - " . $dataFile['filename'],
-                        'file' => 'uploads/' . $dataFile['filename'], //Jika ingin kirim via Whatsapp harus simpan di folder upload whatsapp,
-                    ]);
+                    // return response()->json([
+                    //     'status' => 'success',
+                    //     'reply' => "Dokumen siap - " . $dataFile['filename'],
+                    //     'file' => 'uploads/' . $dataFile['filename'], //Jika ingin kirim via Whatsapp harus simpan di folder upload whatsapp,
+                    // ]);
                 } elseif ($Part1 === 'Rapat') {
                     // handling cek guru
                     switch ($Kode) {

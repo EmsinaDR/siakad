@@ -47,9 +47,14 @@ Route::prefix('admin/seting')->middleware(['auth', 'CekDataSekolah', 'token.chec
 
     Route::resource('reset-password', \App\Http\Controllers\Admin\ResetPasswordController::class)
         ->middleware(['auth', 'verified']);
+
+    Route::post('ubah-data-karpel', [App\Http\Controllers\User\Siswa\DetailsiswaController::class, 'ubahDataKarpel'])->name('ubah.data.karpel');
 });
 Route::get('siswa-cetak/{id}', [App\Http\Controllers\User\Siswa\DetailsiswaController::class, 'cekData'])->name('siswa.cetak');
 Route::POST('siswa-cetak/{id}', [App\Http\Controllers\User\Siswa\DetailsiswaController::class, 'SiswaCetak'])->name('siswa.cetak');
+Route::get('/get-siswa/{id}', [\App\Http\Controllers\User\Siswa\DetailsiswaController::class, 'getSiswa'])->name('get.siswa');
+
+Route::POST('/siswa/scan', [\App\Http\Controllers\User\Siswa\DetailsiswaController::class, 'getByNis'])->name('siswa.scan');
 
 Route::POST('guru/create', [App\Http\Controllers\Admin\UserController::class, 'createuser'])->name('CreateUserGuru')->middleware(['auth', 'CekDataSekolah', 'token.check', 'verified']);
 Route::GET('ekelasx', [\App\Http\Controllers\Admin\EkelasController::class, 'updatex'])->name('UserKaryawanx')->middleware(['auth', 'CekDataSekolah', 'token.check', 'verified']);

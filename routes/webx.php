@@ -282,7 +282,7 @@ Route::prefix('/elearning/{mapel_id}/{semester}/{tingkat_id}/{kelas_id}')->middl
 Route::GET('/api-emateri-mapel-to-materi/{mapel_id}/{materi}', [App\Http\Controllers\Learning\EmateriController::class, 'ematerimateritosub'])->name('ematerimateritosub')->middleware(['auth', 'CekDataSekolah', 'token.check', 'verified']);
 Route::GET('/api-emateri-sub-to-indikator/{materi}/{sub_materi}', [App\Http\Controllers\Learning\EmateriController::class, 'ematerisubtoindikator'])->name('EmateriSubtoIndikator')->middleware(['auth', 'CekDataSekolah', 'token.check', 'verified']);
 //Ajax
-Route::get('/get-siswa/{id}', [\App\Http\Controllers\User\Siswa\DetailsiswaController::class, 'getSiswa'])->name('get.siswa');
+// Route::get('/get-siswa/{id}', [\App\Http\Controllers\User\Siswa\DetailsiswaController::class, 'getSiswa'])->name('get.siswa');
 Route::get('/get-pembayaran-komite/{tingkat_id}', [App\Http\Controllers\Bendahara\KeuanganRiwayatListController::class, 'getPembayaranTingkat'])->name('get.pembayarantingkat')->middleware(['auth', 'CekDataSekolah', 'token.check', 'verified']);
 Route::get('/get-siswa-by-tingkat/{tingkat_id}', [\App\Http\Controllers\WakaKurikulum\Perangkat\PesertaTestController::class, 'getSiswaByTingkat'])->name('get.siswa.by.tingkat')->middleware(['auth', 'CekDataSekolah', 'token.check', 'verified']);
 //---------------------------------------------------------------------------------------------------------------------------

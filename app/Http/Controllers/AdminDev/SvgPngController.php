@@ -108,6 +108,7 @@ class SvgPngController extends Controller
         // $idsiswas = [1, 2, 3, 4, 5];
         $template_id = $request->input('template_id');
         $Siswa = Detailsiswa::whereIn('id',  $idsiswas)->pluck('id');
+        // dd($idsiswas);
         foreach ($idsiswas as $IdSiswa) {
             if ($jenis_kartu === 'Kartu Pelajar') {
                 $folder = 'img/template/karpel';

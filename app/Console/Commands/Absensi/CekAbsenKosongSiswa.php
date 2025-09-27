@@ -47,11 +47,11 @@ class CekAbsenKosongSiswa extends Command
             ->toArray();
 
         if (!config('whatsappSession.WhatsappDev')) {
-            $siswaBelumAbsen = Detailsiswa::whereNotNull('kelas_id')
+            $siswaBelumAbsen = Detailsiswa::with('kelas')->whereNotNull('kelas_id')
                 ->whereNotIn('id', $sudahAbsen)
                 ->get();
         } else {
-            $siswaBelumAbsen = Detailsiswa::whereNotNull('kelas_id')
+            $siswaBelumAbsen = Detailsiswa::with('kelas')->whereNotNull('kelas_id')
                 ->whereNotIn('id', $sudahAbsen)
                 ->limit(5)
                 ->get();
@@ -70,23 +70,24 @@ class CekAbsenKosongSiswa extends Command
             $tanggal = Carbon::now()->translatedFormat('l, d F Y');
             $nama    = $siswa->nama_siswa;
             $kelas   = $siswa->kelasOne->nama_kelas ?? '-'; // pastikan field yg bener
-
+            $jam = $jamSekarang->format('H:i');
             $message =
                 "Selamat {$tanggal} Bp / Ibu, Kami menyampaikan terkait dengan absensi kehadiran ananda *{$nama}* sebagai berikut : \n\n" .
                 "📝 Nama\t\t: {$nama}\n" .
                 "🏫 Kelas\t\t: {$kelas}\n" .
                 "📅 Tanggal\t: {$tanggal}\n" .
-                "⏰ Jam\t\t\t: {$jamSekarang} WIB\n" .
+                "⏰ Jam\t\t\t: {$jam} WIB\n" .
                 "📒 Keterangan : *Alfa System*\n" .
                 ($telat ?? '') . "\n" .
                 "\n" . str_repeat("─", 25) . "\n" .
                 "Kami mohon agar Bapak / Ibu terus bersama membimbing ananda *{$nama}* agar selalu menaati peraturan sekolah.\n";
             if (!config('whatsappSession.WhatsappDev')) {
-                if (!config('whatsappSession.SingleSession')) {
-                    $sessions = getWaSession($siswa->tingkat_id); // jika single whatsapp kosongkan tingkat
-                } else {
-                    $sessions = getWaSession();
-                }
+                // if (!config('whatsappSession.SingleSession')) {
+                //     $sessions = getWaSession(); // jika single whatsapp kosongkan tingkat
+                // } else {
+                //     $sessions = getWaSession();
+                // }
+                $sessions = getWaSession(); // jika single whatsapp kosongkan tingkat
                 $NoTujuan = getNoTujuanOrtu($siswa);
             } else {
                 $sessions = config('whatsappSession.IdWaUtama');
@@ -100,21 +101,47 @@ class CekAbsenKosongSiswa extends Command
                 'whatsapp_response' => $ResponWa['status'] ?? null,
             ]);
         }
+        // Batas Akhir Orang Tua
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*
+            |--------------------------------------------------------------------------
+            | 📌 Wali Kelas :
+            |--------------------------------------------------------------------------
+            |
+            | Fitur :
+            | - xxxxxxxxxxx
+            | - xxxxxxxxxxx
+            |
+            | Tujuan :
+            | - xxxxxxxxxxx
+            |
+            |
+            | Penggunaan :
+            | - xxxxxxxxxxx
+            |
+            */
+        // Proses Coding
         // Rekap semua Kelas
         $jumlahSiswa = count($siswaBelumAbsen);
-        $kelasList = Ekelas::where('tapel_id', $etapels->id)->get();
+        $kelasList = Ekelas::with('Guru')->where('tapel_id', $etapels->id)->get();
+
         $SiswaKelas = '';
         foreach ($kelasList as $kelas) {
-            $jumlah = $siswaBelumAbsen->where('kelas_id', $kelas->id)->count();
-            $SiswaKelas .= "Kelas {$kelas->kelas} \t\t\t\t\t\t: {$jumlah} Siswa\n";
+            $Alfa = Eabsen::whereDate('created_at', Carbon::today())->where('absen', 'alfa')->where('kelas_id', $kelas->id)->where('jenis_absen', $jenisAbsen)->get();
+            $SiswaKelas .= "Kelas {$kelas->kelas} \t\t\t\t\t\t: {$Alfa->count()} Siswa\n";
         }
-
-        $pesanAlfa =
-            "==============================\n" .
-            "📌 *Data Siswa Tidak Absen System*\n" .
-            "==============================\n\n" .
-            "Siswa tidak absen sistem: {$jumlahSiswa} Siswa\n" .
-            "Status telah dibuat *alfa* otomatis per kelas :\n{$SiswaKelas}";
 
         $rekapPerKelas = Eabsen::whereDate('waktu_absen', Carbon::today())
             ->where('jenis_absen', $jenisAbsen)
@@ -123,111 +150,111 @@ class CekAbsenKosongSiswa extends Command
             ->groupBy('kelas_id', 'absen')
             ->get();
 
-        // Tujuan Kepala
-        // Ambil daftar kelas sekaligus, supaya bisa dipanggil nama kelasnya
-        $kelasList = Ekelas::where('tapel_id', $etapels->id ?? null)->get()->keyBy('id');
-
-        $pesanKelas = "\n\n\n";
 
         foreach ($kelasList as $kelas) {
             // $siswaAlfaSystem = Detailsiswa::whereNotIn('id', $sudahAbsen)->where('kelas_id', $kelas->id)->get();
-            $DataEabsen = Eabsen::where('absen', 'alfa')->where('kelas_id', $kelas->id)->get();
-            // dd($siswaAlfaSystem);
+            // ambil detailsiswa_id
+            // dd($kelas);
+            $Alfa = Eabsen::whereDate('created_at', Carbon::today())->where('absen', 'alfa')->where('kelas_id', $kelas->id)->where('jenis_absen', $jenisAbsen)->get();
+            $Hadir = Eabsen::whereDate('created_at', Carbon::today())->where('absen', 'hadir')->where('kelas_id', $kelas->id)->where('jenis_absen', $jenisAbsen)->get();
+            $Ijin = Eabsen::whereDate('created_at', Carbon::today())->where('absen', 'ijin')->where('kelas_id', $kelas->id)->where('jenis_absen', $jenisAbsen)->get();
+            $Sakit = Eabsen::whereDate('created_at', Carbon::today())->where('absen', 'sakit')->where('kelas_id', $kelas->id)->where('jenis_absen', $jenisAbsen)->get();
+            // Data Siswa Alfa
+            $today = Carbon::now()->toDateString(); // "2025-09-24"
+            $DataAlfa = Eabsen::whereDate('created_at', $today)->where('absen', 'alfa')->pluck('detailsiswa_id')->toArray();
+            $SiswaAlfa = Detailsiswa::whereIn('id', $DataAlfa)->where('kelas_id', $kelas->id)->get();
             $daftarNama = '';
-            foreach ($DataEabsen as $index => $siswaNotAbsen) {
-                $daftarNama .= $index + 1 . "." . $siswaNotAbsen->detailsiswa->nama_siswa . "\n";
-            }
-            // Filter hasil rekap sesuai kelas ini
-            $dataKelas = $rekapPerKelas->where('kelas_id', $kelas->id);
+            foreach ($SiswaAlfa as $index => $alfa):
+                $daftarNama .= $index + 1 . "." . $alfa->nama_siswa . "\n";
+            endforeach;
+            // dd($daftarNama);
+
 
             // Buat array default supaya semua status muncul meskipun 0
             $status = ['hadir' => 0, 'alfa' => 0, 'ijin' => 0, 'sakit' => 0];
 
-            foreach ($dataKelas as $item) {
-                $status[strtolower($item->absen)] = $item->total;
-            }
-            $pesanKelas .= "==============================\n";
-            $pesanKelas .= "🏫 *Rekap Absensi Kelas {$kelas->kelas}*\n";
-            $pesanKelas .= "==============================\n\n";
-            $pesanKelas .= "✅ Hadir \t\t\t\t\t\t: {$status['hadir']}\n";
-            $pesanKelas .= "❌ Alfa  \t\t\t\t\t\t\t: {$DataEabsen->count()}\n";
-            $pesanKelas .= "📝 Ijin  \t\t\t\t\t\t\t: {$status['ijin']}\n";
-            $pesanKelas .= "🤒 Sakit \t\t\t\t\t\t: {$status['sakit']}\n\n";
-            $pesanKelas .= "Berikut Daftar Nama Siswa Alfa melalui Sistem :\n";
-            $pesanKelas .= "{$daftarNama}\n";
-        }
-        $footerPesan = "\n" . str_repeat("─", 25) . "\n" .
-            "✍️ Dikirim oleh:\n" .
-            "*Boot Assistant Pelayanan {$Identitas->namasek}*";
-        $pesan = $pesanAlfa . $pesanKelas . $footerPesan;
-
-        if (!config('whatsappSession.WhatsappDev')) {
-            $NoPenerima = config('whatsappSession.SekolahNoTujuan');
-        } else {
-            $NoPenerima = config('whatsappSession.DevNomorTujuan');
-        }
-        // Kirim Ke kepala
-        \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, config('whatsappSession.NoKepala'), $pesan);
-        /*
-            |--------------------------------------------------------------------------
-            | 📌 Pesan Untuk Wali Kelas :
-            |--------------------------------------------------------------------------
-            |
-            | Fitur :
-            | - Pengiriman pesan absensi harian ke wali kelas
-            |
-        */
-        // Kirim ke wali kelas
-        $pesanWaliKelas = "\n\n\n";
-
-        foreach ($kelasList as $kelas) {
-            $DataEabsen = Eabsen::where('absen', 'alfa')->where('kelas_id', $kelas->id)->get();
-            // dd($siswaAlfaSystem);
-            $daftarNama = '';
-            foreach ($DataEabsen as $index => $siswaNotAbsen) {
-                $daftarNama .= $index + 1 . "." . $siswaNotAbsen->detailsiswa->nama_siswa . "\n";
-            }
-            // Filter hasil rekap sesuai kelas ini
-            $dataKelas = $rekapPerKelas->where('kelas_id', $kelas->id);
-
-            // Array default supaya semua status muncul walau 0
-            $status = ['hadir' => 0, 'alfa' => 0, 'ijin' => 0, 'sakit' => 0];
-
-            foreach ($dataKelas as $item) {
-                $status[strtolower($item->absen)] = $item->total;
-            }
-
-            // Reset pesan per kelas
-            if ($kelas->Guru->jenis_kelamin === 'Perempuan') {
-                $sapaan = 'Ibu';
+            // foreach ($dataKelas as $item) {
+            //     $status[strtolower($item->absen)] = $item->total;
+            // }
+            $pesanKelas = "\n";
+            $pesanKelas .= "✅ Hadir \t\t\t\t\t\t: {$Hadir->count()}\n";
+            $pesanKelas .= "❌ Alfa  \t\t\t\t\t\t\t: {$Alfa->count()}\n";
+            $pesanKelas .= "📝 Ijin  \t\t\t\t\t\t\t: {$Ijin->count()}\n";
+            $pesanKelas .= "🤒 Sakit \t\t\t\t\t\t: {$Sakit->count()}\n\n";
+            if ($Alfa->count() > 0) {
+                $pesanKelas .= str_repeat("─", 25) . "\n";
+                $pesanKelas .= "Berikut Daftar Nama Siswa Alfa dikelas :\n";
+                $pesanKelas .= "{$daftarNama}\n";
             } else {
-                $sapaan = 'Bapak';
+                $pesanKelas .= str_repeat("─", 25) . "\n";
+                $pesanKelas .= "Kelas ini tidak memiliki siswa alfa!\n";
             }
-            $pesanWaliKelas = "";
-            $pesanWaliKelas .= "==============================\n";
-            $pesanWaliKelas .= "🏫 *Rekap Absensi Kelas {$kelas->kelas}*\n";
-            $pesanWaliKelas .= "==============================\n\n";
-            $pesanWaliKelas .= "Selama pagi {$sapaan} {$kelas->Guru->nama_guru},{$kelas->Guru->gelar} , data rekap absnesi hari ini kelas {$kelas->kelas} sebagai berikut : \n";
-            $pesanWaliKelas .= "✅ Hadir \t\t\t\t\t\t: {$status['hadir']}\n";
-            $pesanWaliKelas .= "❌ Alfa  \t\t\t\t\t\t\t: {$status['alfa']}\n";
-            $pesanWaliKelas .= "📝 Ijin  \t\t\t\t\t\t\t: {$status['ijin']}\n";
-            $pesanWaliKelas .= "🤒 Sakit \t\t\t\t\t\t: {$status['sakit']}\n\n";
-            $pesanWaliKelas .= "Berikut Daftar Nama Siswa Alfa melalui Sistem :\n";
-            $pesanWaliKelas .= "{$daftarNama}\n";
 
-            $footerPesan = "\n" . str_repeat("─", 25) . "\n" .
-                "✍️ Dikirim oleh:\n" .
-                "*Boot Assistant Pelayanan {$Identitas->namasek}*";
-            $sapaan = $kelas->Guru->jenis_kelamin;
-            $pesan = $pesanWaliKelas . $footerPesan . "\n";
+            // $pesan = $pesanAlfa . $pesanKelas . $footerPesan;
+
+            // Walkes
+            // bagian kirim ke wali kelas
+            $waktuSapaan = $jenisAbsen === 'masuk' ? 'Pagi' : 'Siang';
+            $nama_wali = $kelas->Guru->nama_guru;
+            $gelar = $kelas->Guru->gelar;
+            $kelasSIswa = $kelas->kelas;
+            $PesanWalkes = "\n";
+            $pesan =
+                "Selamat {$waktuSapaan} Bapak / Ibu {$nama_wali}, {$gelar} berikut untuk data absensi rekap {$jenisAbsen} hari ini sebagai informasi wali kelas.\n" .
+                "{$pesanKelas}\n" .
+                "Kami sampaikan banyak terima kasih telah membimbing kelas dengan sabar.\n" .
+                "\n";
             if (!config('whatsappSession.WhatsappDev')) {
-                $NoPenerima = $kelas->Guru->no_hp ?? config('whatsappSession.SekolahNoTujuan');
+                $NoPenerima = $kelas->Guru->no_hp;
             } else {
                 $NoPenerima = config('whatsappSession.DevNomorTujuan');
             }
-            // Kirim pesan WA, ganti nomor di sini sesuai wali kelas
-            \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoPenerima, $pesan);
+            // pesan wali kelas
+            $ResponWa = WhatsApp::sendMessage($sessions, $NoPenerima, format_pesan("🏫 Rekap Absensi Kelas {$kelasSIswa}", $pesan));
+
+            $this->info("Absen $jenisAbsen selesai.\nKelas :{$kelas}\nTotal siswa alfa : {$Alfa->count()} \n" . str_repeat("─", 25) . "\n");
+            // Netralkan pesan dan rekap pesan untuk kepala
+            $pesan = '';
+            $pesanKelas = '';
+            // $pesanKepala = "";
+            // $pesanKepala .= $pesan;
+            // Netralkan pesan dan rekap pesan untuk kepala
+            // Pengiriman Wali Kelas selesai
+            sleep(rand(4, 10));
         }
+
+        // Tujuan Kepala
+        // Ambil daftar kelas sekaligus, supaya bisa dipanggil nama kelasnya
+        $kelasList = Ekelas::where('tapel_id', $etapels->id ?? null)->get()->keyBy('id');
+        $kelasList = Ekelas::where('tapel_id', $etapels->id)->orderBy('id', 'ASC')->get();
+        $pesanAlfa =
+            "==============================\n" .
+            "📌 *Data Siswa Tidak Absen System*\n" .
+            "==============================\n\n" .
+            "Siswa tidak absen sistem: {$siswaBelumAbsen->count()} Siswa\n" .
+            "Status telah dibuat *alfa* otomatis per kelas :\n{$SiswaKelas}";
+        // Rekap Kepala
+        $LaporanAlfaKepala = Eabsen::whereDate('created_at', Carbon::today())->where('absen', 'alfa')->where('jenis_absen', $jenisAbsen)->get();
+        $DfNama = '';
+        foreach ($LaporanAlfaKepala as $index => $dataSiswaKepala) {
+            $DfNama .= $index + 1 . "." . $dataSiswaKepala->detailsiswa->nama_siswa . "/" . $dataSiswaKepala->detailsiswa->kelasOne->kelas . "\n";
+        }
+        if (!config('whatsappSession.WhatsappDev')) {
+            $NoPenerima = config('whatsappSession.NoKepala');
+        } else {
+            $NoPenerima = config('whatsappSession.DevNomorTujuan');
+        }
+        $pesanKelas = '';
+        $pesanKelas .= "\n" . str_repeat("─", 25) . "\n" .
+            "✍️ Dikirim oleh:\n" .
+            "*Boot Assistant Pelayanan {$Identitas->namasek}*";
+        $pesanKelas = $pesanAlfa .
+            "\n" . str_repeat("─", 25) . "\n" .
+            "Berikut daftar nama yang tercatat :\n" .
+            $DfNama .
+            $pesanKelas;
+        // WhatsApp::sendMessage($sessions, '6285329860005', $pesanKelas);
+        $ResponWa = WhatsApp::sendMessage($sessions, $NoPenerima, $pesanKelas);
 
         $this->info("Absen $jenisAbsen selesai. Total siswa alfa : {$jumlahSiswa}");
         return 0;

@@ -47,54 +47,54 @@
 //     }
 // }
 
-namespace App\Providers;
+// namespace App\Providers;
 
-use App\Models\AdminDev\Modul;
-use App\Models\Admin\Identitas;
+// use App\Models\AdminDev\Modul;
+// use App\Models\Admin\Identitas;
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+// use Illuminate\Support\Facades\Route;
+// use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
-class RouteServiceProvider extends ServiceProvider
-{
-    /** * Bootstrap any application services. */ public function boot(): void
-    {
-        $this->routes(function () {
+// class RouteServiceProvider extends ServiceProvider
+// {
+//     /** * Bootstrap any application services. */ public function boot(): void
+//     {
+//         $this->routes(function () {
 
-            // $Identitas = Identitas::first();
-            // if ($Identitas->paket === 'Kerjasama') {
-            //     $apps = Modul::where('is_active', 1)->get();
-            //     // if ($apps->count() > 0) {
-            //     //     foreach ($apps as $app) {
-            //     //         if (class_exists($app->provider_class)) {
-            //     //             $this->app->register($app->provider_class);
-            //     //
-            // $this->loadRoutesFrom(base_path('routes/program/surat.php'));
+                // $Identitas = Identitas::first();
+                // if ($Identitas->paket === 'Kerjasama') {
+                //     $apps = Modul::where('is_active', 1)->get();
+                //     // if ($apps->count() > 0) {
+                //     //     foreach ($apps as $app) {
+                //     //         if (class_exists($app->provider_class)) {
+                //     //             $this->app->register($app->provider_class);
+                //     //
+                // $this->loadRoutesFrom(base_path('routes/program/surat.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/pembina-osis.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/pembina-osis.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/shalat-jamaah.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/shalat-jamaah.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/buku-tamu.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/buku-tamu.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/supervisi.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/supervisi.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/pkks.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/pkks.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/kepala-sekolah.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/kepala-sekolah.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/wali-kelas.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/wali-kelas.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/prestasi.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/prestasi.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/elearning.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/elearning.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/kepala-tata-usaha.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/kepala-tata-usaha.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/vote.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/vote.php'));
 
-            // $this->loadRoutesFrom(base_path('routes/program/template-dokumen.php'));
+                // $this->loadRoutesFrom(base_path('routes/program/template-dokumen.php'));
 
-        });
-    }
-}
+                // \n        $this->loadRoutesFrom(base_path('routes/program/dokumen-sekolah.php'));\n});});
+//             }
+// }

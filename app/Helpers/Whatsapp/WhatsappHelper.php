@@ -101,20 +101,29 @@ if (!function_exists('kirimPesanAbsensi')) {
         $Menyampaikan = $faker->randomElement(['menyampaikan', 'informasikan', 'beritahukan']);
         $Disiplin = $faker->randomElement(['disiplin waktu', 'disiplin', 'tepat waktu']);
         // Format pesan absensi
-
+        $ketereangan = $waktu === 'Pagi' ? 'Hadir' : 'Pulang';
+        $poisisi = $waktu === 'Pagi' ? 'kehadiran' : 'kepulangan';
+        if ($waktu === 'Pagi') {
+            $doa =
+                "Dengan do'a kita semua, bersama seluruh wali.\nSemoga ananda *{$nama}* bisa mengikuti dan menerima pelajaran dengan baik sebagai bekal di masa depan!\nAamiin.\n";
+        } else {
+            $doa =
+                "Semoga apa yang telah di ajarkan disekolah bisa bermanfaat untuk ananda *{$nama}* di masa depan.\n";
+        }
         $message =
             "================================\n" .
             "📌 *LAPORAN ABSENSI HARIAN*\n" .
             "================================\n\n" .
-            "Selamat $waktu Bp / Ibu, $Kami $Menyampaikan terkait dengan absensi kehadiran ananda *$nama* sebagai berikut : \n\n" .
+            "Selamat $waktu Bp / Ibu, $Kami $Menyampaikan terkait dengan absensi {$poisisi} ananda *{$nama}* sebagai berikut : \n\n" .
             "👨‍🎓 Nama\t\t: $nama\n" .
             "🏫 Kelas\t\t: $kelas\n" .
             "📅 Tanggal\t: $tanggal\n" .
             "⏰ Jam\t\t\t: $jam WIB\n" .
-            "📒 Keterangan : *Hadir*\n" .
+            "📒 Keterangan : *{$ketereangan}*\n" .
             "{$telat}\n" .
+            "{$doa}\n" .
             "\n" . str_repeat("─", 25) . "\n" .
-            "$Kami $Ucapkan banyak terima kasih atas partisipasi Bp / Ibu dalam mengarahkan ananda *$nama* agar selalu $Disiplin" .
+            "$Kami $Ucapkan banyak terima kasih atas partisipasi Bapak / Ibu dalam mengarahkan ananda *{$nama}* agar selalu $Disiplin" .
             "\n" . str_repeat("─", 25) . "\n" .
             "✍️ Dikirm oleh:\n WhasappBot *{$identitas->namasek}*";
         return WhatsApp::sendMessage($session, $nomorTujuan, $message);

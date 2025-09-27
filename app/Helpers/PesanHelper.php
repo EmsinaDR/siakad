@@ -337,6 +337,27 @@ if (!function_exists('format_pesan_gb')) {
         return $pesan;
     }
 }
+if (!function_exists('format_pesan_media')) {
+    function format_pesan_media($title, $isi)
+    {
+        //Isi Fungsi
+
+        $Identitas = Identitas::first();
+        $etapels = Etapel::where('aktiv', 'Y')->first();
+        $pesan =
+            "==========================\n" .
+            "📌 *{$title}*\n" .
+            "==========================\n\n" .
+            "*Assalamu'alaikum Wr.Wb.*\n" .
+            $isi .
+            "\n\n" .
+            "*Wasssalamu'alaikum Wr.Wb.*\n" .
+            "\n" . str_repeat("─", 20) . "\n" .
+            "✍️ Dikirim oleh:\n" .
+            "*Boot Assistant Pelayanan {$Identitas->namasek}*";
+        return $pesan;
+    }
+}
 if (!function_exists('format_pesan_group')) {
     function format_pesan_group($title, $isi)
     {

@@ -5,7 +5,7 @@
     <style>
         @page {
             size: A4;
-            margin: 2cm;
+            margin: 0.5cm;
         }
 
         html,
@@ -14,7 +14,7 @@
             overflow: hidden;
             font-family: 'Times New Roman', serif;
             font-size: 12pt;
-            line-height: 1.5;
+            line-height: 1;
             box-sizing: border-box;
         }
 
@@ -70,9 +70,12 @@
         <thead>
             <tr class="table-primary align-middle">
                 <th class='text-center align-middle' rowspan='2' colspan="1">Tanggal</th>
+                <th class='text-center align-middle' rowspan='2' colspan="1">JM</th>
+                <th class='text-center align-middle' rowspan='2' colspan="1">JP</th>
                 <th class='text-center align-middle' rowspan='2' colspan="1">Status <br>(H:I:A)</th>
                 <th class='text-center align-middle' rowspan='1' colspan="2">Masuk</th>
                 <th class='text-center align-middle' rowspan='1' colspan="3">Pulang (P)</th>
+                <th class='text-center align-middle' rowspan='2' colspan="1">Durasi</th>
             </tr>
             <tr class="table-primary align-middle">
                 <th>Jam</th>
@@ -83,19 +86,24 @@
             </tr>
         </thead>
         <tbody>
+
             @foreach ($DataAbsen as $tanggal => $absensis)
                 @php
                     $masuk = $absensis->firstWhere('jenis_absen', 'masuk');
                     $pulang = $absensis->firstWhere('jenis_absen', 'pulang');
+                    // dd($absensis);
                 @endphp
                 <tr>
                     <td class='text-center'>{{ $tanggal }}</td>
+                    <td class="text-center">{{ $masuk->jam_masuk ?? '-' }}</td>
+                    <td class="text-center">{{ $masuk->jam_pulang ?? '-' }}</td>
                     <td class='text-center'>{{ $masuk->absen ?? ($pulang->absen ?? '-') }}</td>
                     <td class='text-center'>{{ $masuk?->created_at?->format('H:i') ?? '-' }}</td>
                     <td class='text-center'>{{ $masuk->telat ?? '-' }}</td>
                     <td class='text-center'>{{ $pulang?->created_at?->format('H:i') ?? '-' }}</td>
                     <td class='text-center'>{{ $pulang->pulang_cepat ?? '-' }}</td>
                     <td class='text-center'>{{ $pulang->pulang_telat ?? '-' }}</td>
+                    <td>{{ $masuk->durasi ?? '-' }}</td>
                 </tr>
             @endforeach
         </tbody>

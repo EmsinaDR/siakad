@@ -13,7 +13,13 @@ class CekPengirimanWaAbsensiCommand extends Command
 
     public function handle()
     {
-        $CekWaAbsensi = Eabsen::whereNull('whatsapp_response')->whereDate('created_at', now())->get();
+        $CekWaAbsensi = Eabsen::where(function ($query) {
+            $query->whereNull('whatsapp_response')
+                ->orWhere('whatsapp_response', 0)
+                ->orWhere('whatsapp_response', 'error');
+        })
+            ->whereDate('created_at', now())
+            ->get();
 
         foreach ($CekWaAbsensi as $kirimWa) {
             $siswa = Detailsiswa::find($kirimWa->detailsiswa_id);
@@ -21,7 +27,7 @@ class CekPengirimanWaAbsensiCommand extends Command
             $jam = \Carbon\Carbon::parse($kirimWa->created_at)->translatedFormat('H:i:s');
             $tanggal = \Carbon\Carbon::parse($kirimWa->created_at)->translatedFormat('l, d F Y');
             if (!config('whatsappSession.WhatsappDev')) {
-                //$sessions = getWaSession($siswa->tingkat_id); // by tingkat ada di dalamnya
+                $sessions = getWaSession(); // by tingkat ada di dalamnya
                 //$sessions = config('whatsappSession.IdWaUtama');
                 $NoTujuan = getNoTujuanOrtu($siswa);
                 // $NoTujuan = $siswa->no_hp;

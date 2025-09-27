@@ -81,6 +81,7 @@ Laravel memberikan aksesibilitas, fleksibilitas, dan tool yang kuat untuk aplika
 -   eVote
 -   System Inventaris
 -   System Program Tahfidz
+-   System Shalat Berjamaah
 -   Aplikasi System Perangkat Test
 -   Perpustakaan Digital
 -   Aplikasi Dokumentasi Digital
@@ -94,6 +95,8 @@ Laravel memberikan aksesibilitas, fleksibilitas, dan tool yang kuat untuk aplika
 -   Generator QR Code
 -   Generator Sertifikat
 -   Generator CoCard Panitia
+-   Generator Kartu NISN
+-   Generator Kartu Pembayaran
 -   Kompresi Gambar
 -   Perangkat Kelas (Nilai, Absensi, dll)
 -   Aplikasi Foto Digital

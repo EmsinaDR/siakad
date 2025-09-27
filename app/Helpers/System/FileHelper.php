@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Models\User\Siswa\Detailsiswa;
 use Illuminate\Support\Facades\Storage;
-
+use PhpOffice\PhpWord\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpWord\TemplateProcessor;
 /*
         |--------------------------------------------------------------------------
         | 📌 FileHelper :
@@ -937,5 +939,233 @@ if (!function_exists('svgtobase64')) {
         $svgContent = $isFile ? file_get_contents($svgPathOrContent) : $svgPathOrContent;
         $base64 = base64_encode($svgContent);
         return 'data:image/svg+xml;base64,' . $base64;
+    }
+}
+
+if (!function_exists('run_task')) {
+    function run_task($taskName)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | 📌 Catatan Penggunaan Scheduled Task (Windows) / Task Schedule
+        |--------------------------------------------------------------------------
+        |
+        | 1️⃣ Cara membuat task restart PC:
+        |     schtasks /Create /TN "RestartPC" ^
+        |         /TR "C:\Windows\System32\shutdown.exe /r /t 0" ^
+        |         /SC ONCE /ST 00:00 /RL HIGHEST /RU SYSTEM /F
+        Gunakan cmd :
+        schtasks /Create /TN "RestartPC" /TR "C:\Windows\System32\shutdown.exe /r /t 0" /SC ONCE /ST 00:00 /RL HIGHEST /RU SYSTEM /F
+        schtasks /Create /TN "RestartPC" /TR "C:\laragon\www\siakad\executor\pc\restart_komputer.exe" /SC ONCE /ST 00:00 /RL HIGHEST /RU SYSTEM /F
+        mode daily
+        schtasks /Create /TN "RestartPC" /TR "C:\laragon\www\siakad\executor\pc\restart_komputer.exe" /SC DAILY /ST 14:00 /RL HIGHEST /RU SYSTEM /F
+
+
+
+        |     - /TN       → Nama task ("RestartPC")
+        |     - /TR       → Perintah yang dijalankan (shutdown restart)
+        |     - /SC ONCE  → Jadwal sekali jalan (harus ada /ST)
+        |     - /ST 00:00 → Start time dummy (task tetap bisa run manual)
+        |     - /RL       → Run Level (HIGHEST = run as admin)
+        |     - /RU SYSTEM→ Jalan pakai akun SYSTEM
+        |     - /F        → Force overwrite kalau sudah ada
+        |
+        | 2️⃣ Cara menjalankan task bat:
+        |     schtasks /Run /TN "RestartPC"
+        |
+        | 3️⃣ Jalankan lewat PHP:
+             exec('schtasks /Run /TN "RestartPC" 2>&1', $output, $status);
+             if ($status === 0) {
+                 $this->info("✅ Restart sukses");
+             } else {
+                 $this->error("❌ Gagal: " . implode("\n", $output));
+             }
+        |
+        | 4️⃣ Cara cek detail task di Windows:
+        |     schtasks /Query /TN "RestartPC" /V /FO LIST
+        |
+        |   - /V  → verbose (detail info)
+        |   - /FO → format output (LIST, TABLE, CSV)
+        |
+        |--------------------------------------------------------------------------
+        */
+
+        $command = 'schtasks /Run /TN "' . $taskName . '" 2>&1';
+        exec($command, $output, $status);
+
+        return [
+            'status' => $status,
+            'output' => $output,
+            'command' => $command
+        ];
+    }
+}
+
+/*
+|------------------------------------------------------------------------------
+| 📌 Catatan Penggunaan Scheduled Task (Windows) / Task Scheduler
+|------------------------------------------------------------------------------
+|
+| 1️⃣ Cara membuat task restart PC (sekali jalan, bisa dipanggil manual):
+|     schtasks /Create /TN "RestartPC" ^
+|         /TR "C:\Windows\System32\shutdown.exe /r /t 0" ^
+|         /SC ONCE /ST 00:00 /RL HIGHEST /RU SYSTEM /F
+|
+| 2️⃣ Cara membuat task restart PC (otomatis setiap hari jam 14:00):
+|     schtasks /Create /TN "RestartPC" ^
+|         /TR "C:\Windows\System32\shutdown.exe /r /t 0" ^
+|         /SC DAILY /ST 14:00 /RL HIGHEST /RU SYSTEM /F
+|
+| 3️⃣ Cara menjalankan task secara manual:
+|     schtasks /Run /TN "RestartPC"
+|
+| 4️⃣ Cara cek detail task:
+|     schtasks /Query /TN "RestartPC" /V /FO LIST
+|
+| 5️⃣ Catatan:
+|     - Gunakan Laragon/Terminal dalam mode Administrator
+|     - Jika /RU SYSTEM dipakai → bisa jalan tanpa login user
+|
+*/
+
+if (!function_exists('create_task')) {
+    /**
+     * Membuat Scheduled Task Windows via schtasks
+     *
+     * @param string      $taskName Nama task (contoh: RestartPC)
+     * @param string      $pathFile Path file exe/bat yang akan dijalankan
+     * @param string|null $daily    Jam harian, contoh "14:00".
+     *                              Jika null → mode sekali jalan (ONCE, jam 00:00).
+     * @return array
+     */
+    function create_task($taskName, $pathFile, $daily = null)
+    {
+        $taskName = escapeshellarg($taskName);
+        $pathFile = escapeshellarg($pathFile);
+
+        if ($daily) {
+            // Mode harian
+            $command = "schtasks /Create /TN $taskName /TR $pathFile /SC DAILY /ST $daily /RL HIGHEST /RU SYSTEM /F";
+        } else {
+            // Mode sekali jalan
+            $command = "schtasks /Create /TN $taskName /TR $pathFile /SC ONCE /ST 00:00 /RL HIGHEST /RU SYSTEM /F";
+        }
+
+        exec($command . " 2>&1", $output, $status);
+
+        return [
+            'command' => $command,
+            'status'  => $status,
+            'output'  => $output
+        ];
+    }
+}
+
+// Konversi docx ke pdf dengan dompdf
+/*
+$docx = storage_path('app/templates/surat.docx');
+$pdf  = storage_path('app/public/surat.pdf');
+
+$hasil = docx_to_pdf($docx, $pdf);
+
+dd("PDF tersimpan di: {$hasil}");
+
+*/
+if (!function_exists('docx_to_pdf')) {
+    /**
+     * Convert DOCX ke PDF
+     *
+     * @param string $inputDocx  full path .docx
+     * @param string|null $outputPdf full path .pdf (default: sama nama dengan .docx)
+     * @return string path pdf hasil konversi
+     */
+    function docx_to_pdf(string $inputDocx, ?string $outputPdf = null): string
+    {
+        if (!file_exists($inputDocx)) {
+            throw new \Exception("File DOCX tidak ditemukan: {$inputDocx}");
+        }
+
+        // Tentukan output default
+        if (!$outputPdf) {
+            $outputPdf = preg_replace('/\.docx$/i', '.pdf', $inputDocx);
+        }
+
+        // Load DOCX
+        $phpWord = IOFactory::load($inputDocx);
+
+        // Export ke HTML
+        $htmlWriter = IOFactory::createWriter($phpWord, 'HTML');
+        ob_start();
+        $htmlWriter->save('php://output');
+        $html = ob_get_clean();
+
+        // Convert ke PDF
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
+        $pdf->save($outputPdf);
+
+        return $outputPdf;
+    }
+}
+// docx isi
+// use PhpOffice\PhpWord\TemplateProcessor;
+
+if (!function_exists('fill_docx_template')) {
+    /**
+     * Isi template DOCX dengan data lalu simpan ke output
+     *
+     * @param string $templatePath  Path ke file template .docx
+     * @param array $data           Data key => value
+     * @param string $outputPath    Path output .docx
+     * @return string Path file hasil
+     */
+    // cara penggunaan
+    /*
+        $data = [
+            'nama'    => 'Budi Santoso',
+            'jabatan' => 'Kepala Sekolah',
+            'tanggal' => date('d F Y'),
+        ];
+
+        $hasil = fill_docx_template(
+            storage_path('templates/surat.docx'),
+            $data,
+            storage_path('app/public/surat-aktif.docx')
+        );
+
+        dd("✅ DOCX berhasil dibuat di: {$hasil}");
+    */
+    function fill_docx_template(string $templatePath, array $data, string $outputPath): string
+    {
+        if (!file_exists($templatePath)) {
+            throw new \Exception("Template tidak ditemukan: {$templatePath}");
+        }
+
+        $template = new TemplateProcessor($templatePath);
+
+        foreach ($data as $key => $value) {
+            $template->setValue($key, $value);
+        }
+
+        $template->saveAs($outputPath);
+
+        return $outputPath;
+    }
+}
+// Helper Hapus file setelah kirim wa
+if (!function_exists('hapusFileWhatsApp')) {
+    function hapusFileWhatsApp($RootFileBasePath, $filename)
+    {
+        //Isi Fungsi
+        clearstatcache();
+        if (file_exists($RootFileBasePath)) {
+            if (unlink($RootFileBasePath)) {
+                $cek = "✅ File {$filename} berhasil dihapus";
+            } else {
+                $cek = "⚠️ Gagal hapus file {$filename}, cek permission";
+            }
+        } else {
+            $cek = "⚠️ File {$filename} tidak ditemukan di {$RootFileBasePath}";
+        }
+        // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $cek);
     }
 }

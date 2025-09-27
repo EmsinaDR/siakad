@@ -84,22 +84,22 @@
             Lat : <input type="text" id="lat" name="lat" readonly>
             Long: <input type="text" id="lng" name="lng" readonly> --}}
 
-            <script>
+            {{-- <script>
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function(position) {
-                        let lat = position.coords.latitude;
-                        let lng = position.coords.longitude;
+                        // let lat = position.coords.latitude;
+                        // let lng = position.coords.longitude;
 
                         console.log("Lat:", lat, "Lng:", lng);
 
                         // contoh kirim ke Laravel via hidden input
-                        document.getElementById("lat").value = lat;
-                        document.getElementById("lng").value = lng;
+                        // document.getElementById("lat").value = lat;
+                        // document.getElementById("lng").value = lng;
                     });
                 } else {
                     alert("Browser tidak support geolocation.");
                 }
-            </script>
+            </script> --}}
 
         </div>
         <div class="col-md-8">
@@ -150,8 +150,8 @@
 
                 axios.post("{{ route('absensi.store.guru.ajax') }}", {
                         kode_guru: decodedText,
-                        lat: lat, // Untuk map lat
-                        lng: lng, // Untuk map long
+                        // lat: lat, // Untuk map lat
+                        // lng: lng, // Untuk map long
 
                     })
                     .then(response => {

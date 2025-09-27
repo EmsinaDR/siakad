@@ -60,7 +60,13 @@ class ServerAktifCommand extends Command
             "\n" . str_repeat("─", 25) . "\n" .
             "✍️ Dikirim oleh:\n" .
             "*Boot Assistant Pelayanan {$Identitas->namasek}*";
-        WhatsApp::sendMessage($sessions, $NoTujuan, $pesanKiriman);
+        $waData = [
+            config('whatsappSession.NoKepala'),
+            config('whatsappSession.DevNomorTujuan')
+        ];
+        foreach ($waData as $kirikke):
+            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $kirikke, format_pesan('Informasi Backup Database', $pesanKiriman));
+        endforeach;
         $response = Http::timeout(3)->post($url, [
             'id'      => $sessions,
             'number'  => $NoTujuan,

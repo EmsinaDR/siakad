@@ -252,6 +252,7 @@ class DetailsiswaController extends Controller
         $siswa = \App\Models\User\Siswa\Detailsiswa::with('Detailsiswatokelas')->find($id);
         return response()->json($siswa);
     }
+
     public function getByNis(Request $request)
     {
         $nis = $request->input('nis');
@@ -264,17 +265,56 @@ class DetailsiswaController extends Controller
                 'message' => 'Data siswa tidak ditemukan.'
             ]);
         }
+        $tanggal_lahir = Carbon::create($siswa->tanggal_lahir)->toDateString();
+        // hasil: "2025-09-27"
+        $wali_kelas = ($siswa->KelasOne->Guru->jenis_kelamin === 'Perempuan' ? 'Ibu' : 'Bapak') . "." . $siswa->KelasOne->Guru->nama_guru . "," . $siswa->KelasOne->Guru->gelar;
+        $alamat_siswa =
+            "Rt " . ($siswa->rt ?? '-')
+            . ", Rw " . ($siswa->rw ?? '-')
+            . ",<br> Desa " . ($siswa->desa ?? '')
+            . ",<br> Kecamatan " . ($siswa->kecamatan ?? '-')
+            . ",<br> Kode Pos " . ($siswa->kode_pos ?? '-');
+        $alamat_siswa =
+            "Rt " . ($siswa->rt ?? '-')
+            . ", Rw " . ($siswa->rw ?? '-')
+            . ",<br> " . ($siswa->desa ?? '')
+            . " - " . ($siswa->kecamatan ?? '-')
+            . ", " . ($siswa->kode_pos ?? '-');
 
         return response()->json([
             'success' => true,
             'data' => [
-                'nama_siswa'   => $siswa->nama_siswa,
-                'nis'          => $siswa->nis,
-                'kelas'        => $siswa->kelas->kelas ?? '-',
-                'alamat'       => $siswa->alamat ?? '-', // ✅ ini yang kurang!
-                'nohpayah'     => $siswa->ayah_nohp ?? '-',
-                'nohpibu'      => $siswa->ibu_nohp ?? '-',
+                'id'        => $siswa->id,
+                'nama_siswa'        => $siswa->nama_siswa,
+                'nis'               => $siswa->nis,
+                'nisn'               => $siswa->nisn,
+                'desa'               => $siswa->desa,
+                'kelas'             => $siswa->kelas->kelas ?? '-',
+                'alamat'            => $alamat_siswa, // ✅ ini yang kurang!
+                'nohpayah'          => $siswa->ayah_nohp ?? '-',
+                'nohpibu'           => $siswa->ibu_nohp ?? '-',
+                'tempat_lahir'      => $siswa->tempat_lahir ?? '-',
+                'tanggal_lahir'     => $tanggal_lahir ?? '-',
+                'wali_kelas'        => $wali_kelas ?? '-',
+                'rt'        => $siswa->rt ?? '-',
+                'rw'        => $siswa->rw ?? '-',
+                'tanggal_lahir_pretty' => Carbon::parse($siswa->tanggal_lahir)->translatedFormat('l, d F Y'),
             ]
         ]);
+    }
+    public function ubahDataKarpel(Request $request)
+    {
+        // dd($request->all());
+        $data = Detailsiswa::find($request->id);
+        $data->nama_siswa = $request->nama_siswa;
+        $data->nis = $request->nis;
+        $data->nisn = $request->nisn;
+        $data->rt = $request->rt;
+        $data->rw = $request->rw;
+        $data->desa = $request->desa;
+        $data->tempat_lahir = $request->tempat_lahir;
+        $data->tanggal_lahir = $request->tanggal_lahir;
+        $data->update();
+        return Redirect::back()->with('Title', 'Sukses')->with('Success', 'Data Telah Di Perbaharui');
     }
 }

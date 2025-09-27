@@ -88,12 +88,22 @@ class EabsenGuruController extends Controller
 
         // Tentukan jam pulang sesuai hari
         if (is_day('sabtu')) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
         } elseif (is_day("jum'at")) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
+        } elseif (is_day("senin")) {
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
         } else {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
         }
+
+        // if (is_day('sabtu')) {
+        //     $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');
+        // } elseif (is_day("jum'at")) {
+        //     $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');
+        // } else {
+        //     $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');
+        // }
 
         // ==========================
         // 1. Cek riwayat absen hari ini
@@ -114,13 +124,16 @@ class EabsenGuruController extends Controller
         if (!$absenMasuk) {
             $jenisAbsen = 'masuk';
         } elseif (!$absenPulang) {
-            $diff = $absenMasuk->waktu_absen->diffInMinutes($jamSekarang);
+            // pakai created_at dari absen masuk
+            $diff = $absenMasuk->created_at->diffInMinutes($jamSekarang);
+
             if ($diff < 240) { // minimal 4 jam
                 return response()->json([
                     'error' => true,
                     'message' => "⚠️ Belum waktunya pulang, tunggu minimal 4 jam sejak absen masuk!",
                 ]);
             }
+
             $jenisAbsen = 'pulang';
         } else {
             return response()->json([
@@ -128,6 +141,7 @@ class EabsenGuruController extends Controller
                 'message' => "⚠️ Sudah absen hari ini!",
             ]);
         }
+
 
         // ==========================
         // 3. Hitung telat / pulang cepat / pulang telat
@@ -138,7 +152,7 @@ class EabsenGuruController extends Controller
 
         if ($jenisAbsen === 'masuk') {
             if ($jamSekarang->greaterThan($jamBatasMasuk)) {
-                $telatMenit = $jamBatasMasuk->diffInMinutes($jamSekarang);
+                $telatMenit = number_format($jamBatasMasuk->diffInMinutes($jamSekarang));
             }
         } else { // pulang
             if ($jamSekarang->lessThan($jamBatasPulang)) {

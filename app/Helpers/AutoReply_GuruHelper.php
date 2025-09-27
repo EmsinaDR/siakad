@@ -69,19 +69,8 @@ if (!function_exists('Auto_reply_Data_Guru')) {
 
         $data = explode('/', $message);
         $Guru = Detailguru::where('kode_guru', $data[2])->first();
-        // $sessions = config('whatsappSession.IdWaUtama');
-        // $sessions = 'Siswa';
         $DevNomor = config('whatsappSession.DevNomorTujuan');
-        if ($NoRequest !== $DevNomor) {
-            if (!$Guru || $NoRequest !== $Guru->no_hp) {
-                return \App\Models\Whatsapp\WhatsApp::sendMessage(
-                    $sessions,
-                    $NoRequest,
-                    "Maaf anda tidak diijinkan akses disini"
-                );
-            }
-        }
-        if (!validateWhatsappAccess($NoRequest, $Guru)) {
+        if (!validateWhatsappAccessGuruUmum($NoRequest, $Guru)) {
             return; // stop eksekusi
         }
         // lanjut proses lainnya, karena guru valid atau dev

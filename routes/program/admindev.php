@@ -35,4 +35,5 @@ Route::middleware(['web', 'auth', 'CekDataSekolah', 'verified', 'is_admindev'])-
     Route::resource('sosialisasi-vendor', \App\Http\Controllers\AdminDev\SosialisasiAdminDevController::class)->middleware(['auth', 'verified']); //Belum
     Route::resource('data-vendor', \App\Http\Controllers\AdminDev\DataVendorController::class)->middleware(['auth', 'verified']); //Belum
     Route::get('data-kartu', [\App\Http\Controllers\AdminDev\DataVendorController::class, 'DataKarpel'])->name('data.kartu')->middleware(['auth', 'CekDataSekolah', 'verified']);
+    Route::resource('helper-auto-reply-whatsapp', \App\Http\Controllers\AdminDev\HelperSekolahController::class)->middleware(['auth', 'verified']); //Belum
 });

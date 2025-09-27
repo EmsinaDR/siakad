@@ -182,7 +182,7 @@ class AppServiceProvider extends ServiceProvider
             });
 
             $kelas = Cache::tags(['cache_kelas'])->remember("kelas_tapel_{$tapels->id}", now()->addHours(2), function () use ($tapels) {
-                return Ekelas::where('tapel_id', $tapels->id)->get();
+                return \App\Models\Admin\Ekelas::where('tapel_id', $tapels->id)->get();
             });
             $modul = Cache::tags(['Cache_modul'])->remember('Remember_modul', now()->addMinutes(10), function () {
                 return Modul::get();

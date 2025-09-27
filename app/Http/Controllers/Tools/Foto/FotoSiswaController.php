@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Tools\Foto;
 
 
-use Illuminate\Support\Facades\File;
 use App\Models\Admin\Etapel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Tools\Foto\FotoSiswa;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use App\Models\User\Siswa\Detailsiswa;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
@@ -130,24 +132,35 @@ class FotoSiswaController extends Controller
 
         // Buat nama file: nis-ukuran.png
         $filename = $nis . '-' . $ukuran . '.png';
+        // Update Field Foto
+        $siswa = Detailsiswa::where('nis', $nis)->update([
+            'foto' => 1,
+        ]);
 
         // Simpan file
         $fullPath = $path . '/' . $filename;
         $saved = file_put_contents($fullPath, $fotoBinary);
+        sleep(10);
+        if (Auth::user()->posisi === 'Admindev') {
+            $cek = 'Yes';
+            $folder = 'img/template/karpel';
+            $IdSiswa = Detailsiswa::where('nis', $request->nis)->first();
+            $template_id = 11;
+            $result = generatekarpel_depan($IdSiswa->id, $template_id, $folder);
+            $result = generatekarpel_belakang($IdSiswa->id, $template_id, $folder);
+        }
 
         if (!$saved) {
             return response()->json([
                 'message' => 'Gagal simpan file ke server',
             ], 500);
         }
-
         return response()->json([
-            'message' => 'Foto siswa berhasil diunggah!',
+            'message' => 'Foto siswa berhasil diunggah! oleh ' . $cek,
             'filename' => $filename,
             'path' => asset('img/siswa/' . $filename), // Biar link bisa langsung diakses browser
         ]);
     }
-
     public function storex(Request $request)
     {
 

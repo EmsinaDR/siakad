@@ -136,6 +136,7 @@ class Detailsiswa extends Model
         'wali_provinsi',
         'wali_kodepos',
         'wali_nohp',
+        'foto',
     ];
 
 

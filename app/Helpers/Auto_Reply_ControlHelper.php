@@ -17,7 +17,7 @@ if (!function_exists('Auto_Reply_ControlHelper')) {
         $data = explode('/', $message);
         $Guru = Detailguru::where('kode_guru', $data[2])->first();
         $sessions = config('whatsappSession.IdWaUtama');
-        if (!validateWhatsappAccess($NoRequest, $Guru)) {
+        if (!validateWhatsappAccessGuruUmum($NoRequest, $Guru)) {
             return; // stop eksekusi
         }
         switch ($Kode) {
@@ -36,13 +36,13 @@ if (!function_exists('Auto_Reply_ControlHelper')) {
                 $pesan = ShutdownPC();
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
                 break;
-            case 'Cek Service':
-                $pesan = CekServices();
-                \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Informasi Service',  $pesan));
-                break;
             case 'Restart Service':
                 $pesan = RestartServices();
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                break;
+            case 'Cek Service':
+                $pesan = CekServices();
+                \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Informasi Service',  $pesan));
                 break;
             //case 'Siswa':
             //break;

@@ -134,7 +134,7 @@ class ScheduleServiceProvider extends ServiceProvider
                 $schedule->command('ekstra:pengingat-ekstra')->dailyAt('09:30'); // PengingatEkstracommand
                 // CekAbsenKosongSiswa
                 $schedule->command('siakad:CekAbsenKosongSiswa')->dailyAt('08:30')->runInBackground(); // CekAbsenKosong
-                $schedule->command('siakad:CekAbsenKosongSiswa')->dailyAt('13:45')->runInBackground(); // CekAbsenKosong
+                $schedule->command('siakad:CekAbsenKosongSiswa')->dailyAt('14:00')->runInBackground(); // CekAbsenKosong
                 // CekPengirimanWaAbsensiCommand
                 $schedule->command('whatsapp:cek-wa-absensi-null')->hourly(); // Pengecekan kirim wa saat wa absensi bermasalah dicek setiap jam akan dikirim ulang
                 // LaporanAbsensiGuruCommand
@@ -259,6 +259,7 @@ class ScheduleServiceProvider extends ServiceProvider
                 */
             // Proses Coding
             $schedule->command('backup:database')->dailyAt('08:00'); //BackupDatabase
+            $schedule->command('system:cek-registrasi')->dailyAt('08:00'); //BackupDatabase
 
 
         });

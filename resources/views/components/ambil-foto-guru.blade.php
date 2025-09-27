@@ -1,7 +1,36 @@
+<style>
+    #video {
+        width: 100%;
+        /* penuh lebar container */
+        height: 100%;
+        /* penuh tinggi container */
+        object-fit: cover;
+        /* isi penuh, crop kalau perlu */
+        background: black;
+        /* biar nggak putih kalau kamera belum nyala */
+    }
+
+    .video-container {
+        /* width: 300px; */
+        /* contoh: lebar preview */
+        /* height: 400px; */
+        /* contoh: lebar preview */
+        width: 576px;
+        /* contoh: lebar preview */
+        height: 768px;
+        /* tinggi sesuai 3:4 */
+        overflow: hidden;
+        /* sembunyikan area crop */
+        border: 2px solid #ccc;
+        border-radius: 8px;
+    }
+</style>
+
+
 <div class="p-4 bg-light rounded shadow">
     <div class="mb-3">
         <label for="cameraSelect" class="form-label fw-semibold">Pilih Kamera</label>
-        <select id="cameraSelect" class="form-select"></select>
+        <select id="cameraSelect" class="select2 form-select"></select>
     </div>
 
     <!-- Kamera dan Preview -->
@@ -9,8 +38,12 @@
         <!-- Kamera -->
         <div class="col-md-5 text-center">
             <h5 class="mb-3 text-primary">Live Kamera</h5>
-            <video id="video" autoplay class="rounded border border-primary shadow"
-                style="width: 100%; height: 600px; object-fit: cover;"></video>
+            {{-- <video id="video" autoplay class="rounded border border-primary shadow" style="width: 100%; height: 600px; object-fit: cover;"></video> --}}
+            {{-- <video id="video" autoplay style="width: 100%; object-fit: cover;"></video> --}}
+            <div class="video-container">
+                <video id="video" autoplay playsinline></video>
+
+            </div>
         </div>
 
         <!-- Preview -->
@@ -40,6 +73,7 @@
             </select>
         </div>
 
+
         <div class="col-md-4">
             <label for="kodeguru" class="form-label fw-semibold">Data Guru</label>
             <select name="kodeguru" id="kodeguru" class="form-select" required>
@@ -64,7 +98,6 @@
     <input type="hidden" name="foto" id="fotoInput">
     <input type="hidden" name="ukuranFoto" id="ukuranFoto">
 </form>
-
 <canvas id="canvas" style="display: none;"></canvas>
 
 <script>

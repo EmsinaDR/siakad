@@ -69,7 +69,7 @@ if (!function_exists('generatekarpel_depan')) {
             'kode_pos' => $Siswa->kode_pos,
             'lebar' => $lebar,
             // img\template\karpel\data
-            'foto'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/akun-fake.png'))),
+            'foto'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/siswa/' . $Siswa->nis . '-3x4.png'))),
         ];
 
         $svgPath = public_path($folder . '/karpel_' . $template . '.svg');

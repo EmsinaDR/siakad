@@ -93,7 +93,8 @@ Artisan::command('make:custom-controller {name} {fillablin} {routename} {--force
     // Menyusun folder dan file view
     $viewFolder = implode('/', $viewNameParts); // fitur/aplikasi
     $viewFile = $viewName; // nama file view default
-    $rootBlade = 'role.' . strtolower($pathingviewcontroller) . '.' . $viewFolder . '.' . $newString;
+    // $rootBlade = 'role.' . strtolower($pathingviewcontroller) . '.' . $viewFolder . '.' . $newString;
+    $rootBlade =  strtolower($pathingviewcontroller) . '.' . $viewFolder . '.' . $newString;
     // $this->info("Controller '{$rootBlade}' rootBlade.");
     // Menyusun namespace controller
     $namespace = 'App\\Http\\Controllers\\' . str_replace('/', '\\', dirname($name)); // Misalnya 'App\\Http\\Controllers\\Aplikasi\\Fitur'
@@ -2432,3 +2433,126 @@ PHP;
     File::put($filePath, $template);
     $this->info("✅ Custom migration '{$className}' berhasil dibuat di: {$filePath}");
 })->describe('Membuat file migration baru dengan subfolder custom');
+// view
+Artisan::command('make:dokumen {path} {--force}', function ($path) {
+    $force = $this->option('force');
+
+    // 1️⃣ Normalisasi path
+    $path = str_replace('\\', '/', $path);
+    $parts = explode('/', $path);
+    $name = array_pop($parts); // contoh: "nama-dokumen"
+
+    // 2️⃣ Lokasi view
+    $folder = resource_path('views/role/dokumen/' . implode('/', $parts));
+    $file = "{$folder}/{$name}.blade.php";
+
+    // 3️⃣ Pastikan folder ada
+    File::ensureDirectoryExists($folder);
+
+    // 4️⃣ Buat judul dari nama terakhir
+    $judul = strtoupper(str_replace('-', ' ', $name));
+    // contoh: "nama-dokumen" → "NAMA DOKUMEN"
+
+    // 5️⃣ Cek file exist / force
+    if (!File::exists($file) || $force) {
+        $template = <<<BLADE
+{{-- View: {$path} --}}
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{$judul}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+
+        .kop {
+            display: flex;
+            align-items: center;
+            border-bottom: 3px double black;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .kop img {
+            height: 80px;
+            margin-right: 15px;
+        }
+
+        .ttd {
+            float: right;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <x-kop-surat-cetak>{{ \$logo }}</x-kop-surat-cetak>
+
+    <h3 class="text-center"><u>{$judul}</u></h3>
+    <p class="text-center">{{\$nomor_surat}}</p>
+    <br>
+
+    <div class="ttd">
+        <p>{{ \$kabupaten }}, {{ date('d F Y') }}</p>
+        Kepala {{ \$kedinasan }}<br><br><br><br>
+        <p><strong>{{ \$nama_kepala ?? '' }}</strong><br></p>
+        <b style='margin-left:-145px'>NIP. {{ \$nip_kepala ?? '__________' }}</b>
+    </div>
+
+</body>
+
+</html>
+BLADE;
+
+        File::put($file, $template);
+        $this->info("✅ View '{$name}.blade.php' berhasil dibuat di {$file}");
+    } else {
+        $this->warn("⚠️ View '{$name}.blade.php' sudah ada, gunakan --force untuk menimpa");
+    }
+})->describe('Membuat dokumen view baru di resources/views/role/dokumen dengan judul otomatis dari nama file');
+
+
+// Data Custom dokumen list
+Artisan::command('make:dokumen-default {data} {--force}', function ($data) {
+    $list = [
+        "{$data}/surat-home-visit",
+        "{$data}/surat-keterangan-pip",
+        "{$data}/surat-keterangan-aksioma",
+        "{$data}/surat-keterangan-sppd",
+        "{$data}/surat-penerimaan-pindahan",
+        "{$data}/surat-tugas",
+    ];
+
+    foreach ($list as $item) {
+        $this->call('make:dokumen', [
+            'path'    => $item,
+            '--force' => $this->option('force'),
+        ]);
+    }
+
+    $this->info("✅ Semua dokumen custom berhasil dibuat!");
+})->describe('Generate banyak dokumen view sekaligus sesuai daftar preset');

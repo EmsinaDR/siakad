@@ -8,6 +8,7 @@ use App\Models\Admin\Ekelas;
 use App\Models\Admin\Etapel;
 use Illuminate\Http\Request;
 use App\Models\Absensi\Eabsen;
+use Illuminate\Support\Number;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -361,13 +362,25 @@ class EabsenController extends Controller
         $jamBatasMasuk  = Carbon::today()->setTimeFromTimeString('07:05');  // jam batas masuk
 
         // Tentukan jam pulang sesuai hari
+        // if (is_day('sabtu')) {
+        //     $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');
+        // } elseif (is_day("jum'at")) {
+        //     $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');
+        // } elseif (is_day("senin")) {
+        //     $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');
+        // } else {
+        //     $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:00');
+        // }
         if (is_day('sabtu')) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('12:30');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
         } elseif (is_day("jum'at")) {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
+        } elseif (is_day("senin")) {
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
         } else {
-            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('13:15');
+            $jamBatasPulang = Carbon::today()->setTimeFromTimeString('11:00');
         }
+
 
         // ==========================
         // 1. Cek sudah absen hari ini
@@ -395,21 +408,33 @@ class EabsenController extends Controller
                 'message' => "⚠️ Sudah absen hari ini!",
             ]);
         }
+
         if ($jenisAbsen === 'masuk') {
-            // Simpan seperti biasa
+            // Simpan absen masuk seperti biasa
         } else { // pulang
             $absenMasuk = Eabsen::whereDate('created_at', today())
                 ->where('detailsiswa_id', $siswa->id)
                 ->where('jenis_absen', 'masuk')
                 ->first();
 
-            $diff = $absenMasuk->waktu_absen->diffInMinutes(now());
+            if (!$absenMasuk) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => "Data absen masuk tidak ditemukan!",
+                ]);
+            }
+
+            // Gunakan created_at, bukan waktu_absen
+            $diff = $absenMasuk->created_at->diffInMinutes(now());
+
             if ($diff < 240) { // 4 jam = 240 menit
                 return response()->json([
-                    'error' => true,
+                    'error'   => true,
                     'message' => "⚠️ Belum waktunya pulang, tunggu minimal 4 jam sejak absen masuk!",
                 ]);
             }
+
+            // Simpan absen pulang
         }
 
         // ==========================
@@ -553,7 +578,7 @@ class EabsenController extends Controller
         $etapels = Etapel::where('aktiv', 'Y')->first();
 
         $data = [
-            'telat' => $telatMenit,
+            'telat' => Number::forHumans($telatMenit),
             'waktu' => $jenisAbsen === 'masuk' ? 'Pagi' : 'Siang',
         ];
 

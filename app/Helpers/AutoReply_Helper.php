@@ -35,29 +35,29 @@ if (!function_exists('HelpPesan')) {
     function HelpPesan($message, $NoRequest)
     {
         $Identitas = Indetitas(); // ambil data identitas sekali panggil di sini
-        $Guru = Detailguru::where('no_hp', $NoRequest)->first();
-        if (!config('whatsappSession.WhatsappDev')) {
-            //$sessions = getWaSession($siswa->tingkat_id); // by tingkat ada di dalamnya
-            //$sessions = config('whatsappSession.IdWaUtama');
-            //$NoTujuan = getNoTujuanOrtu($siswa)
-            $NoTujuan = $Guru->no_hp;
-        } else {
-            $sessions = config('whatsappSession.IdWaUtama');
-            $NoTujuan = config('whatsappSession.DevNomorTujuan');
-        }
-        $DevNomor = config('whatsappSession.DevNomorTujuan');
-        if ($NoRequest !== $DevNomor) {
-            if (!$Guru || $NoRequest !== $Guru->no_hp) {
-                // Cek No Ortu
-                $NoOrtu = getAllNoHpSiswa();
-                if (!in_array($NoRequest, $NoOrtu)) {
-                    WhatsApp::sendMessage($sessions, $NoRequest, "Maaf anda tidak diijinkan akses disini");
-                    return false;
-                }
-                return true; // ✅ kalau valid ortu, izinkan
-            }
-            return true; // ✅ kalau valid guru, izinkan
-        }
+        // $Guru = Detailguru::where('no_hp', $NoRequest)->first();
+        // if (!config('whatsappSession.WhatsappDev')) {
+        //     //$sessions = getWaSession($siswa->tingkat_id); // by tingkat ada di dalamnya
+        //     //$sessions = config('whatsappSession.IdWaUtama');
+        //     //$NoTujuan = getNoTujuanOrtu($siswa)
+        //     $NoTujuan = $Guru->no_hp;
+        // } else {
+        //     $sessions = config('whatsappSession.IdWaUtama');
+        //     $NoTujuan = config('whatsappSession.DevNomorTujuan');
+        // }
+        // $DevNomor = config('whatsappSession.DevNomorTujuan');
+        // if ($NoRequest !== $DevNomor) {
+        //     if (!$Guru || $NoRequest !== $Guru->no_hp) {
+        //         // Cek No Ortu
+        //         $NoOrtu = getAllNoHpSiswa();
+        //         if (!in_array($NoRequest, $NoOrtu)) {
+        //             WhatsApp::sendMessage($sessions, $NoRequest, "Maaf anda tidak diijinkan akses disini");
+        //             return false;
+        //         }
+        //         return true; // ✅ kalau valid ortu, izinkan
+        //     }
+        //     return true; // ✅ kalau valid guru, izinkan
+        // }
         switch ($message) {
             case 'Assalamu\'alaikum':
                 $pesanKiriman =
@@ -84,14 +84,16 @@ if (!function_exists('HelpPesan')) {
                     "- Help Guru\n" .
                     "- Help Siswa\n" .
                     "- Help Surat\n" .
-                    "- Help Ijin\n" .
-                    "- Help Dokumen\n" .
+                    // "- Help Ijin\n" .
+                    // "- Help Dokumen\n" .
                     "- Help Pencarian\n" .
                     "- Help Control\n" .
                     "- Help Kepala\n" .
                     "- Help PPDB ( _Premium Only_ )\n" .
                     "- Help BK ( _Premium Only_ )\n" .
                     "- Help Perpustakaan ( _Premium Only_ )\n" .
+                    "- Help Pembayaran Siswa ( _Premium Only_ )\n" .
+                    "- Help Pembayaran Siswa ( _Premium Only_ )\n" .
                     "\n";
                 return format_pesan('INFORMASI HELP', $pesanKiriman);
                 break;
@@ -148,6 +150,14 @@ if (!function_exists('HelpPesan')) {
                     "Surat Panggilant\t\t\t\t\t: Surat Panggilan/Surat/kode guru waka/kode wali kelas/NIS/keperluan/+Hari/Waktu/\n" .
                     "Contoh\t\t\t\t\t\t\t: Surat Panggilan/Surat/CA/CA/NIS/keperluan/+Hari/Waktu/\n" .
                     "Tanggal Datang : 2 artinya 2 hari kedepan\n" .
+                    "\n" .
+                    "*Surat Custom Via Template Sekolah :*\n" .
+                    "*Home Visit* : \n" .
+                    "*Surat SPPD* : \n" .
+                    "*Surat Tugas* : \n" .
+                    "*Surat Penerimaan Pindah* : \nSurat Penerimaan Pindah / Surat / nomor_surat / tgl_surat / nama_siswa / tempat_tanggal_lahir / kelas / alamat_siswa\n" .
+                    "*Surat Ket PIP* : \n" .
+                    "*Surat Aksioma* : \n" .
                     "\n";
                 return format_pesan('INFORMASI HELP SURAT', $pesanKiriman);
                 break;
@@ -264,8 +274,9 @@ if (!function_exists('HelpPesan')) {
                     "- Restart PC/Control\n" .
                     "- Shutdown Service/Control\n" .
                     "- Shutdown PC/Control\n" .
+                    "- Cek Service/Control\n" .
                     "\n";
-                return format_pesan('INFORMASI HELP CONTROL*', $pesanKiriman);
+                return format_pesan('INFORMASI HELP CONTROL', $pesanKiriman);
                 break;
             case 'Help Media':
                 //  Auto_Reply_VendorHelper
@@ -304,10 +315,10 @@ if (!function_exists('HelpPesan')) {
                 break;
             case 'Media File':
                 //  Auto_Reply_VendorHelper
-                $pesanKiriman =  "" .
-                    "Media telah tersimpan di server\n" .
-                    "\n\n";
-                return format_pesan("Penyimpanan Media", $pesanKiriman);
+                // $pesanKiriman =  "" .
+                //     "Media telah tersimpan di server\n" .
+                //     "\n\n";
+                // return format_pesan("Penyimpanan Media", $pesanKiriman);
                 break;
             default:
                 $pesanKiriman =

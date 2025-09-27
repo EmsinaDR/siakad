@@ -1125,3 +1125,14 @@ if (!function_exists('string_to_array')) {
         return $result;
     }
 }
+if (!function_exists('combine_format_pesan')) {
+    function combine_format_pesan($keyMessage, $message)
+    {
+        //Isi Fungsi
+        $keydata =  array_map('trim', explode(",", str_replace(' / ', ',', $keyMessage)));
+        $values = array_map('trim', explode("/", $message));
+        // 3️⃣ Zip key dan value jadi associative array
+        $dataPesan = array_combine($keydata, $values);
+        return $dataPesan;
+    }
+}

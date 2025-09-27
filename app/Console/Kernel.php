@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Whatsapp\CekPengirimanWaAbsensiCommand::class,
         \App\Console\Commands\Ucapan\UlanganTahunCommandCommand::class,
 
-    \n        \App\Console\Commands\System\ControlPCCommand::class,\n\n        \App\Console\Commands\System\CekRegistrasiCommand::class,\n\n        \App\Console\Commands\System\UpdateSiakadCommand::class,\n\n        \App\Console\Commands\System\EksekusiSeederCommand::class,\n\n        \App\Console\Commands\System\EksekusiMiggrationCommandCommand::class,\n\n        \App\Console\Commands\Whatsapp\CekSessionQrcodeCommand::class,\n\n        \App\Console\Commands\System\AktivasiModulCommand::class,\n];
+    \n        \App\Console\Commands\System\ControlPCCommand::class,\n\n        \App\Console\Commands\System\CekRegistrasiCommand::class,\n\n        \App\Console\Commands\System\UpdateSiakadCommand::class,\n\n        \App\Console\Commands\System\EksekusiSeederCommand::class,\n\n        \App\Console\Commands\System\EksekusiMiggrationCommandCommand::class,\n\n        \App\Console\Commands\Whatsapp\CekSessionQrcodeCommand::class,\n\n        \App\Console\Commands\System\AktivasiModulCommand::class,\n\n        \App\Console\Commands\Absensi\CekAlfaCommand::class,\n\n        \App\Console\Commands\System\InfonShutdownPCCommand::class,\n];
 
 
     protected function commands(): void
