@@ -2,9 +2,11 @@
 
 use Carbon\Carbon;
 use Faker\Factory as Faker;
+use Illuminate\Support\Number;
 use App\Models\Admin\Identitas;
 use Illuminate\Database\Seeder;
 use App\Models\Whatsapp\WhatsApp;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\User\Siswa\Detailsiswa;
 use App\Models\Whatsapp\WhatsAppSession;
@@ -47,7 +49,7 @@ if (!function_exists('kirimPesanAbsensi')) {
         $faker = Faker::create(); //Simpan didalam code run
         $identitas = Identitas::first();
         $telat = $data['telat'] ?? 0;        // default 0 menit
-        $telat = $data['jenisAbsen'] === 'masuk' ? '⏰ Telat      : ' . $telat . ' Menit' : '';        // default 0 menit
+        $telat = $data['jenisAbsen'] === 'masuk' ? '⏰ Telat      : ' . Number::forHumans($telat) . ' Menit' : '';        // default 0 menit
         $waktu = $data['waktu'] ?? 'Pagi';  // default "Pagi"
         // Ambil URL gateway dari config atau .env
         $url = config('services.wa_gateway') ?? env('WA_GATEWAY_URL', 'http://127.0.0.1:3000');

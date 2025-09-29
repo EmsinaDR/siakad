@@ -47,7 +47,7 @@ if (!function_exists('Auto_reply_SiswaKode')) {
         Log::info("Request received: Number - $NoRequest, Nis - $Nis dan Kode = $Kode");
         WhatsappLog::LogWhatsapp($NoRequest, $message);
 
-        if (!valdiateOrtu($NoRequest, $Nis)) {
+        if (!validate_Ortu($NoRequest, $Nis)) {
             return;
         };
         // TODO: Implement your helper logic here

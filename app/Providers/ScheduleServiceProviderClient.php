@@ -138,6 +138,7 @@ class ScheduleServiceProviderClient extends ServiceProvider
                 $schedule->command('siakad:CekAbsenKosongSiswa')->dailyAt('13:45')->runInBackground(); // CekAbsenKosong
                 // CekPengirimanWaAbsensiCommand
                 $schedule->command('whatsapp:cek-wa-absensi-null')->hourly(); // Pengecekan kirim wa saat wa absensi bermasalah dicek setiap jam akan dikirim ulang
+                $schedule->command('whatsapp:cek-wa-absensi-null')->everyThirtyMinutes(); // Pengecekan kirim wa saat wa absensi bermasalah dicek setiap jam akan dikirim ulang
                 // LaporanAbsensiGuruCommand
                 $schedule->command('laporan:absensi-guru')->dailyAt('09:00')->runInBackground(); // Kirim laporan absensi ke kepala : LaporanAbsensiGuruCommand
             }

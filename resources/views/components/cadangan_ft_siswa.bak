@@ -170,24 +170,24 @@
                         }
                     @endphp
                     <option value="{{ $Siswa->nis }}">{{ $InFoto }}{{ $Siswa->nis }} -
-                        {{ $Siswa->nama_siswa }} - {{ $Siswa->KelasOne->kelas }}</option>
-                @endforeach
+            {{ $Siswa->nama_siswa }} - {{ $Siswa->KelasOne->kelas }}</option>
+            @endforeach
             </select> --}}
             @php
-                $siswasFoto = \App\Models\User\Siswa\Detailsiswa::with(['KelasOne'])
-                    ->whereNotNull('kelas_id')
-                    ->orderBy('kelas_id')
-                    ->orderBy('nama_siswa')
-                    ->get();
+            $siswasFoto = \App\Models\User\Siswa\Detailsiswa::with(['KelasOne'])
+            ->whereNotNull('kelas_id')
+            ->orderBy('kelas_id')
+            ->orderBy('nama_siswa')
+            ->get();
             @endphp
             <select name="nis" id="nis" class="form-select" required>
                 <option value="">--- Pilih Data Siswa ---</option>
                 @foreach ($siswasFoto as $Siswa)
-                    @php $InFoto = $Siswa->foto > 0 ? '✅' : ''; @endphp
-                    <option value="{{ $Siswa->nis }}">
-                        {{ $InFoto }}{{ $Siswa->nis }} - {{ $Siswa->nama_siswa }} -
-                        {{ $Siswa->KelasOne->kelas ?? '-' }}
-                    </option>
+                @php $InFoto = $Siswa->foto > 0 ? '✅' : ''; @endphp
+                <option value="{{ $Siswa->nis }}">
+                    {{ $InFoto }}{{ $Siswa->nis }} - {{ $Siswa->nama_siswa }} -
+                    {{ $Siswa->KelasOne->kelas ?? '-' }}
+                </option>
                 @endforeach
             </select>
             <script>
@@ -241,13 +241,14 @@
                         const formData = new FormData();
                         formData.append('nis', currentNIS);
 
-                        fetch('{{ route('siswa.scan') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: formData
-                            })
+                        fetch('{{ route('
+                                siswa.scan ') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: formData
+                                })
                             .then(res => res.json())
                             .then(data => {
                                 const infoDiv = $('#data-siswa');
@@ -494,7 +495,7 @@
             </div>
             <div class="col-xl-7 p-4">
                 @php
-                    $KelasFotos = \App\Models\Admin\Ekelas::where('tapel_id', $Tapels->id)->get();
+                $KelasFotos = \App\Models\Admin\Ekelas::where('tapel_id', $Tapels->id)->get();
                 @endphp
                 <div class='card-header bg-primary'>
                     <h3 class='card-title'>Data Foto</h3>
@@ -509,17 +510,17 @@
                     </thead>
                     <tbody>
                         @foreach ($KelasFotos as $data)
-                            <tr class='text-center'>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $data->kelas }}</td>
-                                @php
-                                    $JumlahFoto = $siswasFoto
-                                        ->where('kelas_id', $data->id)
-                                        ->whereNotNull('foto')
-                                        ->count();
-                                @endphp
-                                <td>{{ $JumlahFoto }}</td>
-                            </tr>
+                        <tr class='text-center'>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $data->kelas }}</td>
+                            @php
+                            $JumlahFoto = $siswasFoto
+                            ->where('kelas_id', $data->id)
+                            ->whereNotNull('foto')
+                            ->count();
+                            @endphp
+                            <td>{{ $JumlahFoto }}</td>
+                        </tr>
                         @endforeach
                     </tbody>
                     <tfoot>
@@ -561,37 +562,51 @@
 
     // Fungsi untuk menyalakan kamera tertentu
     function startCamera(deviceId = null) {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+
+        const constraints = {
+            video: {
+                width: {
+                    ideal: 900
+                },
+                height: {
+                    ideal: 1200
+                },
+                aspectRatio: {
+                    ideal: 2
+                    // ideal: 0.75
+                } // 3:4 potrait
+            }
+        };
+        //        const constraints = {
+        //   video: {
+        //     width: { exact: 1280 },
+        //     height: { exact: 720 },
+        //     aspectRatio: { exact: 16/9 },
+        //     facingMode: "environment" // kamera belakang (lebih jernih)
+        //   }
+        // };
+
+
+        if (deviceId) {
+            constraints.video.deviceId = {
+                exact: deviceId
+            };
+        }
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                currentStream = stream;
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(err => {
+                console.error("Gagal akses kamera:", err);
+            });
     }
 
-    let constraints;
-
-    if (deviceId) {
-        // kalau pilih kamera dari <select>, pakai deviceId saja
-        constraints = {
-            video: { deviceId: { exact: deviceId } }
-        };
-    } else {
-        // default: coba kamera belakang
-        constraints = {
-            video: { facingMode: { ideal: "environment" } }
-        };
-    }
-
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => {
-            currentStream = stream;
-            video.srcObject = stream;
-            video.play();
-
-            // debug: cek kamera aktif
-            console.log("Kamera aktif:", stream.getVideoTracks()[0].label);
-        })
-        .catch(err => {
-            console.error("Gagal akses kamera:", err);
-        });
-}
     // Ambil daftar kamera
     navigator.mediaDevices.enumerateDevices()
         .then(devices => {
@@ -672,13 +687,14 @@
         formData.append('nis', nisInput.value);
         formData.append('ukuran', ukuranFotoInput.value);
 
-        fetch('{{ route('foto-digital-siswa.store') }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: formData
-            })
+        fetch('{{ route('
+                foto - digital - siswa.store ') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
             .then(response => response.json())
             .then(data => {
                 alert(data.message); // <-- langsung pakai respon dari controller

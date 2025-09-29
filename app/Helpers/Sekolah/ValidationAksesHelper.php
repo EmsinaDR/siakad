@@ -85,8 +85,8 @@ if (!function_exists('ValidateGuruAksesSiswa')) {
     }
 }
 // Validasi Ortu dan Guru
-if (!function_exists('valdiateOrtu')) {
-    function valdiateOrtu($NoRequest, $Nis)
+if (!function_exists('validate_Ortu')) {
+    function validate_Ortu($NoRequest, $Nis)
     {
         //Isi Fungsi
         $DataSiswa = Detailsiswa::with('kelas')->where('nis', $Nis)->first();
@@ -140,7 +140,8 @@ function validate_BendaharaKomite($NoRequest)
 {
     $allowed = [
         config('whatsappSession.NoBendaharaKomite'),
-        config('whatsappSession.NoKepala')
+        config('whatsappSession.NoKepala'),
+        config('whatsappSession.DevNomorTujuan')
     ];
     if (in_array($NoRequest, $allowed)) {
         return true;
