@@ -8,6 +8,7 @@ if (config('session.client_server')) {
         App\Providers\RouteProviders::class,
         // Penjadwalan Pesan
         App\Providers\ScheduleServiceProvider::class,
+        App\Providers\ScheduleServiceProviderClient::class,
     ];
 } else {
     return [
