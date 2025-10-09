@@ -53,7 +53,17 @@ if (!function_exists('Auto_reply_SiswaKode')) {
         // TODO: Implement your helper logic here
         switch (ucfirst($Kode)) {
             case 'Data Siswa':
-                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest,  PesanDataSiswa($Siswa->id));
+                $pesan = PesanDataSiswa($Siswa->id);
+                $Carifilename = $Nis . '-3x4.png';
+                $copyFile = CopyDataSiswa($Carifilename, 'img/siswa/');
+                if ($copyFile['status'] === 'error') {
+                    $filename = 'blanko-foto.png'; // fallback manual
+                } else {
+                    $filename = $copyFile['file']; // aman, sudah pasti ada
+                }
+                $filePath = base_path('whatsapp/uploads/' . $filename);
+                $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $pesan, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest,  $pesan);
                 break;
             case 'Pembayaran':
                 // Pembayaran/Siswa/25001/Rekap

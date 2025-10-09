@@ -45,10 +45,9 @@
                     <button type='button' class='btn btn-block btn-default bg-primary btn-md' data-toggle='modal'
                         data-target='#GenerateKartuSiswa'><i class='fa fa-plus'></i> Generate Kartu Siswa</button>
 
-                    <button type="button" class="btn btn-block btn-default bg-secondary btn-md"
-                        onclick='window.location.href="{{ route('tokenapp.index') }}"'>
-                        <i class="fa fa-undo"></i> Kembali
-                    </button>
+                    <button type='button' class='btn btn-block btn-default bg-primary btn-md' data-toggle='modal'
+                        data-target='#KarpelByKelas'><i class='fa fa-plus'></i> Tambah Data</button>
+
                 </div>
                 <div class='col-xl-10'></div>
             </div>
@@ -271,7 +270,8 @@
                     </div>
                     <div class='form-group'>
                         <label for='halaman_siswa'>Pilih Halaman Siswa</label>
-                        <select name='halaman_siswa' id='halaman_siswa' class='select2 form-control' required>
+                        <select name='halaman_siswa' id='halaman_siswa' multiple class='select2 form-control'
+                            required>
                             <option value=''>--- Pilih Halaman ---</option>
                             @foreach ($Siswas->chunk(10) as $index => $chunk)
                                 <option value='{{ $chunk->pluck('id')->sort()->join(',') }}'>
@@ -285,6 +285,55 @@
                            <div class='modal-footer'>
                                <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
                                <button type='submit' class='btn btn-primary'><i class='fa fa-save'></i> Simpan</button>
+                           </div>
+                           {{-- blade-formatter-enable --}}
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{{-- @dd(dd($Kelas)) --}}
+
+{{-- Modal Edit Data Awal --}}
+<div class='modal fade' id='KarpelByKelas' tabindex='-1' aria-labelledby='LabelKarpelByKelas' aria-hidden='true'>
+    <div class='modal-dialog modal-lg'>
+        <div class='modal-content'>
+            <div class='modal-header bg-primary'>
+                <h5 class='modal-title' id='LabelKarpelByKelas'>
+                    Tambah Data Baru
+                </h5>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <span aria-hidden='true'>&times;</span>
+                </button>
+            </div>
+            <div class='modal-body'>
+                <form id='GenerateKartuSiswa-form' action='{{ route('all.in.kartu.kelas') }}' method='POST'>
+                    @csrf
+                    @method('POST')
+                    <div class='form-group'>
+                        <label for='jenis_kartu'>Jenis Kartu</label>
+                        <select name='jenis_kartu' id='id' class='select2 form-control' required>
+                            <option value=''>--- Pilih Jenis Kartu ---</option>
+                            @foreach ($kartus as $kartu)
+                                <option value='{{ $kartu }}'>{{ $kartu }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class='form-group'>
+                        <label for='kelas_id'>Kelas</label>
+                        <select name='kelas_id' id='id' class='form-control' required>
+                            <option value=''>--- Pilih Kelas ---</option>
+                            @foreach ($Kelas as $Ekelas)
+                                <option value='{{ $Ekelas->id }}'>{{ $Ekelas->kelas }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- blade-formatter-disable --}}
+                           <div class='modal-footer'>
+                               <button type='submit' class='btn btn-primary'><i class='fa fa-save'></i> Generate</button>
                            </div>
                            {{-- blade-formatter-enable --}}
                 </form>

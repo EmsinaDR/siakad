@@ -1,11 +1,13 @@
 <?php
 
-use App\Models\Admin\Identitas;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use App\Models\Admin\Ekelas;
+use App\Models\Admin\Identitas;
 use App\Models\Whatsapp\WhatsApp;
 use App\Models\User\Guru\Detailguru;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use App\Models\User\Siswa\Detailsiswa;
 
 /*
@@ -31,8 +33,7 @@ if (!function_exists('generatekarpel_depan')) {
     {
         $Identitas = Identitas::first();
 
-        $Siswa = Detailsiswa::find($id);
-
+        $Siswa = Detailsiswa::with('KelasOne')->find($id);
         if (!$Siswa) {
             return false;
         }
@@ -48,6 +49,21 @@ if (!function_exists('generatekarpel_depan')) {
         } else {
             $desa = ' Desa ' . $Siswa->desa;
         }
+        // dd($Siswa->nis);
+        $fotoPath = public_path('img/siswa/' . $Siswa->nis . '-3x4.png');
+        if (file_exists($fotoPath)) {
+            $fotoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($fotoPath));
+        } else {
+            // fallback: default.png harus ada di /public/img/
+            $defaultFoto = public_path('img/default/blanko-foto.png');
+            $fotoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($defaultFoto));
+        }
+
+        $data['foto'] = $fotoBase64;
+        $rt = (!$Siswa->rt || $Siswa->rt === '000') ? '' : 'Rt ' . $Siswa->rt;
+        $rw = (!$Siswa->rw || $Siswa->rw === '000') ? '' : 'Rw ' . $Siswa->rw;
+
+        $alamat_siswa = $jalan . $rt . ' ' . $rw;
         $data = [
             'logo' => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/logo.png'))),
             'tutwuri'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/nisn/img/tutwuri.png'))),
@@ -57,19 +73,20 @@ if (!function_exists('generatekarpel_depan')) {
             'nama_kepala' => strtoupper($Identitas->namakepala),
             'akreditasi_sekolah' => $Identitas->akreditasi,
             'alamat_sekolah' => $Identitas->jalan . ' Kec. ' . $Identitas->kecamatan . ' Kab. ' . $Identitas->kabupaten . ' ' . $Identitas->kode_pos,
-            'nama_siswa' => $Siswa->nama_siswa,
+            'nama_siswa' => ucwords(strtolower($Siswa->nama_siswa)),
             'alamat_siswa' => $Siswa->alamat_siswa,
             'nis' => $Siswa->nis,
             'nisn' => $Siswa->nisn,
             'tempat_lahir' => $Siswa->tempat_lahir,
             'tanggal_lahir' => \Carbon\Carbon::create($Siswa->tanggal_lahir)->translatedFormat('d F Y'),
-            'alamat' => $jalan . 'Rt ' . $Siswa->rt . ' Rw ' . $Siswa->rw . $desa,
+            'alamat' => $alamat_siswa . $desa,
+            // 'alamat' => $jalan ?? ' ' . 'Rt ' . $Siswa->rt . ' Rw ' . $Siswa->rw . $desa,
             'kecamatan' => $Siswa->kecamatan,
             'kabupaten' => $Siswa->kabupaten,
             'kode_pos' => $Siswa->kode_pos,
             'lebar' => $lebar,
             // img\template\karpel\data
-            'foto'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/siswa/' . $Siswa->nis . '-3x4.png'))),
+            'foto'     => 'data:image/png;base64,' . base64_encode(file_get_contents($fotoBase64)),
         ];
 
         $svgPath = public_path($folder . '/karpel_' . $template . '.svg');
@@ -101,7 +118,15 @@ if (!function_exists('generatekarpel_depan')) {
             return false;
         }
 
-        $savePath = public_path("img/karpel/{$filename}.png");
+        // Penyimpanan
+        $folderPath = public_path("img/karpel/{$Siswa->KelasOne->kelas}");
+        // cek folder, kalau belum ada → buat
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0777, true, true);
+        }
+
+        $savePath = $folderPath . '/' . $filename . '.png';
+
 
         if (!rename($outputPng, $savePath)) {
             return false;
@@ -110,7 +135,8 @@ if (!function_exists('generatekarpel_depan')) {
         return [
             'path' => $savePath,
             'url' => asset("img/karpel/{$filename}.png"),
-            'filename' => "{$filename}.png"
+            'filename' => "{$filename}.png",
+            'nis' => "{$Siswa->nis}"
         ];
         // controller tambahkan untuk download return response()->download($result['path'], $result['filename'])->deleteFileAfterSend(false);
     }
@@ -160,7 +186,7 @@ if (!function_exists('generatekarpel_belakang')) {
             'nama_sekolah' => $Identitas->namasek,
             'akreditasi_sekolah' => $Identitas->akreditasi,
             'alamat_sekolah' => $Identitas->jalan . ' Kec.' . $Identitas->kecamatan . ' Kab.' . $Identitas->kabupaten . ' ' . $Identitas->kode_pos,
-            'nama_siswa' => $Siswa->nama_siswa,
+            'nama_siswa' => ucwords(strtolower($Siswa->nama_siswa)),
             'nis' => $Siswa->nis,
             'nisn' => $Siswa->nisn,
             'tempat_lahir' => $Siswa->tempat_lahir,
@@ -199,8 +225,8 @@ if (!function_exists('generatekarpel_belakang')) {
         }
 
         $filename = $Siswa->nis;
-        $tempSvg = "$basePath/{$filename}.svg";
-        $outputPng = "$basePath/{$filename}.png";
+        $tempSvg = "$basePath/belakang_{$filename}.svg";
+        $outputPng = "$basePath/belakang_{$filename}.png";
 
         file_put_contents($tempSvg, $templateSvg);
 
@@ -213,7 +239,18 @@ if (!function_exists('generatekarpel_belakang')) {
             return false;
         }
 
-        $savePath = public_path("img/karpel/belakang_{$filename}.png");
+        // Penyimpanan
+        $folderPath = public_path("img/karpel/{$Siswa->KelasOne->kelas}");
+        // cek folder, kalau belum ada → buat
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0777, true, true);
+        }
+
+        $savePath = $folderPath . '/belakang_' . $filename . '.png';
+
+
+
+        // $savePath = public_path("img/karpel/belakang_{$filename}.png");
 
         if (!rename($outputPng, $savePath)) {
             return false;
@@ -222,7 +259,8 @@ if (!function_exists('generatekarpel_belakang')) {
         return [
             'path' => $savePath,
             'url' => asset("img/karpel/belakang_{$filename}.png"),
-            'filename' => "{$filename}.png"
+            'filename' => "{$filename}.png",
+            'nis' => "{$Siswa->nis}"
         ];
     }
 }
@@ -395,7 +433,7 @@ if (!function_exists('KartuPembayaran')) {
             'nama_sekolah' => strtoupper($Identitas->namasek),
             'akreditasi_sekolah' => $Identitas->akreditasi,
             'alamat_sekolah' => $Identitas->jalan . ' Kec. ' . $Identitas->kecamatan . ' Kab. ' . $Identitas->kabupaten . ' ' . $Identitas->kode_pos,
-            'nama_siswa' => $Siswa->nama_siswa,
+            'nama_siswa' => ucwords(strtolower($Siswa->nama_siswa)),
             'kelas' => $kelas,
             'nis' => $Siswa->nis,
             'nisn' => $Siswa->nisn,
@@ -460,5 +498,195 @@ if (!function_exists('kartu_perputakaan')) {
     function kartu_perputakaan($id, $template, $folder)
     {
         //Isi Fungsi
+    }
+}
+if (!function_exists('generatrKartuGuru_depan')) {
+    function generatrKartuGuru_depan($id, $template, $folder)
+    {
+        $Identitas = Identitas::first();
+
+        $Guru = Detailguru::find($id);
+        if (!$Guru) {
+            return false;
+        }
+        //Jl. Makensi Kec. Banjarharjo Kab Brebes 52265
+        $lebar = 3570.28 / 2;
+
+        $fotoPath = public_path('img/guru/' . $Guru->kode_guru . '.png');
+        if (file_exists($fotoPath)) {
+            $fotoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($fotoPath));
+        } else {
+            // fallback: default.png harus ada di /public/img/
+            $defaultFoto = public_path('img/default/blanko-foto.png');
+            $fotoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($defaultFoto));
+        }
+
+        $data['foto'] = $fotoBase64;
+        $gelar = $Guru->gelar ? "," . $Guru->gelar : '';
+        $data = [
+            'logo' => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/logo.png'))),
+            'masking-logo' => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/logo/masking-logo.png'))),
+            // 'tutwuri'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/kode_gurun/img/tutwuri.png'))),
+            'stempel'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/ttd/stempel.png'))),
+            'ttd_kepala'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/ttd/kepala.png'))),
+            'nama_sekolah' => strtoupper($Identitas->namasek),
+            'nama_kepala' => strtoupper($Identitas->namakepala),
+            'akreditasi_sekolah' => $Identitas->akreditasi,
+            'alamat_sekolah' => $Identitas->jalan . ' Kec. ' . $Identitas->kecamatan . ' Kab. ' . $Identitas->kabupaten . ' ' . $Identitas->kode_pos,
+            'nama_guru' => $Guru->nama_guru . $gelar,
+            'nip' => $Guru->nip ?? '-',
+            'nuptk' => $Guru->nuptk ?? '-',
+            'status' => $Guru->status ?? '-',
+            'kode_guru' => $Guru->kode_guru,
+            'lebar' => $lebar,
+            // img\template\karpel\data
+            'foto'     => 'data:image/png;base64,' . base64_encode(file_get_contents($fotoBase64)),
+            'qrcode'     => qrttd($Guru->kode_guru),
+        ];
+
+        $svgPath = public_path($folder . '/kartu-guru-' . $template . '.svg');
+        if (!file_exists($svgPath)) {
+            return false;
+        }
+
+        $templateSvg = file_get_contents($svgPath);
+        foreach ($data as $key => $value) {
+            $templateSvg = str_replace('{{' . $key . '}}', htmlspecialchars($value), $templateSvg);
+        }
+
+        $basePath = base_path('public/temp');
+        if (!file_exists($basePath)) {
+            mkdir($basePath, 0777, true);
+        }
+
+        $filename = $Guru->kode_guru;
+        $tempSvg = "$basePath/{$filename}.svg";
+        $outputPng = "$basePath/{$filename}.png";
+
+        file_put_contents($tempSvg, $templateSvg);
+
+        $magick = '"C:\\Program Files\\ImageMagick-7.1.2-Q16-HDRI\\magick.exe"';
+        $command = "$magick -density 300 \"$tempSvg\" -resize 1004x650 -quality 100 \"$outputPng\"";
+        exec($command . ' 2>&1', $output, $result);
+
+        if ($result !== 0 || !file_exists($outputPng)) {
+            return false;
+        }
+
+        // Penyimpanan
+        $folderPath = public_path("img/kartu-guru");
+        // cek folder, kalau belum ada → buat
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0777, true, true);
+        }
+
+        $savePath = $folderPath . '/' . $filename . '.png';
+
+
+        if (!rename($outputPng, $savePath)) {
+            return false;
+        }
+
+        return [
+            'path' => $savePath,
+            'url' => asset("img/karpel/{$filename}.png"),
+            'filename' => "{$filename}.png"
+        ];
+        // controller tambahkan untuk download return response()->download($result['path'], $result['filename'])->deleteFileAfterSend(false);
+    }
+}
+if (!function_exists('generatrKartuGuru_belakang')) {
+    function generatrKartuGuru_belakang($id, $template, $folder)
+    {
+        $Identitas = Identitas::first();
+
+        $Guru = Detailguru::find($id);
+        if (!$Guru) {
+            return false;
+        }
+        //Jl. Makensi Kec. Banjarharjo Kab Brebes 52265
+        $lebar = 3570.28 / 2;
+
+        $fotoPath = public_path('img/guru/' . $Guru->kode_guru . '.png');
+        if (file_exists($fotoPath)) {
+            $fotoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($fotoPath));
+        } else {
+            // fallback: default.png harus ada di /public/img/
+            $defaultFoto = public_path('img/default/blanko-foto.png');
+            $fotoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($defaultFoto));
+        }
+
+        $data['foto'] = $fotoBase64;
+
+        $data = [
+            'logo' => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/logo.png'))),
+            'masking-logo' => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/logo/masking-logo.png'))),
+            // 'tutwuri'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/kode_gurun/img/tutwuri.png'))),
+            'stempel'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/ttd/stempel.png'))),
+            'ttd_kepala'     => 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('img/template/ttd/kepala.png'))),
+            'nama_sekolah' => strtoupper($Identitas->namasek),
+            'nama_kepala' => strtoupper($Identitas->namakepala),
+            'akreditasi_sekolah' => $Identitas->akreditasi,
+            'alamat_sekolah' => $Identitas->jalan . ' Kec. ' . $Identitas->kecamatan . ' Kab. ' . $Identitas->kabupaten . ' ' . $Identitas->kode_pos,
+            'nama_guru' => $Guru->nama_guru,
+            'nip' => $Guru->nip ?? '-',
+            'nuptk' => $Guru->nuptk ?? '-',
+            'status' => $Guru->status ?? '-',
+            'kode_guru' => $Guru->kode_guru,
+            'lebar' => $lebar,
+            // img\template\karpel\data
+            'foto'     => 'data:image/png;base64,' . base64_encode(file_get_contents($fotoBase64)),
+            'qrcode'     => qrttd($Guru->kode_guru),
+        ];
+
+        $svgPath = public_path($folder . '/belakang-' . $template . '.svg');
+        if (!file_exists($svgPath)) {
+            return false;
+        }
+
+        $templateSvg = file_get_contents($svgPath);
+        foreach ($data as $key => $value) {
+            $templateSvg = str_replace('{{' . $key . '}}', htmlspecialchars($value), $templateSvg);
+        }
+
+        $basePath = base_path('public/temp');
+        if (!file_exists($basePath)) {
+            mkdir($basePath, 0777, true);
+        }
+
+        $filename = 'belakang-' . $Guru->kode_guru;
+        $tempSvg = "$basePath/{$filename}.svg";
+        $outputPng = "$basePath/{$filename}.png";
+
+        file_put_contents($tempSvg, $templateSvg);
+
+        $magick = '"C:\\Program Files\\ImageMagick-7.1.2-Q16-HDRI\\magick.exe"';
+        $command = "$magick -density 300 \"$tempSvg\" -resize 1004x650 -quality 100 \"$outputPng\"";
+        exec($command . ' 2>&1', $output, $result);
+
+        if ($result !== 0 || !file_exists($outputPng)) {
+            return false;
+        }
+
+        // Penyimpanan
+        $folderPath = public_path("img/kartu-guru");
+        // cek folder, kalau belum ada → buat
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0777, true, true);
+        }
+
+        $savePath = $folderPath . '/' . $filename . '.png';
+
+
+        if (!rename($outputPng, $savePath)) {
+            return false;
+        }
+
+        return [
+            'path' => $savePath,
+            'url' => asset("img/karpel/{$filename}.png"),
+            'filename' => "{$filename}.png"
+        ];
+        // controller tambahkan untuk download return response()->download($result['path'], $result['filename'])->deleteFileAfterSend(false);
     }
 }

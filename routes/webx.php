@@ -772,28 +772,30 @@ Route::get('/absensi/list', function () {
 
     return response()->json($absensi);
 })->name('absensi.list');
-Route::get('/absensi/list-guru', function () {
-    $absensi = \App\Models\Absensi\EabsenGuru::with('guru')
-        ->whereDate('created_at', Carbon::today()) // ✅ Filter hari ini saja
-        ->orderByDesc('created_at')
-        ->get()
-        ->map(function ($item) {
-            $jamMasuk = Carbon::parse($item->created_at->format('Y-m-d') . ' 07:00:00');
-            $waktuAbsen = $item->created_at;
-            $terlambat = $waktuAbsen->greaterThan($jamMasuk)
-                ? $waktuAbsen->diff($jamMasuk)->format('%H:%I:%S')
-                : null;
+// Route::get('/absensi/list-guru', function () {
+//     $absensi = \App\Models\Absensi\EabsenGuru::with('guru')
+//         ->whereDate('created_at', Carbon::today()) // ✅ Filter hari ini saja
+//         ->orderByDesc('created_at')
+//         ->get()
+//         ->map(function ($item) {
+//             $jamMasuk = Carbon::parse($item->created_at->format('Y-m-d') . ' 07:00:00');
+//             $waktuAbsen = $item->created_at;
+//             $terlambat = $waktuAbsen->greaterThan($jamMasuk)
+//                 ? $waktuAbsen->diff($jamMasuk)->format('%H:%I:%S')
+//                 : null;
 
-            return [
-                'nama_guru'  => $item->guru->nama_guru ?? '-',
-                'kode_guru'  => $item->guru->kode_guru ?? '-',
-                'waktu'      => $waktuAbsen->format('Y-m-d H:i:s'),
-                'terlambat'  => $terlambat ?? 'Tepat Waktu',
-            ];
-        });
 
-    return response()->json($absensi);
-})->name('absensi.list.guru');
+//             return [
+//                 'gelar'  => $item->guru->gelar ?? '-',
+//                 'nama_guru'  => $item->guru->kode_guru ?? '-',
+//                 'kode_guru'  => $item->guru->kode_guru ?? '-',
+//                 'waktu'      => $waktuAbsen->format('Y-m-d H:i:s'),
+//                 'terlambat'  => $terlambat ?? 'Tepat Waktu',
+//             ];
+//         });
+
+//     return response()->json($absensi);
+// })->name('absensi.list.guru');
 
 
 Route::middleware(['auth', 'CekDataSekolah', 'token.check', 'verified'])->prefix('absensi')->name('absensi')->group(

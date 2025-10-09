@@ -29,28 +29,29 @@ Route::middleware(['web',])->name('absensi.')->prefix('absensi')->group(function
 
         return response()->json($absensi);
     })->name('list.siswa');
-    Route::get('/list-guru', function () {
-        $absensi = \App\Models\Absensi\EabsenGuru::with('guru')
-            ->whereDate('created_at', Carbon::today()) // ✅ Filter hari ini saja
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(function ($item) {
-                $jamMasuk = Carbon::parse($item->created_at->format('Y-m-d') . ' 07:00:00');
-                $waktuAbsen = $item->created_at;
-                $terlambat = $waktuAbsen->greaterThan($jamMasuk)
-                    ? $waktuAbsen->diff($jamMasuk)->format('%H:%I:%S')
-                    : null;
+    // Route::get('/list-guru', function () {
+    //     $absensi = \App\Models\Absensi\EabsenGuru::with('guru')
+    //         ->whereDate('created_at', Carbon::today()) // ✅ Filter hari ini saja
+    //         ->orderByDesc('created_at')
+    //         ->get()
+    //         ->map(function ($item) {
+    //             $jamMasuk = Carbon::parse($item->created_at->format('Y-m-d') . ' 07:00:00');
+    //             $waktuAbsen = $item->created_at;
+    //             $terlambat = $waktuAbsen->greaterThan($jamMasuk)
+    //                 ? $waktuAbsen->diff($jamMasuk)->format('%H:%I:%S')
+    //                 : null;
 
-                return [
-                    'nama_guru'  => $item->guru->nama_guru ?? '-',
-                    'kode_guru'  => $item->guru->kode_guru ?? '-',
-                    'waktu'      => $waktuAbsen->format('Y-m-d H:i:s'),
-                    'terlambat'  => $terlambat ?? 'Tepat Waktu',
-                ];
-            });
+    //             return [
+    //                 'gelar'  => $item->guru->gelar ?? '-',
+    //                 'nama_guru'  => $nama_guru ?? '-',
+    //                 'kode_guru'  => $item->guru->kode_guru ?? '-',
+    //                 'waktu'      => $waktuAbsen->format('Y-m-d H:i:s'),
+    //                 'terlambat'  => $terlambat ?? 'Tepat Waktu',
+    //             ];
+    //         });
 
-        return response()->json($absensi);
-    })->name('list.guru');
+    //     return response()->json($absensi);
+    // })->name('list.guru');
 });
 
 /*

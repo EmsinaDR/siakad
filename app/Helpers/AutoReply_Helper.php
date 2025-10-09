@@ -153,9 +153,11 @@ if (!function_exists('HelpPesan')) {
                     "\n" .
                     "*Surat Custom Via Template Sekolah :*\n" .
                     "*Home Visit* : \n" .
+                    "Home Visit Custom / Surat / 2025:SPPD / 2 / AS:DR / Guru BK:Wali Kelas / 2 / 08:30 / Rumah Siswa / 250001 / Ya#No\n\n" .
                     "*Surat SPPD* : \n" .
+                    "Surat SPPD Custom / Surat / 225:SPPD / 2 / kode_guru / jabatan_guru / tempat_tujuan / tanggal_berangkat / tanggal_pulang / kendaraan / tujuan_perjalanan\n\n" .
                     "*Surat Tugas* : \n" .
-                    "*Surat Penerimaan Pindah* : \nSurat Penerimaan Pindah / Surat / nomor_surat / tgl_surat / nama_siswa / tempat_tanggal_lahir / kelas / alamat_siswa\n" .
+                    "*Surat Penerimaan Pindah* : \nSurat Penerimaan Pindah / Surat / nomor_surat / tgl_surat / nama_siswa / tempat_tanggal_lahir / kelas / alamat_siswa\n\n" .
                     "*Surat Ket PIP* : \n" .
                     "*Surat Aksioma* : \n" .
                     "\n";
@@ -257,6 +259,7 @@ if (!function_exists('HelpPesan')) {
                     "- *Kontak Sekolah* : Kontak Sekolah/Guru/Kode Guru\n" .
                     "- *Kontak Kosong* : Kontak Kosong/Guru/Kode Guru\n" .
                     "- *Cek Server* : Cek Server/Guru/Kode Guru\n" .
+                    "- *Dokumen Siswa* : Dokumen Siswa / Guru / NIS / karpel#foto#kk#nisn#ktp#ijazah#kia#bantuan 1#bantuan 2#bantuan 3#bantuan 4#bantuan 5\n" .
                     // "- *Registrasi Guru* : Registrasi Guru/Guru/Kode Guru ( Belum Tersedia )\n" .
                     "\n" . str_repeat("─", 25) . "\n" .
                     "✍️ Dikirim oleh:\nWhatsappBot Sekolah *{$Identitas->namasek}*";
@@ -275,6 +278,14 @@ if (!function_exists('HelpPesan')) {
                     "- Shutdown Service/Control\n" .
                     "- Shutdown PC/Control\n" .
                     "- Cek Service/Control\n" .
+                    "\n";
+                return format_pesan('INFORMASI HELP CONTROL', $pesanKiriman);
+                break;
+            case 'Help Operator':
+                // Auto_Reply_ControlHelper
+                $pesanKiriman =  "" .
+                    "Informasi bantuan Operator :\n" .
+                    "- Ubah Status Siswa : Ubah Status Siswa / Operator / arraynis / Status aktif#drop out#meninggal#lulus#pindah#mengundurkan diri#tidak dikenal \n" .
                     "\n";
                 return format_pesan('INFORMASI HELP CONTROL', $pesanKiriman);
                 break;
@@ -310,6 +321,14 @@ if (!function_exists('HelpPesan')) {
                     "*Database*\n" .
                     "- Siswa/Vendor\n" .
                     "- Guru/Vendor\n" .
+                    "- Info Update Data Siswa / Vendor/Data Siswa / nis\n" .
+                    "- Bagian Update Siswa\n" .
+                    "Update Siswa/Vendor/250001/\n" .
+                    "status_tempat_tinggal:Milik Sendiri\n\n" .
+                    "- Info Update Data Ayah / Vendor / nis\n" .
+                    "- Info Update Data Ibu / Vendor / nis\n" .
+                    "- Info Update Data Wali / Vendor / nis\n" .
+                    "- Info Update Data Bantuan / Vendor / nis\n" .
                     "\n";
                 return format_pesan('INFORMASI HELP VENDOR*', $pesanKiriman);
                 break;

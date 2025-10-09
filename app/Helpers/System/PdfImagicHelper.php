@@ -1,4 +1,5 @@
 <?php
+
 use imagick;
 use Spatie\PdfToImage\Pdf;
 /*
@@ -48,4 +49,46 @@ if (!function_exists('pdfToImageWa')) {
 
         return $namafile; // Sukses, balikin nama file
     }
+}
+/*
+// pdfFile = 'file1'
+// uploadDir = 'whatsapp/uploads'
+// outputName = 'file1_converted'
+$result = pdfToImageWa('file1', 'whatsapp/uploads', 'file1_converted');
+echo "File JPG hasil convert: $result";
+
+*/
+function pdfToImage($pdfFile, $uploadDir, $outputName = null)
+{
+    // Tentukan folder upload relatif ke base_path
+    $uploadPath = base_path($uploadDir);
+
+    // File PDF
+    $pdfPath = $uploadPath . '/' . $pdfFile . '.pdf';
+    if (!file_exists($pdfPath)) {
+        throw new \Exception("File PDF tidak ditemukan: $pdfPath");
+    }
+
+    // Nama output default sama dengan nama file PDF kalau tidak diberikan
+    $outputName = $outputName ?? pathinfo($pdfFile, PATHINFO_FILENAME);
+    $outputPath = $uploadPath . '/' . $outputName . '.jpg';
+
+    // Path magick.exe
+    $magickPath = '"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe"';
+
+    // Command konversi halaman pertama PDF ke JPG
+    $command = sprintf(
+        '%s -density 300 %s[0] -background white -alpha remove -alpha off -quality 100 %s',
+        $magickPath,
+        escapeshellarg($pdfPath),
+        escapeshellarg($outputPath)
+    );
+
+    exec($command, $output, $returnVar);
+
+    if ($returnVar !== 0) {
+        throw new \Exception("Konversi PDF ke JPG gagal. Command: $command");
+    }
+
+    return $outputPath;
 }

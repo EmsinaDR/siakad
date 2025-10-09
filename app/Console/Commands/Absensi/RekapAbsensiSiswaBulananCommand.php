@@ -94,6 +94,7 @@ class RekapAbsensiSiswaBulananCommand extends Command
         //     $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, "isiPesan" . "\n\n\n" . $data2);
         // }
 
+        // Ke Orang Tua
         if (!config('whatsappSession.WhatsappDev')) {
             $Siswa =  Detailsiswa::whereNotNull('kelas_id')->get();
         } else {
@@ -110,7 +111,7 @@ class RekapAbsensiSiswaBulananCommand extends Command
                 $NoTujuan = config('whatsappSession.DevNomorTujuan');
             }
             // $PesanKirim = PesanAbsensiTahunan($siswa->id);
-            $PesanKirim = PesanAbsensiBulananOrtu($siswa->id);
+            $PesanKirim = PesanAbsensiBulananOrtu($siswa->id, 9);
             $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoTujuan, $PesanKirim);
         }
         $this->info("Command 'RekapBulananCommand' berhasil dijalankan.");

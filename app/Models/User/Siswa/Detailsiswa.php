@@ -35,6 +35,9 @@ class Detailsiswa extends Model
         'nokk',
         'hobi',
         'cita_cita',
+        'waktu_tempuh',
+        'transportasi_berangkat',
+        'status_tempat_tinggal',
         'jenis_kelamin',
         'tempat_lahir',
         'tanggal_lahir',
@@ -85,6 +88,7 @@ class Detailsiswa extends Model
 
         // Ayah
         'ayah_nama',
+        'ayah_nik',
         'ayah_keadaan',
         'ayah_agama',
         'ayah_kewarganegaraan',
@@ -103,6 +107,7 @@ class Detailsiswa extends Model
 
         // Ibu
         'ibu_nama',
+        'ibu_nik',
         'ibu_keadaan',
         'ibu_agama',
         'ibu_kewarganegaraan',
@@ -121,6 +126,7 @@ class Detailsiswa extends Model
 
         // Wali
         'wali_nama',
+        'wali_nik',
         'wali_keadaan',
         'wali_agama',
         'wali_kewarganegaraan',

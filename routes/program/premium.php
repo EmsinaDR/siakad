@@ -782,9 +782,9 @@ Route::get('/absensi/list-guru', function () {
             $terlambat = $waktuAbsen->greaterThan($jamMasuk)
                 ? $waktuAbsen->diff($jamMasuk)->format('%H:%I:%S')
                 : null;
-
+            $nama_guru = $item->guru->nama_guru . ',' . $item->guru->gelar;
             return [
-                'nama_guru'  => $item->guru->nama_guru ?? '-',
+                'nama_guru'  => $nama_guru,
                 'kode_guru'  => $item->guru->kode_guru ?? '-',
                 'waktu'      => $waktuAbsen->format('Y-m-d H:i:s'),
                 'terlambat'  => $terlambat ?? 'Tepat Waktu',

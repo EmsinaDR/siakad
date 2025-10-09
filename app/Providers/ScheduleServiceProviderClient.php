@@ -196,7 +196,6 @@ class ScheduleServiceProviderClient extends ServiceProvider
                 })
                 ->at('09:30')
                 ->runInBackground();
-
             // RekapAbsensiSiswaBulananCommand
             $schedule->command('absensi:rekap-bulanan')
                 ->when(function () {
@@ -217,7 +216,8 @@ class ScheduleServiceProviderClient extends ServiceProvider
 
                     return false;
                 })
-                ->at('09:30')
+                // ->at('09:30')
+                ->at('18:16')
                 ->runInBackground();
 
             // Shalat Berjamaah
@@ -260,6 +260,8 @@ class ScheduleServiceProviderClient extends ServiceProvider
             // Proses Coding
             $schedule->command('backup:database')->dailyAt('08:00'); //BackupDatabase
             $schedule->command('update:SynGitHub')->weeklyOn(3, '11:00'); // Update Github
+            // ConverterJpgToPngCommand
+            $schedule->command('convert:jpg-to-png')->dailyAt(3, '10:00'); // Update Github
 
 
         });

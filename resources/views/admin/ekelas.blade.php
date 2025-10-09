@@ -40,15 +40,19 @@
                         <table id='example1' width='100%' class='table table-responsive table-bordered table-hover'>
                             <thead>
                                 <tr class='text-center align-middle'>
-                                    <th  class='text-center align-middle' colspan='1' rowspan='2' width='1%'>ID</th>
+                                    <th class='text-center align-middle' colspan='1' rowspan='2' width='1%'>ID
+                                    </th>
                                     @foreach ($arr_ths as $arr_th)
-                                        <th  class='text-center align-middle' @if($arr_th === 'Jumlah Siswa') colspan='3' rowspan='1' @else colspan='1' rowspan='2' @endif> {{ $arr_th }}</th>
+                                        <th class='text-center align-middle'
+                                            @if ($arr_th === 'Jumlah Siswa') colspan='3' rowspan='1' @else colspan='1' rowspan='2' @endif>
+                                            {{ $arr_th }}</th>
                                     @endforeach
-                                    <th colspan='1' rowspan='2'  class='text-center align-middle' width='20%'>Action</th>
+                                    <th colspan='1' rowspan='2' class='text-center align-middle' width='20%'>
+                                        Action</th>
                                 </tr>
-                                    <th class='text-center'>L</th>
-                                    <th class='text-center'>P</th>
-                                    <th class='text-center'>Total</th>
+                                <th class='text-center'>L</th>
+                                <th class='text-center'>P</th>
+                                <th class='text-center'>Total</th>
                             </thead>
                             <tbody>
                                 @foreach ($DataKelas as $data)
@@ -63,11 +67,11 @@
                                         <td class='text-center'> {{ $data->kelastotapel->semester ?? '' }}</td>
                                         <td class='text-center'> {{ $data->kelas }}</td>
                                         <td class='text-center'> {{ $data->siswas_laki_count }}</td>
-                                        <td class='text-center'> {{$data->siswas_perempuan_count }}</td>
-                                        <td class='text-center'> {{ $data->siswas_count ?? ''  }}</td>
+                                        <td class='text-center'> {{ $data->siswas_perempuan_count }}</td>
+                                        <td class='text-center'> {{ $data->siswas_count ?? '' }}</td>
                                         {{-- blade-formatter-disable --}}
                                         <td width='25%'>
-                                             {{ $data->kelastoDetailguru->nama_guru ?? '' }}
+                                             {{ $data->kelastoDetailguru->nama_guru ?? '' }}, {{ $data->kelastoDetailguru->gelar ?? '' }}
                                         </td>
                                        {{-- blade-formatter-enable --}}
                                         <td width="10%">

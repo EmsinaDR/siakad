@@ -19,6 +19,7 @@ Route::middleware(['web', 'auth', 'CekDataSekolah', 'verified', 'is_admindev'])-
     Route::get('copy-fitur/{progres_aplikasi}', [\App\Http\Controllers\AdminDev\ProgresAplikasiController::class, 'CopyData'])->name('copy-fitur');
     Route::resource('svg-to-png', \App\Http\Controllers\AdminDev\SvgPngController::class)->middleware(['auth', 'verified']);
     Route::post('all-in-kartu', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'AllInKartu'])->name('all.in.kartu');
+    Route::post('all-in-kartu-kelas', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'AllInKartuKelas'])->name('all.in.kartu.kelas');
     Route::post('generate-karpel', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateKarpel'])->name('generate.karpel');
     Route::post('generate-kartu-guru', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateKartuGuru'])->name('generate.kartu.guru');
     Route::get('generate-nisn', [\App\Http\Controllers\AdminDev\SvgPngController::class, 'GenerateNisn'])->name('generate.nisn');

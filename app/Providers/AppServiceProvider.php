@@ -181,20 +181,26 @@ class AppServiceProvider extends ServiceProvider
                 return Detailguru::WhereNotIn('id', [1, 2, 3])->orderBy('nama_guru', 'ASC')->get();
             });
 
-            $kelas = Cache::tags(['cache_kelas'])->remember("kelas_tapel_{$tapels->id}", now()->addHours(2), function () use ($tapels) {
+            // $kelas = Cache::tags(['cache_kelas'])->remember("kelas_tapel_{$tapels->id}", now()->addHours(2), function () use ($tapels) {
+            //     return \App\Models\Admin\Ekelas::where('tapel_id', $tapels->id)->get();
+            // });
+
+            $kelas = Cache::tags(['Cache_kelas'])->remember('Remember_kelas', now()->addMinutes(10), function () use ($tapels){
                 return \App\Models\Admin\Ekelas::where('tapel_id', $tapels->id)->get();
             });
+            HapusCacheDenganTag('kelas');
+
             $modul = Cache::tags(['Cache_modul'])->remember('Remember_modul', now()->addMinutes(10), function () {
                 return Modul::get();
             });
-            $siswas = Cache::tags(['Cache_siswas'])->remember('Remember_siswas', now()->addMinutes(10), function () {
+            // HapusCacheDenganTag('siswas');
+            $siswas = Cache::tags(['Cache_siswas'])->remember('Remember_siswas', now()->addMinutes(2), function () {
                 return Detailsiswa::with(['KelasOne'])
                     ->whereNotNull('kelas_id')
                     ->orderBy('kelas_id')
                     ->orderBy('nama_siswa')
                     ->get();
             });
-            // HapusCacheDenganTag('siswas');
             // $siswas = Cache::remember('siswas_global', now()->addMinutes(10), function () {
             //     return Detailsiswa::with(['KelasOne'])
             //         ->whereNotNull('kelas_id')

@@ -117,7 +117,7 @@
                 <tbody id="absenList">
                     @foreach ($absensiGuru as $data)
                         <tr>
-                            <td>{{ $data->guru->nama_guru ?? '-' }}</td>
+                            <td>{{ $data->guru->nama_guru ?? '-' }},{{ $data->guru->gelar ?? '-' }}</td>
                             <td>{{ $data->guru->kode_guru ?? '-' }}</td>
                             <td>{{ $data->created_at }}</td>
                             <td>{{ $data->terlambat }}</td>

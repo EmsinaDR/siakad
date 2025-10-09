@@ -47,11 +47,11 @@ class CekAbsenKosongSiswa extends Command
             ->toArray();
 
         if (!config('whatsappSession.WhatsappDev')) {
-            $siswaBelumAbsen = Detailsiswa::with('kelas')->whereNotNull('kelas_id')
+            $siswaBelumAbsen = Detailsiswa::where('status_siswa', 'aktif')->with('kelas')->whereNotNull('kelas_id')
                 ->whereNotIn('id', $sudahAbsen)
                 ->get();
         } else {
-            $siswaBelumAbsen = Detailsiswa::with('kelas')->whereNotNull('kelas_id')
+            $siswaBelumAbsen = Detailsiswa::where('status_siswa', 'aktif')->with('kelas')->whereNotNull('kelas_id')
                 ->whereNotIn('id', $sudahAbsen)
                 ->limit(5)
                 ->get();

@@ -259,3 +259,70 @@ if (! function_exists('getAllNoHpSiswa')) {
             ->all();
     }
 }
+if (!function_exists('CopyDataSiswa')) {
+    /**
+     * Menyalin file data siswa dari public/folderAsal ke whatsapp/uploads/siswa
+     * Jika file tidak ada maka gunakan default (blanko-foto)
+     *
+     * @param string $namaFile Nama file asli (contoh: foto_123.jpg)
+     * @param string $folderAsal Folder asal dalam public (default: 'img/siswa')
+     * @param string $defaultFile Nama file default jika file tidak ditemukan (contoh: 'blanko-foto.png')
+     * @return array ['status' => 'success|error', 'file' => string, 'message' => string]
+     */
+    function CopyDataSiswa(
+        string $namaFile,
+        string $folderAsal = 'img/siswa',
+        string $defaultFile = 'img/default/blanko-foto.png'
+    ): array {
+        $sourcePath = public_path($folderAsal . '/' . $namaFile);
+        $targetDir  = base_path('whatsapp/uploads');
+        $targetPath = $targetDir . '/' . $namaFile;
+
+        // cek apakah file ada
+        if (!file_exists($sourcePath)) {
+            // fallback ke default
+            $sourcePath = public_path($defaultFile);
+            $targetPath = $targetDir . '/' . basename($defaultFile);
+
+            if (!file_exists($sourcePath)) {
+                return [
+                    'status'  => 'error',
+                    'file'    => basename($defaultFile),
+                    'message' => "File default '$defaultFile' tidak ditemukan di public"
+                ];
+            }
+
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0775, true);
+            }
+
+            copy($sourcePath, $targetPath);
+
+            return [
+                'status'  => 'success',
+                'file'    => basename($defaultFile),
+                'message' => "File '$namaFile' tidak ada, gunakan default '" . basename($defaultFile) . "'"
+            ];
+        }
+
+        // buat folder tujuan kalau belum ada
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0775, true);
+        }
+
+        // copy file asli
+        if (!copy($sourcePath, $targetPath)) {
+            return [
+                'status'  => 'error',
+                'file'    => $namaFile,
+                'message' => "Gagal menyalin file '$namaFile'"
+            ];
+        }
+
+        return [
+            'status'  => 'success',
+            'file'    => $namaFile,
+            'message' => "File '$namaFile' berhasil disalin ke whatsapp/uploads/siswa"
+        ];
+    }
+}

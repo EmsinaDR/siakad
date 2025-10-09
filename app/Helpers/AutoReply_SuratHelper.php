@@ -338,21 +338,20 @@ if (!function_exists('SuratKode')) {
                 hapusFileWhatsApp($FileKiriman, $filename);
                 break;
             case 'Surat SPPD Custom':
-                $keyMessage = 'Case / bagian / nomor_surat / tgl_surat / nama_guru / jabatan_guru / tempat_tujuan / tanggal_berangkat / tanggal_pulang / kendaraan / tujuan_perjalanan';
+                $keyMessage = 'Case / bagian / nomor_surat / tgl_surat / kode_guru / jabatan_guru / tempat_tujuan / tanggal_berangkat / tanggal_pulang / kendaraan / tujuan_perjalanan';
                 $dataPesan = combine_format_pesan($keyMessage, $message);
 
                 //_____________________________________________________________________________________
-                $keyMessage = 'Case / bagian / nomor_surat / tgl_surat / nama_guru / jabatan_guru / tempat_tujuan / tanggal_berangkat / tanggal_pulang / kendaraan / tujuan_perjalanan';
-                $dataPesan = combine_format_pesan($keyMessage, $message);
+                $keyMessage = 'Surat SPPD Custom / Surat / 225:SPPD / 2 / kode_guru / jabatan_guru / tempat_tujuan / tanggal_berangkat / tanggal_pulang / kendaraan / tujuan_perjalanan';
+                // Contoh 'Case / bagian / nomor_surat / tgl_surat / AS:DR / jabatan_guru:jabatan_guru2 / tempat_tujuan / tanggal_berangkat / tanggal_pulang / kendaraan / tujuan_perjalanan';
+                $data = combine_format_pesan($keyMessage, $message);
                 $pesan = "Hasil Map Pesan \n";
-                foreach ($dataPesan as $key => $value) {
+                foreach ($data as $key => $value) {
                     $pesan .= $key . "=>" . $value . "\n";
                 }
-                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesan);
-                return false;
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesan);
+                // return false;
                 //_____________________________________________________________________________________
-
-
                 $Identitas = Identitas::first();
                 $hari = isset($IsiPesan[3]) && is_numeric($IsiPesan[3]) ? (int)$IsiPesan[3] : 0;
                 $tanggal_surat = \Carbon\Carbon::now()->addDays($hari)->translatedFormat('d F Y');
@@ -368,23 +367,32 @@ if (!function_exists('SuratKode')) {
                 $kendaraan = $IsiPesan[9] ?? '-';
                 $tujuan_perjalanan = $IsiPesan[10] ?? '-';
                 $namaGuruList = ['Dany Rosepta', 'Emira Nawal Zahbi']; // contoh array nama guru
-                $jabatanGuruList = ['Guru BK', 'Wali Kelas']; // contoh jabatan
+
 
                 // Buat numbered list
-                $namaGuruText = '';
-                foreach ($namaGuruList as $i => $guru) {
-                    $namaGuruText .= ($i + 1) . ". " . $guru . "\n";
+
+                // Data Guru
+                $kodeGuru = explode(':', $data['kode_guru']);
+                $dataGuru = Detailguru::whereIn('kode_guru', $kodeGuru)->get();
+                $namaGuru = '';
+                foreach ($dataGuru as $index => $Guru) {
+                    $namaGuru .= $index + 1 . ". " . $Guru->nama_guru . ', ' . $Guru->gelar . "\n";
                 }
-                $jabatanGuruText = '';
-                foreach ($jabatanGuruList as $i => $jabatan) {
-                    $jabatanGuruText .= ($i + 1) . ". " . $jabatan . "\n";
+
+                // Jabatan
+                $jabatan_guru = explode(':', $data['jabatan_guru']);
+                $Listjabatan = '';
+                foreach ($jabatan_guru as $index => $jabatan) {
+                    $Listjabatan .= ($index + 1) . ". " . $jabatan . "\n";
                 }
-                $data['nama_guru'] = $namaGuruText;
-                $data['jabatan_guru'] = $jabatanGuruText;
+                $Listjabatan = rtrim($Listjabatan, "\r\n");
+
+                $data['nama_guru'] = $namaGuru;
+                $data['jabatan_guru'] = $Listjabatan;
 
                 // $isipesan =
                 $data = [
-                    'nomor_surat'    => $nomor_surat,
+                    'nomor_surat'    => $nomor_surat . ' / ' . $Identitas->namasingkat,
                     'tanggal_surat'    => $tanggal_surat,
                     'nama_kepala' => $Identitas->namakepala,
                     'nama_sekolah' => $Identitas->namasek,
@@ -419,7 +427,7 @@ if (!function_exists('SuratKode')) {
                 $caption =
                     "File {$Kode} telah selesai diproses.\n" .
                     "Mohon periksa kembali file ini dan kesesuaian data yang di masukan.\n\n" .
-                    "*No Surat :* \n{$nomor_surat}/MTs.IM/{$data['bulan']}/{$data['tahun']}\n" .
+                    "*No Surat :* \n{$nomor_surat}/{$Identitas->namasingkat}/{$data['bulan']}/{$data['tahun']}\n" .
                     "*Tanggal Surat :* \n$tanggal_surat\n" .
                     "*Keperluan :* \n{$dataPesan['tujuan_perjalanan']}\n" .
                     "*Terima Kasih.*\n";
@@ -432,13 +440,14 @@ if (!function_exists('SuratKode')) {
                 $Identitas = Identitas::first();
                 //_____________________________________________________________________________________
                 //Dump Pesan Wa
-                $keyMessage = trim('Case / Surat / nomor_surat / tanggal_surat / kode_guru / jabatan_guru / tanggal_kunjungan / jam_kunjungan / tempat_kunjungan / tujuan_kunjungan / nis'); // Case / Guru / Kode_guru
-                // Contoh = 'Home Visit Custom / Surat / 2025 / 2 / AS / Guru BK / 2 / 08:30 / Rumah Siswa / 250001'; // Case / Guru / Kode_guru
+                $keyMessage = trim('Case / Surat / nomor_surat / tanggal_surat / kode_guru / jabatan_guru / tanggal_kunjungan / jam_kunjungan / tempat_kunjungan / tujuan_kunjungan / nis / kirim_wa'); // Case / Guru / Kode_guru
+                // Contoh = 'Home Visit Custom / Surat / 2025:SPPD / 2 / AS:DR / Guru BK:Wali Kelas / 2 / 08:30 / Rumah Siswa / 250001 / Ya#No'; // Case / Guru / Kode_guru
                 $dataPesan = combine_format_pesan($keyMessage, $message);
                 $data = [];
                 foreach ($dataPesan as $key => $value) {
                     $data[$key] = $value;
                 }
+                // Data Guru
                 $kodeGuru = explode(':', $data['kode_guru']);
                 $dataGuru = Detailguru::whereIn('kode_guru', $kodeGuru)->get();
                 $namaGuru = '';
@@ -446,6 +455,7 @@ if (!function_exists('SuratKode')) {
                     $namaGuru .= $index + 1 . ". " . $Guru->nama_guru . "\n";
                 }
                 $namaGuru = rtrim($namaGuru, "\r\n");
+                // Jabatan
                 $jabatan_guru = explode(':', $data['jabatan_guru']);
                 $Listjabatan = '';
                 foreach ($jabatan_guru as $index => $jabatan) {
@@ -473,15 +483,24 @@ if (!function_exists('SuratKode')) {
                     $data,
                     base_path('whatsapp/uploads/' . $filename)
                 );
-
+                if ($data['kirim_wa'] === 'ya') {
+                }
                 // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, json_encode($data));
                 //CopyFileWa(filename, 'template'); // template : folder di public jika diperlukan
                 $FileKiriman  = base_path('whatsapp/uploads/' . $filename);
                 $caption =
-                    "File siap\n" .
+                    "Berikut File Surat Home Visit :\n" .
+                    "No Surat :\n {$data['nomor_surat']} / {$Identitas->namasingkat} / {$data['bulan']} / {$data['tahun']}\n" .
+                    "Atas Nama Siswa :\n {$datasiswa['nama_siswa']}\n" .
+                    "Guru / Petugas :\n{$namaGuru}\n" .
+                    "Tanggal Kunjungan :\n {$tanggal_kunjungan}\n" .
+                    "Jam Kunjungan :\n {$data['jam_kunjungan']}\n\n" .
                     "*Terima Kasih.*\n";
                 sleep(10);
                 $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_media("Generator {$Kode}", $caption), $FileKiriman);
+                sleep(10);
+                // Pemeritahuan awal ke ortu melalui whtsapp
+                Whatsaap_surat_siswa($dataPesan);
                 sleep(10);
                 hapusFileWhatsApp($FileKiriman, $filename);
                 return false;
@@ -508,6 +527,121 @@ if (!function_exists('SuratKode')) {
                    sleep(10);
                    hapusFileWhatsApp($FileKiriman, $filename);
                */
+                break;
+            case 'Suket PIP':
+                //Suket PIP / Guru / Kode Guru / array_siswa / tahap
+                //_____________________________________________________________________________________
+                // Data Sekolah
+                $Identitas = Identitas::first()->toArray();
+                //Dump Pesan Wa
+                $keyMessage = 'Case / Surat / nomor_surat / tanggal_surat / Kode Guru / array_siswa / tahap';
+                $dataPesan = combine_format_pesan($keyMessage, $message);
+                $data = [];
+                foreach ($dataPesan as $key => $value) {
+                    $data[$key] = $value;
+                }
+                $data['nomor_surat'] = str_replace(':', '/', $data['nomor_surat']) . '/' . $Identitas['namasingkat'] . '/' . bulanRomawi(date('n')) . '/' . date('Y');
+                // Data Guru
+                // $Gurus = Detailguru::whereIn('kode_guru', $data['kode_guru'])->first();
+                // $dataSurat =
+                $data['tanggal_surat'] = Carbon::create(now($data['tanggal_surat']))->translatedformat('d F Y');
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, json_encode($dataAll));
+                // return false;
+                //_____________________________________________________________________________________
+
+                // DataSiswa
+                $arrayNis = explode(":", $data['array_siswa']);
+                $Siswa = Detailsiswa::whereIn('nis', $arrayNis)->get();
+
+                // mapping data sesuai placeholder di template
+                $data['siswa'] = $Siswa->map(function ($row, $i) {
+                    // $kelas = Ekelas::where('kelas_id', $row->kelas_id)->first();
+                    return [
+                        'no'   => $i + 1,
+                        'nis'   => $row->nis,
+                        'nama_siswa'  => $row->nama_siswa,
+                        'tingkat'  => $row->tingkat_id,
+                        'nomor_kip'  => $row->kartu_bantuan_1 ?? '-',
+                    ];
+                })->toArray();
+                $dataAll = array_merge($data, $Identitas, [
+                    'siswa' => $data['siswa'],
+                ]);
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, json_encode($data['siswa']));
+                // return false;
+                $filename = 'template_pip.docx'; // file name untuk dikirim atau hasil created
+                $filetemplate = 'template_pip.docx';
+                $hasil = fill_docx_template_complex(
+                    public_path('template/' . $Identitas['namasingkat'] . '/' . $filetemplate),
+                    $dataAll,
+                    base_path('whatsapp/uploads/' . $filename)
+                );
+                sleep(10);
+                $FileKiriman  = base_path('whatsapp/uploads/' . $filename);
+                $caption =
+                    // "Berikut File Surat Home Visit :\n" .
+                    // "No Surat :\n {$data['nomor_surat']} / {$Identitas['namasingkat']} / {$data['bulan']} / {$data['tahun']}\n" .
+                    // "Atas Nama Siswa :\n {xxxxxxx}\n" .
+                    // "Guru / Petugas :\n{xxxxxxx}\n" .
+                    // "Tanggal Kunjungan :\n {xxxxxxx}\n" .
+                    // "Jam Kunjungan :\n {xxxxxxxxxxx}\n\n" .
+                    "*Terima Kasih.*\n";
+                sleep(10);
+                $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_media("Generator {$Kode}", $caption), $FileKiriman);
+
+                $isiPesan =
+                    "isikiriman\n" .
+                    " \n ";
+                $pesanKiriman = format_pesan('Data Link Website Saat Ini', $isiPesan);
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
+                break;
+            case 'Surat Keterangan Lulus':
+                $keyMessage = 'Case / Guru / kode_guru'; // Case / Guru / Kode_guru
+                $dataPesan = combine_format_pesan($keyMessage, $message);
+                // Untuk pengecekan bisa gunakan : dump::pesan-wa-dump-pesan-whatsapp-laravel
+
+
+
+                /*
+                   Untuk pengiriman tanpa media
+                   $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $PesanKirim);
+
+                   Untuk pengiriman Dengan media
+                       $filename = 'namafile_disertai_ekstensi';
+                       //CopyFileWa(filename, 'template'); // template : folder di public jika diperlukan
+                       $FileKiriman  = base_path('whatsapp/uploads/' . $filename);
+                       $caption =
+                       "$isi_pesan\n".
+                       "*Terima Kasih.*\n";
+                       sleep(10);
+                       $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_media("Generator {$Kode}", $caption), $FileKiriman);
+                       sleep(10);
+                       hapusFileWhatsApp($FileKiriman, $filename);
+                   */
+                break;
+            case 'Surat Keterangan Keterangan':
+                $keyMessage = 'Case / Guru / kode_guru'; // Case / Guru / Kode_guru
+                $dataPesan = combine_format_pesan($keyMessage, $message);
+                // Untuk pengecekan bisa gunakan : dump::pesan-wa-dump-pesan-whatsapp-laravel
+
+
+
+                /*
+                   Untuk pengiriman tanpa media
+                   $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $PesanKirim);
+
+                   Untuk pengiriman Dengan media
+                       $filename = 'namafile_disertai_ekstensi';
+                       //CopyFileWa(filename, 'template'); // template : folder di public jika diperlukan
+                       $FileKiriman  = base_path('whatsapp/uploads/' . $filename);
+                       $caption =
+                       "$isi_pesan\n".
+                       "*Terima Kasih.*\n";
+                       sleep(10);
+                       $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_media("Generator {$Kode}", $caption), $FileKiriman);
+                       sleep(10);
+                       hapusFileWhatsApp($FileKiriman, $filename);
+                   */
                 break;
             default:
                 $pesanKiriman = "Kode Pesan anda *$Kode* Tidak ditemukan";

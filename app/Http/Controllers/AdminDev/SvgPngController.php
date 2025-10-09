@@ -75,11 +75,12 @@ class SvgPngController extends Controller
     public function GenerateKartuGuru(Request $request)
     {
         $idGurus = explode(",", $request->input('halaman_guru'));
-        $kodeKarpel = 8;
-        $folder = 'img/template/karpel';
-        $Siswa = Detailguru::whereIn('id', [1, 2, 3, 4, 5])->pluck('id');
+        $KodeKartu = 1;
+        $folder = 'img/template/kartu-guru';
+        // $Siswa = Detailguru::whereIn('id', [1, 2, 3, 4, 5])->pluck('id');
         foreach ($idGurus as $idGuru) {
-            $result = generatekarpel_depan($idGuru, $kodeKarpel, $folder);
+            $result = generatrKartuGuru_depan($idGuru, $KodeKartu, $folder);
+            $result = generatrKartuGuru_belakang($idGuru, $KodeKartu, $folder);
             // $result = generatekarpel_belakang($IdSiswa, $kodeKarpel, $folder);
         }
         // return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Seluruh siswa telah dibuat menjadi karpel');
@@ -111,6 +112,43 @@ class SvgPngController extends Controller
         // dd($idsiswas);
         foreach ($idsiswas as $IdSiswa) {
             if ($jenis_kartu === 'Kartu Pelajar') {
+                $folder = 'img/template/karpel';
+                $template_id = 11;
+                $result = generatekarpel_depan($IdSiswa, $template_id, $folder);
+                $result = generatekarpel_belakang($IdSiswa, $template_id, $folder);
+            } elseif ($jenis_kartu === 'Kartu NISN') {
+                $folder = 'img/template/karpel';
+                $result = generateNisn($IdSiswa, $template_id, $folder);
+                $result = generateNisnBelakang($IdSiswa, $template_id, $folder);
+            } elseif ($jenis_kartu === 'Kartu Pembayaran') {
+                // dd($request->all());
+                $folder = 'img/template/pembayaran';
+                $result = KartuPembayaran($IdSiswa, $template_id, $folder);
+                // $result = generateNisnBelakang($dataSiswa, $kodeKarpel, $folder);
+            } elseif ($jenis_kartu === 'Kartu Perpustakaan') {
+                $folder = 'img/template/kartu-perpustakaan';
+                $result = generateNisn($IdSiswa, $template_id, $folder);
+                $result = generateNisnBelakang($IdSiswa, $template_id, $folder);
+            } else {
+                // return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Anda belum memilih kartu');
+            }
+        }
+        // return Redirect::back()->with('Title', 'Berhasil')->with('Success', 'Pembuatan kartu NISN telah selesai');
+    }
+    public function AllInKartuKelas(Request $request)
+    {
+        // dd($request->all());
+        // $idsiswas = explode(",", $request->input('kelas_id'));
+        $jenis_kartu = $request->input('jenis_kartu');
+        // id siswa, dan kode karpel
+        // $idsiswas = [1, 2, 3, 4, 5];
+        $template_id = $request->input('template_id');
+        $idsiswas = Detailsiswa::where('kelas_id',  $request->input('kelas_id'))->pluck('id');
+        // dd($idsiswas);
+        // $idsiswas = [133];
+        foreach ($idsiswas as $IdSiswa) {
+            if ($jenis_kartu === 'Kartu Pelajar') {
+
                 $folder = 'img/template/karpel';
                 $template_id = 11;
                 $result = generatekarpel_depan($IdSiswa, $template_id, $folder);

@@ -7,7 +7,11 @@
     |
 */
 
+use App\Models\Admin\Ekelas;
+use App\Models\Whatsapp\WhatsApp;
 use App\Models\AdminDev\DataVendor;
+use App\Models\User\Guru\Detailguru;
+use App\Models\User\Siswa\Detailsiswa;
 
 if (!function_exists('cekVendor')) {
     function cekVendor($NoRequest, $sessions)
@@ -64,7 +68,7 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                 return $pesan;
                 break;
             case 'Teruskan':
-                // Teruskan/Vendor/Guru:Siswa:Wali/isipesan/
+                // Teruskan/Vendor/Guru:Siswa:Wali:Wali Kelas/isipesan/
                 $pesan = explode('/', $message); // Memecah Array yang yang telah diterima, lanjut fungsi loop fetch
                 /*
                    $xxxxxxx = $pesan[0];  -> xxxxxxxxxxxx
@@ -79,11 +83,30 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                    $xxxxxxx = $pesan[9];  -> xxxxxxxxxxxx
                    $xxxxxxx = $pesan[10];  -> xxxxxxxxxxxx
                 */
-                $pesan =
-                    "- Absensi\n" .
-                    "- PPDB\n" .
-                    "isiCode\n";
-                return $pesan;
+                if ($pesan[2] === 'Guru') {
+                } elseif ($pesan[2] === 'Siswa') {
+                } elseif ($pesan[2] === 'Wali') {
+                } elseif ($pesan[2] === 'Wali Kelas') {
+                    $WaliKelasId = Ekelas::pluck('detailguru_id');
+                    $NoWaliKelas = Detailguru::whereIn('id', $WaliKelasId)->pluck('no_hp');
+                    $pesan =
+                        "Di informasikan kepada wali kelas :\n" .
+                        "$pesan[3]\n\n" .
+                        // "{json_encode($NoWaliKelas)}\n" .
+                        "Ganti Tanda *#* dengan */*\n" .
+                        "Semoga bermanfaat dan mempermudah proses kerja Bapak / Ibu.\n";
+                    if (!config('whatsappSession.WhatsappDev')) {
+                        foreach ($NoWaliKelas as $walkes):
+                            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $walkes, format_pesan('Informasi Vendor', $pesan));
+                        endforeach;
+                    } else {
+                        $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Informasi Vendor', $pesan));
+                    }
+                }
+
+
+                return false;
+
                 break;
             // Data Siswa Uji Coba
             case 'Field Data Siswa':
@@ -101,6 +124,30 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                     "- {$message}\n" .
                     "- {$baris}\n";
                 \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Insert Data Siswa',  $pesan));
+                break;
+            case 'Siswa Baru':
+                $keyMessage = 'Case / Vendor / Data'; // Case / Guru / Kode_guru
+                $dataPesan = combine_format_pesan($keyMessage, $message);
+                // Untuk pengecekan bisa gunakan : dump::pesan-wa-dump-pesan-whatsapp-laravel
+
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, json_encode($dataPesan));
+
+                /*
+                   Untuk pengiriman tanpa media
+                   $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $PesanKirim);
+
+                   Untuk pengiriman Dengan media
+                       $filename = 'namafile_disertai_ekstensi';
+                       //CopyFileWa(filename, 'template'); // template : folder di public jika diperlukan
+                       $FileKiriman  = base_path('whatsapp/uploads/' . $filename);
+                       $caption =
+                       "$isi_pesan\n".
+                       "*Terima Kasih.*\n";
+                       sleep(10);
+                       $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_media("Generator {$Kode}", $caption), $FileKiriman);
+                       sleep(10);
+                       hapusFileWhatsApp($FileKiriman, $filename);
+                   */
                 break;
             // Management Server
             case 'Cek Service':
@@ -154,7 +201,206 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                     "*File  :*\n{$result['success']}\n";
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
                 break;
+            case 'Generate Karpel':
+                // Case / Vendor / nis / dokumen
+                $pesan = explode('/', $message);
+                $dokumen = $pesan[3];
+                // $DataNis
+                if ($dokumen === 'karpel') {
+                    $kodeKarpel = 11;
+                    $folder = 'img/template/karpel';
+                    $arrayNis = explode(':', $pesan[2]);
+                    $idsiswas = Detailsiswa::whereIn('nis', $arrayNis)->pluck('id');
+                    foreach ($idsiswas as $IdSiswa) {
+                        $KarpelDepan = generatekarpel_depan($IdSiswa, $kodeKarpel, $folder);
+                        $Carifilename = $KarpelDepan['nis'] . '.png';
+                        $copyFile = CopyDataSiswa($Carifilename, 'img/karpel/');
+                        $pesan =
+                            "Karpel Bagian Depan\n" .
+                            "\n";
+                        $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                        $KarpelBelakang = generatekarpel_belakang($IdSiswa, $kodeKarpel, $folder);
+                        $Carifilename = 'belakang_' . $KarpelBelakang['nis'] . '.png';
+                        $copyFile = CopyDataSiswa($Carifilename, 'img/karpel/');
+                        $pesan =
+                            "Karpel Bagian Depan\n" .
+                            "\n";
+                        $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                    }
+                } elseif ($dokumen === 'nisn') {
+                } else {
+                }
+                break;
+            case 'Info Update Data Bantuan':
+                //Info Update Data Bantuan / Vendor / nis
+                $pesan = explode('/', $message);
+                $siswa = Detailsiswa::where('nis', $pesan[2])->first();
+                $isiPesan =
+                    "Update Siswa/Vendor/{$pesan[2]}/\n" .
+                    "kartu_bantuan_1:{$siswa->kartu_bantuan_1}\n" .
+                    "kartu_bantuan_2:{$siswa->kartu_bantuan_2}\n" .
+                    "kartu_bantuan_3:{$siswa->kartu_bantuan_3}\n" .
+                    "kartu_bantuan_4:{$siswa->kartu_bantuan_4}\n" .
+                    "kartu_bantuan_5:{$siswa->kartu_bantuan_5}\n";
 
+                $pesanKiriman = format_pesan('Data Link Website Saat Ini', $isiPesan);
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
+                break;
+            case 'Info Update Data Siswa':
+                //Info Update Data Siswa / Vendor / nis
+                $pesan = explode('/', $message);
+                $siswa = Detailsiswa::where('nis', $pesan[2])->first();
+                $isiPesan =
+                    "Update Siswa/Vendor/$pesan[2]/\n" .
+                    "nama_siswa:{$siswa->nama_siswa}\n" .
+                    "nama_panggilan:{$siswa->nama_panggilan}\n" .
+                    "nik:{$siswa->nik}\n" .
+                    "nokk:{$siswa->nokk}\n" .
+                    "hobi:{$siswa->hobi}\n" .
+                    "cita_cita:{$siswa->cita_cita}\n" .
+                    "waktu_tempuh:{$siswa->waktu_tempuh}\n" .
+                    "status_tempat_tinggal:{$siswa->waktu_tempuh}\n" .
+                    "transportasi_berangkat:{$siswa->transportasi_berangkat}\n" .
+                    "jenis_kelamin:{$siswa->jenis_kelamin}\n" .
+                    "tempat_lahir:{$siswa->tempat_lahir}\n" .
+                    "tanggal_lahir:{$siswa->tanggal_lahir}\n" .
+                    "nohp_siswa:{$siswa->nohp_siswa}\n" .
+                    "agama:{$siswa->agama}\n" .
+                    "kewarganegaraan:{$siswa->kewarganegaraan}\n" .
+                    "anak_ke:{$siswa->anak_ke}\n" .
+                    "jml_saudara:{$siswa->jml_saudara}\n" .
+                    "jumlah_saudara_tiri:{$siswa->jumlah_saudara_tiri}\n" .
+                    "jumlah_saudara_angkat:{$siswa->jumlah_saudara_angkat}\n" .
+                    "status_anak:{$siswa->status_anak}\n" .
+                    "status_yatim_piatu:{$siswa->status_yatim_piatu}\n" .
+                    "bahasa:{$siswa->bahasa}\n" .
+                    "alamat_siswa:{$siswa->alamat_siswa}\n" .
+                    "jalan:{$siswa->jalan}\n" .
+                    "rt:{$siswa->rt}\n" .
+                    "rw:{$siswa->rw}\n" .
+                    "desa:{$siswa->desa}\n" .
+                    "kecamatan:{$siswa->kecamatan}\n" .
+                    "kabupaten:{$siswa->kabupaten}\n" .
+                    "provinsi:{$siswa->provinsi}\n" .
+                    "kode_pos:{$siswa->kode_pos}\n" .
+                    "tinggal_bersama:{$siswa->tinggal_bersama}\n" .
+                    "jarak_sekolah:{$siswa->jarak_sekolah}\n" .
+                    "golongan_darah:{$siswa->golongan_darah}\n" .
+                    "riwayat_penyakit:{$siswa->riwayat_penyakit}\n" .
+                    "kelainan_jasmani:{$siswa->kelainan_jasmani}\n" .
+                    "tinggi_badan:{$siswa->tinggi_badan}\n" .
+                    "berat_badan:{$siswa->berat_badan}\n" .
+                    "namasek_asal:{$siswa->namasek_asal}\n" .
+                    "alamatsek_asal:{$siswa->alamatsek_asal}\n" .
+                    "tanggal_ijazah_sd:{$siswa->tanggal_ijazah_sd}\n" .
+                    "nomor_ijazah_sd:{$siswa->nomor_ijazah_sd}\n" .
+                    "lama_belajar:{$siswa->lama_belajar}\n" .
+                    "asal_pindahan:{$siswa->asal_pindahan}\n" .
+                    "alasan_pindahan:{$siswa->alasan_pindahan}\n" .
+                    "tanggal_penerimaan:{$siswa->tanggal_penerimaan}\n" .
+                    "jabatan_kelas:{$siswa->jabatan_kelas}\n" .
+                    "piket_kelas:{$siswa->piket_kelas}\n" .
+                    "petugas_upacara:{$siswa->petugas_upacara}\n" .
+                    " \n ";
+                $pesanKiriman = format_pesan('Data Link Website Saat Ini', $isiPesan);
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
+                break;
+            case 'Info Update Data Ayah':
+                //Info Update Data Ayah / Vendor / nis
+                $pesan = explode('/', $message);
+                $siswa = Detailsiswa::where('nis', $pesan[2])->first();
+                $isiPesan =
+                    "Update Siswa/Vendor/$pesan[2]/\n" .
+                    "ayah_nama:{$siswa->ayah_nama}\n" .
+                    "ayah_nik:{$siswa->ayah_nik}\n" .
+                    "ayah_pekerjaan:{$siswa->ayah_pekerjaan}\n" .
+                    "ayah_keadaan:{$siswa->ayah_keadaan}\n" .
+                    "ayah_agama:{$siswa->ayah_agama}\n" .
+                    "ayah_pendidikan:{$siswa->ayah_pendidikan}\n" .
+                    "ayah_penghasilan:{$siswa->ayah_penghasilan}\n" .
+                    "ayah_nohp:{$siswa->ayah_nohp}\n" .
+                    " \n ";
+                $pesanKiriman = format_pesan('Data Ayah', $isiPesan);
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
+                break;
+            case 'Info Update Data Ibu':
+                //Info Update Data Ibu / Vendor / nis
+                $pesan = explode('/', $message);
+                $siswa = Detailsiswa::where('nis', $pesan[2])->first();
+                $isiPesan =
+                    "Update Siswa/Vendor/$pesan[2]/\n" .
+                    "ibu_nama:{$siswa->ibu_nama}\n" .
+                    "ibu_nik:{$siswa->ibu_nik}\n" .
+                    "ibu_pekerjaan:{$siswa->ibu_pekerjaan}\n" .
+                    "ibu_keadaan:{$siswa->ibu_keadaan}\n" .
+                    "ibu_agama:{$siswa->ibu_agama}\n" .
+                    "ibu_pendidikan:{$siswa->ibu_pendidikan}\n" .
+                    "ibu_penghasilan:{$siswa->ibu_penghasilan}\n" .
+                    "ibu_nohp:{$siswa->ibu_nohp}\n" .
+                    " \n ";
+                $pesanKiriman = format_pesan('Data Ibu', $isiPesan);
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
+                break;
+            case 'Info Update Data Wali':
+                //Info Update Data Ibu / Vendor / nis
+                $pesan = explode('/', $message);
+                $siswa = Detailsiswa::where('nis', $pesan[2])->first();
+                $isiPesan =
+                    "Update Siswa/Vendor/$pesan[2]/\n" .
+                    "wali_nama:{$siswa->wali_nama}\n" .
+                    "wali_nik:{$siswa->wali_nik}\n" .
+                    "wali_pekerjaan:{$siswa->wali_pekerjaan}\n" .
+                    "wali_keadaan:{$siswa->wali_keadaan}\n" .
+                    "wali_agama:{$siswa->wali_agama}\n" .
+                    "wali_pendidikan:{$siswa->wali_pendidikan}\n" .
+                    "wali_penghasilan:{$siswa->wali_penghasilan}\n" .
+                    "wali_nohp:{$siswa->wali_nohp}\n" .
+                    " \n ";
+                $pesanKiriman = format_pesan('Data Wali', $isiPesan);
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
+                break;
+
+
+            case 'Update Siswa':
+                //Tester / Guru / Kode Guru / xxxxxxxxxx
+                /* $message = "
+                Case / bagian / 250001/
+                Update NB/Operator/250001/
+                kartu_bantuan_1:1000
+                kartu_bantuan_2:
+                kartu_bantuan_3:500
+                kartu_bantuan_4:
+                kartu_bantuan_5:200
+
+                */
+                $message = preg_replace("/\r\n|\n|\r/", "/", $message);
+                // Split pesan dan trim
+                $parts = array_map('trim', explode('/', $message));
+                // Ambil model siswa
+                $siswa = Detailsiswa::where('nis', $parts[2])->first();
+                // Assign key:value ke model
+                ArrayUpdateDataWa($parts, $siswa, 3); // skip 4 bagian pertama jika perlu
+                // Simpan perubahan
+                $siswa->save();
+
+                // $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, json_encode($kartuParts));
+                // Bagian Pesan Update
+                $parts = array_slice($parts, 3);
+                $dataUpdate = '';
+                foreach ($parts as $key => $value):
+                    $value_update = str_replace(':', ' : ', $value);
+                    $dataUpdate .= "{$value_update}\n";
+                endforeach;
+                $isiPesan =
+                    "Data telah di update harap periksa kembali\n" .
+                    "{$dataUpdate}\n" .
+                    // "{$message}\n" .
+                    // "json_encode($kartuData)-\n" .
+                    " \n ";
+                $pesanKiriman = format_pesan('Data Link Website Saat Ini', $isiPesan);
+                $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
+                return $result;
+                break;
             default:
                 return "Tidak ada kode pesan yang sesuai ";
         }

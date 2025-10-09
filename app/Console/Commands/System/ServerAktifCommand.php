@@ -51,15 +51,9 @@ class ServerAktifCommand extends Command
         $sessions = config('whatsappSession.IdWaUtama');
         $NoTujuan = config('whatsappSession.DevNomorTujuan');
         $pesanKiriman =
-            "==============================\n" .
-            "📌 *Informasi Server :*\n" .
-            "==============================\n\n" .
             "*Server telah aktif!*\n" .
             "🗓 Hari & Tanggal\t: {$hari}\n" .
-            "⏰ Jam\t\t\t\t\t\t\t\t: {$jam} WIB\n" .
-            "\n" . str_repeat("─", 25) . "\n" .
-            "✍️ Dikirim oleh:\n" .
-            "*Boot Assistant Pelayanan {$Identitas->namasek}*";
+            "⏰ Jam\t\t\t\t\t\t\t\t: {$jam} WIB\n";
         if (!config('whatsappSession.WhatsappDev')) {
             $waData = [
                 config('whatsappSession.NoKepala'),
@@ -71,7 +65,7 @@ class ServerAktifCommand extends Command
             ];
         }
         foreach ($waData as $kirikke):
-            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $kirikke, format_pesan('Informasi Backup Database', $pesanKiriman));
+            $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $kirikke, format_pesan('Informasi Server Aktif', $pesanKiriman));
         endforeach;
         // $response = Http::timeout(3)->post($url, [
         //     'id'      => $sessions,

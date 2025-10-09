@@ -55,36 +55,74 @@ if (!function_exists('PesanDataSiswa')) {
         $kelas = optional($Siswa->Detailsiswatokelas)->kelas ?? '-';
         $tanggal = Carbon::now()->translatedformat('l, d F Y');
         $jam = $Siswa->created_at->translatedFormat('H:i:s');
+        $nama_siswa = ucwords(strtolower($Siswa->nama_siswa));
+        $nama_panggilan = ucwords(strtolower($Siswa->nama_panggilan));
+
         $message =
-            "==================================\n" .
+            "=============================\n" .
             "📌 *Data Siswa*\n" .
-            "==================================\n\n" .
-            "📝 Nama\t\t\t\t: $nama\n" .
-            "🏫 Kelas\t\t\t\t: $kelas\n" .
-            "🎓 NIS\t\t\t\t\t: $nis\n" .
-            "🎓 NISN\t\t\t\t\t: $nisn\n" .
-            "📅 Tempat & Tanggal Lahir\t: $tempat_lahir, $tanggal_lahir\n" .
-            "🏡 Alamat\t\t\t\t: $alamat_siswa\n" .
-            "📍 RT\t\t\t\t\t: $rt\n" .
-            "📍 RW\t\t\t\t\t: $rw\n" .
-            "🏘️ Desa\t\t\t\t: $desa\n" .
-            "📱 No HP\t\t\t\t: $nohp_siswa\n" .
-            "==================================\n\n" .
+            "=============================\n\n" .
+            "👤 Nama Lengkap : $nama_siswa\n" .
+            "👤 Nama Panggilan : $nama_panggilan\n" .
+            "🎂 Tempat & Tgl Lahir : $tempat_lahir, $tanggal_lahir\n" .
+            "⭐ Cita - Cita : $Siswa->cita_cita\n" .
+            "🎨 Hobi : $Siswa->hobi\n" .
+            "🏫 Kelas : $kelas\n" .
+            "🆔 NIS / NIM : $nis\n" .
+            "🆔 NISN : $nisn\n" .
+            "🆔 NIK : $Siswa->nik\n" .
+            "🆔 No KK : $Siswa->nokk\n" .
+            "👶 Anak Ke : $Siswa->anak_ke\n" .
+            "👨‍👩‍👧 Jumlah Saudara  : $Siswa->jml_saudara\n" .
+            "🕊️ Status Yatim/Piatu : $Siswa->status_yatim_piatu\n" .
+            "📏 Jarak Sekolah : $Siswa->jarak_sekolah\n" .
+            "🩸 Riwayat Penyakit : $Siswa->riwayat_penyakit\n" .
+            "🩸 Kelainan Jasmani : $Siswa->kelaianan_jasmani\n" .
+            "🩸 Gol. Darah : $Siswa->golongan_darah\n" .
+            "📏 Tinggi Badan : $Siswa->tinggi_badan cm \n" .
+            "⚖️ Berat Badan : $Siswa->berat_badan Kg\n" .
+            "🏡 Alamat : $alamat_siswa\n" .
+            "📍 RT : $rt\n" .
+            "📍 RW : $rw\n" .
+            "🏘️ Desa : $desa\n" .
+            "📱 No HP : $nohp_siswa\n" .
+            "=============================\n\n" .
+            "📌 *Sekolah Asal*\n" .
+            "=============================\n\n" .
+            "🏫 Sekolah Asal   : $Siswa->namasek_asal\n" .
+            "📍 Alamat         : $Siswa->alamatsek_asal\n" .
+            "📅 Tanggal Ijazah : $Siswa->tanggal_ijazah_sd\n" .
+            "📑 No Ijazah      : $Siswa->nomor_ijazah_sd\n" .
+            "🔄 Asal Pindah    : $Siswa->asal_pindahan\n" .
+            "🎓 Kelas Pindah   : $Siswa->kelas_penerimaan\n" .
+            "=============================\n\n" .
             "📌 *Data Ayah*\n" .
-            "==================================\n\n" .
-            "👨 Nama Ayah\t\t\t: $ayah_nama\n" .
-            "💼 Pekerjaan Ayah\t\t: $ayah_pekerjaan\n" .
-            "📞 Nomor HP Ayah\t\t: $ayah_nohp\n" .
-            "==================================\n\n" .
+            "=============================\n\n" .
+            "👨 Nama            : $ayah_nama\n" .
+            "💼 Pekerjaan       : $ayah_pekerjaan\n" .
+            "💰 Penghasilan     : $Siswa->ayah_penghasilan\n" .
+            "🎓 Pendidikan      : $Siswa->ayah_pendidikan\n" .
+            "📱 Nomor HP        : $ayah_nohp\n" .
+            "=============================\n\n" .
             "📌 *Data Ibu*\n" .
-            "==================================\n\n" .
-            "👩 Nama Ibu\t\t\t: $ibu_nama\n" .
-            "💼 Pekerjaan Ibu\t\t: $ibu_pekerjaan\n" .
-            "📞 Nomor HP Ibu\t\t: $ibu_nohp\n" .
-            "==================================\n" .
-            "\n" . str_repeat("─", 25) . "\n" .
+            "=============================\n\n" .
+            "👩 Nama            : $ibu_nama\n" .
+            "💼 Pekerjaan       : $ibu_pekerjaan\n" .
+            "💰 Penghasilan     : $Siswa->ibu_penghasilan\n" .
+            "🎓 Pendidikan      : $Siswa->ibu_pendidikan\n" .
+            "📱 Nomor HP         : $ibu_nohp\n" .
+            "=============================\n\n" .
+            "📌 *Data Bantuan*\n" .
+            "=============================\n\n" .
+            "🎫 Kartu Bantuan PIP : $Siswa->kartu_bantuan_1\n" .
+            "🎫 Kartu Bantuan      : $Siswa->kartu_bantuan_2\n" .
+            "🎫 Kartu Bantuan      : $Siswa->kartu_bantuan_3\n" .
+            "🎫 Kartu Bantuan      : $Siswa->kartu_bantuan_4\n" .
+            "🎫 Kartu Bantuan      : $Siswa->kartu_bantuan_5\n" .
+            "\n" . str_repeat("─", 20) . "\n" .
             "✍️ Dikirim oleh:\n" .
-            "   *Boot Assiten Pelayanan {$Identitas->namasek}*\n";
+            "   *Boot Asisten Pelayanan {$Identitas->namasek}*\n";
+
 
         return $message;
     }

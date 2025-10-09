@@ -37,54 +37,80 @@ if (!function_exists('Auto_reply_CariKode')) {
         $sessions = config('whatsappSession.IdWaUtama');
         switch ($Kode) {
             // $data = explode('/', $message);
-            case 'Siswa': //Konsep Untuk Kirim dan Buat Surat Lewat Whatsapp
-                // handling cek guru
+            case 'Siswa':
+                // Konsep Untuk Kirim dan Buat Surat Lewat Whatsapp
+                // Format perintah:
                 // Siswa/Cari/key/pencarian
+                // Contoh:
                 // Siswa/Cari/kelas/VII A
                 // Siswa/Cari/nama/xxxx
                 // Siswa/Cari/alamat/xxxx
                 // Siswa/Cari/nis/2025xx
                 // Siswa/Cari/statusytm/yatim:piatu:yatim piatu:lengkap
+                // Siswa/Cari/umur/11
                 // Cari/Siswa
-                $field = $data['2'];
-                if ($data[2] === 'kelas') {
+
+                $field = $data[2] ?? ''; // ambil field pencarian
+                if ($field === 'kelas') {
+                    // khusus pencarian kelas (karena kelas pakai ID)
                     $etapels = Etapel::where('aktiv', 'Y')->first();
                     $kelasId = Ekelas::where('tapel_id', $etapels->id)->where('kelas', $data[3])->first();
-                    $keyword = $kelasId->id;
+                    $keyword = $kelasId->id ?? ''; // jika kelas tidak ditemukan → kosong
                 } else {
-                    $keyword = $data[3] ?? '';
+                    $keyword = $data[3] ?? ''; // ambil keyword pencarian
                 }
+
+                // mapping field agar aman (hindari SQL injection dan typo)
                 $fieldMap = [
                     'nama' => 'nama_siswa',
                     'nis' => 'nis',
                     'alamat' => 'alamat_siswa',
                     'kelas' => 'kelas_id',
                     'statusytm' => 'status_yatim_piatu',
+                    // 'umur' tidak ada di DB, jadi harus dihandle manual dengan TIMESTAMPDIFF
                 ];
-                if (array_key_exists($field, $fieldMap) && $keyword != '') {
+
+                if ($field === 'umur' && $keyword != '') {
+                    // pencarian berdasarkan umur (hitung dari tanggal_lahir)
+                    $Caris = Detailsiswa::with('KelasOne')
+                        ->where('status_siswa', 'aktif')
+                        ->whereRaw('TIMESTAMPDIFF(YEAR, tanggal_lahir, CURDATE()) = ?', [$keyword])
+                        ->get();
+                } elseif (array_key_exists($field, $fieldMap) && $keyword != '') {
+                    // pencarian field biasa (nama, nis, alamat, kelas, statusytm)
                     $dbField = $fieldMap[$field];
-                    $Caris = Detailsiswa::With('KelasOne')->where('status_siswa', 'aktif')->where($dbField, 'like', '%' . $keyword . '%')->get();
+                    $Caris = Detailsiswa::with('KelasOne')
+                        ->where('status_siswa', 'aktif')
+                        ->where($dbField, 'like', '%' . $keyword . '%')
+                        ->get();
                 } else {
-                    $Caris = collect(); // atau null / response error
+                    // kalau field tidak cocok → kembalikan kosong
+                    $Caris = collect();
                 }
+
+                // format hasil pencarian
                 $isiSiswa = '';
                 foreach ($Caris as $siswa) {
-                    $kelas = $siswa->kelas->kelas ?? '-';
-                    $nis = $siswa->nis ?? '-';
-                    $isiSiswa .= "📝 {$siswa->nama_siswa} ({$kelas} - {$nis})\n";
+                    $kelas = $siswa->kelas->kelas ?? '-'; // ambil nama kelas
+                    $nis = $siswa->nis ?? '-'; // ambil NIS
+                    $umur = umursiswa($siswa->tanggal_lahir); // fungsi helper hitung umur
+                    $isiSiswa .= "📝 {$siswa->nama_siswa} ({$kelas} - {$nis}) | {$umur} th\n";
                 }
+
+                // pesan kiriman ke WhatsApp
                 $pesanKiriman =
                     "==================================\n" .
                     "📌 *Data $Kode Siswa*\n" .
                     "==================================\n\n" .
-                    $isiSiswa . // <<<<< di sini masukin hasil foreach
+                    ($isiSiswa ?: "⚠️ Tidak ada data ditemukan.\n") . // fallback kalau kosong
                     "\n" . str_repeat("─", 25) . "\n" .
                     "✍️ Dikirim oleh:\n" .
                     "\t\t*Boot Asisten Pelayanan {$Identitas->namasek}*\n";
 
-                // Log::info("Request received: Number - $number, Nis - $Part2 dan Kode = $Kode (Surat)");
+                // kirim ke WhatsApp Gateway
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, $pesanKiriman);
                 break;
+
             default:
                 $pesanKiriman = "Kode Pesan anda *$Kode* Tidak ditemukan";
                 break;

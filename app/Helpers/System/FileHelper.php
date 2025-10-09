@@ -1151,6 +1151,111 @@ if (!function_exists('fill_docx_template')) {
         return $outputPath;
     }
 }
+/*
+ * Isi template DOCX dengan data lalu simpan ke output
+ *
+ * - Value biasa (string/number) => langsung diganti dengan setValue
+ * - Array multidimensi          => dianggap tabel, diganti dengan cloneRowAndSetValues
+ * - Gambar (path / array)       => diproses dengan setImageValue
+ *
+ * ---------------------------------
+ *
+ * Cara penggunaan:
+ *
+ */
+/* $data = [
+      // Value biasa
+      'nama'    => 'Budi Santoso',
+      'jabatan' => 'Kepala Sekolah',
+      'tanggal' => date('d F Y'),
+
+      // Gambar (path langsung)
+      'foto'    => public_path('uploads/foto_budi.jpg'),
+
+      // Gambar (detail setting)
+      'ttd'     => [
+          'path'   => public_path('uploads/ttd.png'),
+          'width'  => 120,
+          'height' => 80,
+          'ratio'  => true,
+      ],
+
+      // Tabel (multi-row)
+      'lomba'   => [
+          [
+              'lomba'   => 'LCC',
+              'juara'   => 'Juara 1',
+              'tingkat' => 'Kecamatan',
+          ],
+          [
+              'lomba'   => 'Cerdas Cermat',
+              'juara'   => 'Juara 2',
+              'tingkat' => 'Kabupaten',
+          ],
+          [
+              'lomba'   => 'Debat',
+              'juara'   => 'Juara Harapan',
+              'tingkat' => 'Provinsi',
+          ],
+      ],
+  ];
+
+  $hasil = fill_docx_template(
+      storage_path('templates/surat.docx'),
+      $data,
+      storage_path('app/public/surat-aktif.docx')
+  );
+
+  dd("✅ DOCX berhasil dibuat di: {$hasil}");
+*/
+
+if (!function_exists('fill_docx_template_complex')) {
+    function fill_docx_template_complex(string $templatePath, array $data, string $outputPath): string
+    {
+        if (!file_exists($templatePath)) {
+            throw new \Exception("Template tidak ditemukan: {$templatePath}");
+        }
+
+        $template = new TemplateProcessor($templatePath);
+
+        foreach ($data as $key => $value) {
+            // === Handle TABEL (array multidimensi) ===
+            if (is_array($value) && isset($value[0]) && is_array($value[0])) {
+                // ambil key pertama dari array anak
+                $firstChildKey = array_key_first($value[0]);
+                $template->cloneRowAndSetValues($firstChildKey, $value);
+
+                // === Handle GAMBAR (array config) ===
+            } elseif (is_array($value) && isset($value['path'])) {
+                $imgOptions = array_merge([
+                    'width'  => 100,
+                    'height' => 100,
+                    'ratio'  => true,
+                ], $value);
+
+                $template->setImageValue($key, $imgOptions);
+
+                // === Handle GAMBAR (path langsung) ===
+            } elseif (is_string($value) && preg_match('/\.(jpg|jpeg|png|gif)$/i', $value) && file_exists($value)) {
+                $template->setImageValue($key, [
+                    'path'   => $value,
+                    'width'  => 100,
+                    'height' => 100,
+                    'ratio'  => true,
+                ]);
+
+                // === Handle VALUE biasa ===
+            } else {
+                $template->setValue($key, $value);
+            }
+        }
+
+        $template->saveAs($outputPath);
+
+        return $outputPath;
+    }
+}
+
 // Helper Hapus file setelah kirim wa
 if (!function_exists('hapusFileWhatsApp')) {
     function hapusFileWhatsApp($RootFileBasePath, $filename)

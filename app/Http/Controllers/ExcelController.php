@@ -209,8 +209,8 @@ class ExcelController extends Controller
             $detailsiswa = Detailsiswa::create([
                 'user_id' => $LatesUser,
                 'status_siswa'           => 'aktif',
-                'nama_siswa'             => ucwords($row[4]),
-                'nama_panggilan'         => ucwords($nama_panggilan),
+                'nama_siswa'             => ucwords(strtolower($row[4])),
+                'nama_panggilan'         => ucwords(strtolower($nama_panggilan)),
                 'nis'                    => $nis,
                 'nisn'                   => $nisn,
                 'nik'                    => $row[7] ?? null, // 7 Artinya kolom ke 8
@@ -218,7 +218,7 @@ class ExcelController extends Controller
                 'hobi'                   => $row[9] ?? null, // 9
                 'cita_cita'              => ucwords($row[10]) ?? null, // 10
                 'jenis_kelamin'          => $row[11] ?? null, // 11
-                'tempat_lahir'           => ucwords($row[12]) ?? null, // 12
+                'tempat_lahir'           => ucwords(strtolower($row[12])) ?? null, // 12
                 'tanggal_lahir'          => $row[13] !== null ? format_tanggal_lahir($row[13]) : null, // 13
                 'nohp_siswa'             => $row[14] !== null ? format_no_hp($row[14]) : null, // 14
                 'agama'                  => $row[15] ?? null, // 15

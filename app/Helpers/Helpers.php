@@ -68,3 +68,12 @@ require_once __DIR__ . '/System/ReaderDeviceHelper.php';
 require_once __DIR__ . '/Sekolah/ValidationAksesHelper.php';
 require_once __DIR__ . '/Auto_Reply_OperatorHelper.php';
 require_once __DIR__ . '/System/VendorHelper.php';
+require_once __DIR__ . '/System/ExportTabelHelper.php';
+
+require_once __DIR__ . '/System/ExportExcelHelper.php';
+require_once __DIR__ . '/System/PyCetakHelper.php';
+
+require_once __DIR__ . '/System/ScanHelper.php';
+require_once __DIR__ . '/System/JpgToPngHelper.php';
+//require_once __DIR__ . '/System/PdfToImageHelper.php';
+require_once __DIR__ . '/Update/UpdateDataViaWaHelper.php';

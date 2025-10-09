@@ -418,7 +418,9 @@ app.use(cors()); // izinkan semua origin
         $pecahNo = explode('@', $request->query('number'));
         $NoRequest = $pecahNo[0];
         $number = $request->query('number');
-        $message = str_replace(' / ', '/', $request->query('message'));
+        $message = $request->query('message');
+        $message = preg_replace('/\s*\/\s*/', '/', $message);
+
         if (!$message) {
             $message =  'Media File';
         }
@@ -544,11 +546,6 @@ app.use(cors()); // izinkan semua origin
                     // handling cek guru
                     FiturPaket($paket, $NoRequest);
                     Auto_Reply_Database($Kode, $Siswa, $NoRequest, $message);
-                } elseif ($Part1 === 'Vendor') {
-                    // handling cek guru
-                    // FiturPaket($paket, $NoRequest);
-                    Auto_Reply_VendorHelper($Kode, $NoRequest, $message, config('whatsappSession.IdWaUtama'));
-                    // Auto_Reply_Database($Kode, $Siswa, $NoRequest, $message);
                 } elseif ($Part1 === 'Control') {
                     // handling cek guru
                     // FiturPaket($paket, $NoRequest);
@@ -566,6 +563,11 @@ app.use(cors()); // izinkan semua origin
                     //     'reply' => "Dokumen siap - " . $dataFile['filename'],
                     //     'file' => 'uploads/' . $dataFile['filename'], //Jika ingin kirim via Whatsapp harus simpan di folder upload whatsapp,
                     // ]);
+                } elseif ($Part1 === 'Vendor') {
+                    // handling cek guru
+                    // FiturPaket($paket, $NoRequest);
+                    Auto_Reply_VendorHelper($Kode, $NoRequest, $message, config('whatsappSession.IdWaUtama'));
+                    // Auto_Reply_Database($Kode, $Siswa, $NoRequest, $message);
                 } elseif ($Part1 === 'Rapat') {
                     // handling cek guru
                     switch ($Kode) {
