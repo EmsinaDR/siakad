@@ -27,6 +27,9 @@ class ClearAllCache extends Command
         $this->info('View cache dibersihkan.');
 
         $this->info('Semua bersih! Aplikasi fresh seperti baru install 😎');
+        $file = 'executor\\pc\\cleaner-file.bat';
+        run_bating($file);
+        $this->info('Folder Temp Semua telah dibersihkan');
     }
 }
 // php artisan clear:clear-all

@@ -15,6 +15,7 @@ class ScheduleServiceProviderClient extends ServiceProvider
     {
         //
         $this->commands([
+
             \App\Console\Commands\Whatsapp\PenjadwalanPesanCommand::class,
             \App\Console\Commands\Absensi\CekAbsenKosongSiswa::class,
             \App\Console\Commands\Rapat\DataRapatCommand::class,
@@ -262,6 +263,7 @@ class ScheduleServiceProviderClient extends ServiceProvider
             $schedule->command('update:SynGitHub')->weeklyOn(3, '11:00'); // Update Github
             // ConverterJpgToPngCommand
             $schedule->command('convert:jpg-to-png')->dailyAt(3, '10:00'); // Update Github
+            $schedule->command('siakad:clear')->hourlyAt(15); // Update Github
 
 
         });

@@ -44,18 +44,20 @@ if (!function_exists('Auto_reply_SiswaKode')) {
         $NamaAyah = $Siswa->ayah_nama;
         $IdSiswa = $Siswa->id;
         $Nis = $Siswa->nis;
+        // diclient bermasalah
         Log::info("Request received: Number - $NoRequest, Nis - $Nis dan Kode = $Kode");
         WhatsappLog::LogWhatsapp($NoRequest, $message);
 
         if (!validate_Ortu($NoRequest, $Nis)) {
             return;
         };
+        // diclient bermasalah
         // TODO: Implement your helper logic here
         switch (ucfirst($Kode)) {
             case 'Data Siswa':
                 $pesan = PesanDataSiswa($Siswa->id);
                 $Carifilename = $Nis . '-3x4.png';
-                $copyFile = CopyDataSiswa($Carifilename, 'img/siswa/');
+                $copyFile = CopyDataSiswa($Carifilename, 'img/siswa/foto/');
                 if ($copyFile['status'] === 'error') {
                     $filename = 'blanko-foto.png'; // fallback manual
                 } else {

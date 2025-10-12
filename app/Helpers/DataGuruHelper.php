@@ -192,3 +192,35 @@ if (!function_exists('CekGuru')) {
         return Detailguru::where('kode_guru', $kodeGuru)->exists();
     }
 }
+// Generate Kode Guru
+if (!function_exists('generate_kode_guru')) {
+    function generate_kode_guru($nama_guru)
+    {
+        // Array statis: menampung semua kode yang sudah dipakai
+        static $kode_terpakai = [];
+
+        // 1️⃣ Ambil semua huruf besar dari nama
+        preg_match_all('/[A-Z]/', $nama_guru, $matches);
+        $kode = implode('', $matches[0]);
+
+        // 2️⃣ Kalau gak ada huruf besar, ambil huruf awal tiap kata (case-insensitive)
+        if ($kode === '') {
+            preg_match_all('/\b[a-z]/i', $nama_guru, $matches);
+            $kode = strtoupper(implode('', $matches[0]));
+        }
+
+        // 3️⃣ Pastikan kode unik
+        $kode_asli = $kode;
+        $counter = 1;
+        while (in_array($kode, $kode_terpakai)) {
+            $kode = $kode_asli . $counter; // tambah angka berurutan (bisa diganti random kalau mau)
+            $counter++;
+        }
+
+        // 4️⃣ Simpan ke daftar kode terpakai
+        $kode_terpakai[] = $kode;
+
+        // 5️⃣ Return kode unik
+        return $kode;
+    }
+}

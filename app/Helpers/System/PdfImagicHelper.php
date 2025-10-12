@@ -2,6 +2,8 @@
 
 use imagick;
 use Spatie\PdfToImage\Pdf;
+use setasign\Fpdi\Fpdi;
+
 /*
     |--------------------------------------------------------------------------
     | 📌 Imagick Instalasi :

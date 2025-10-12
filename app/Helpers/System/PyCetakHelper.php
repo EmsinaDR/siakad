@@ -37,3 +37,27 @@ if (!function_exists('print_docx')) {
         return $output ?: 'File berhasil dikirim ke printer default';
     }
 }
+if (!function_exists('py_print')) {
+    /**
+     * Cetak file DOCX ke printer default
+     *
+     * @param string $filePath
+     * @return string
+     */
+    function py_print($filePath)
+    {
+        // Normalisasi path (Windows pakai \)
+        $filePath = str_replace('/', '\\', $filePath);
+
+        // Path full ke Python Laragon
+        $pythonPath = 'C:\\laragon\\bin\\python\\python-3.10\\python.exe'; // sesuaikan versi
+
+        // Inline Python langsung (tanpa file .py)
+        $cmd = "$pythonPath -c \"import os; os.startfile(r'$filePath', 'print')\"";
+
+        // Jalankan command
+        $output = shell_exec($cmd . " 2>&1");
+
+        return $output ?: 'File berhasil dikirim ke printer default';
+    }
+}

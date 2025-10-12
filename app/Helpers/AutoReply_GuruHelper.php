@@ -419,10 +419,10 @@ if (!function_exists('Auto_reply_Data_Guru')) {
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Informasi', $PesanKirim));
                 break;
             case 'Dokumen Siswa':
-                // Dokumen Siswa / Guru / 230019 / karpel#foto#kk#nisn#ktp#ijazah#kia#bantuan 1#bantuan 2#bantuan 3#bantuan 4#bantuan 5
+                // Dokumen Siswa / Guru / 230019 / karpel # foto # kk # nisn # ktp ayah # ktp ibu # ijazah # ijazah sd # kia # bantuan 1 # bantuan 2 # bantuan 3 # bantuan 4 # bantuan 5
                 $pesan = explode('/', $message);
                 // $dok = explode(':', $pesan[3]);
-                $Siswa = Detailsiswa::where('nis', $pesan[2])->first();
+                $Siswa = Detailsiswa::with('KelasOne')->where('nis', $pesan[2])->first();
                 $nama_siswa    = ucwords(strtolower($Siswa->nama_siswa));
                 $nama_panggilan = ucwords(strtolower($Siswa->nama_panggilan));
                 $dok = strtolower($pesan[3]);
@@ -434,7 +434,7 @@ if (!function_exists('Auto_reply_Data_Guru')) {
                         "Nama Panggilan: {$nama_panggilan}\n" .
                         "NIS: {$Siswa->nis}\n" .
                         "NISN: {$Siswa->nisn}\n";
-                    CopyFileWa($filename, 'img/siswa');
+                    CopyFileWa($filename, 'img/siswa/foto');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Data Siswa', $caption), $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'karpel') {
@@ -449,85 +449,164 @@ if (!function_exists('Auto_reply_Data_Guru')) {
                         "TTL: {$Siswa->tempat_lahir}, {$tanggal}\n" .
                         "Alamat: Rt {$Siswa->rt}, Rw {$Siswa->rw}, Desa {$Siswa->desa}\n" .
                         "\n";
-                    CopyFileWa($filename, 'img/karpel');
+                    CopyFileWa($filename, 'img/siswa/karpel/');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
-                    $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Data Karpel', $caption), $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder
+                    $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Data Karpel Depan', $caption), $filePath);
+                    CopyFileWa('belakang_' . $filename, 'img/siswa/karpel/');
+                    $filePath = base_path('whatsapp/uploads/belakang_' . $filename);
+                    $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Data Karpel Belakang', $caption), $filePath);
                 } else if ($dok === 'kk') {
                     $filename = $Siswa->nis . '.png';
                     $tanggal = Carbon::create($Siswa->tanggal_lahir)->translatedformat('d F Y');
                     $caption =
-                        "Data Karpel \n" .
+                        "Data Kartu Keluarga \n" .
                         "Nama Lengkap : {$nama_siswa}\n" .
                         "Nama Panggilan: {$nama_panggilan}\n" .
-                        "NIS: {$Siswa->nis}\n" .
-                        "NISN: {$Siswa->nisn}\n" .
-                        "TTL: {$Siswa->tempat_lahir}, {$tanggal}\n" .
+                        "No NIK: {$Siswa->nik}\n" .
+                        "No KK: {$Siswa->kk}\n" .
+                        "Nama Ayah: {$Siswa->ayah_nama}\n" .
+                        "Nama Ibu: {$Siswa->ibu}\n" .
                         "Alamat: Rt {$Siswa->rt}, Rw {$Siswa->rw}, Desa {$Siswa->desa}\n" .
                         "\n";
-                    CopyFileWa($filename, 'img/kk');
+                    CopyFileWa($filename, 'img/siswa/kk');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Data Kartu Keluarga', $caption), $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
-                } else if ($dok === 'ktp') {
+                } else if ($dok === 'ktp ayah') {
+                    $filename = 'ayah_' . $Siswa->nis . '.png';
+                    $caption =
+                        "Nama Lengkap : {$nama_siswa}\n" .
+                        "Nama Panggilan: {$nama_panggilan}\n\n" .
+                        "*Data Ayah*\n" .
+                        "Nama Ayah: {$Siswa->ayah_nama}\n" .
+                        "No NIK: {$Siswa->nik}\n" .
+                        "No KK: {$Siswa->kk}\n" .
+                        "Alamat: {$Siswa->ayah_alamat}\n" .
+                        "Pekerjaan: {$Siswa->ayah_pekerjaan}\n" .
+                        "Alamat: Rt {$Siswa->ayah_rt}, Rw {$Siswa->ayah_rw}, Desa {$Siswa->ayah_desa}\n" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/ktp-ortu');
+                    $filePath = base_path('whatsapp/uploads/' . $filename);
+                    $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Data KTP Ayah', $caption), $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
+                } else if ($dok === 'ktp ibu') {
+                    $filename = 'ibu_' . $Siswa->nis . '.png';
+                    $caption =
+                        "Nama Lengkap : {$nama_siswa}\n" .
+                        "Nama Panggilan: {$nama_panggilan}\n\n" .
+                        "*Data Ayah*\n" .
+                        "Nama Ayah: {$Siswa->ibu_nama}\n" .
+                        "No NIK: {$Siswa->nik}\n" .
+                        "No KK: {$Siswa->kk}\n" .
+                        "Alamat: {$Siswa->ibu_alamat}\n" .
+                        "Pekerjaan: {$Siswa->ibu_pekerjaan}\n" .
+                        "Alamat: Rt {$Siswa->ibu_rt}, Rw {$Siswa->ibu_rw}, Desa {$Siswa->ibu_desa}\n" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/ktp-ortu');
+                    $filePath = base_path('whatsapp/uploads/' . $filename);
+                    $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Data KTP Ayah', $caption), $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
+                } else if ($dok === 'ijazah sd') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/ktp');
+                        "Nama Lengkap : {$nama_siswa}\n" .
+                        "Nama Panggilan: {$nama_panggilan}\n\n" .
+                        "*Data Ijazah*\n" .
+                        "Sekolah Asal: {$Siswa->namasek_asal}\n" .
+                        "No Ijazah: {$Siswa->nomor_ijazah_sd}\n" .
+                        "Tanggal Ijazah: {$Siswa->tanggal_ijazah_sd}\n" .
+                        "Lama Belajar: {$Siswa->lama_belajar} Tahun\n" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/ijazah-sd');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'ijazah') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/ijazah');
+                        "Nama Lengkap : {$nama_siswa}\n" .
+                        "Nama Panggilan: {$nama_panggilan}\n\n" .
+                        "*Data NISN*\n" .
+                        "No Ijazah: {$Siswa->nisn}\n" .
+                        "Tahun Lulus: {$Siswa->nisn}\n" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/ijazah');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'kia') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/ktp');
+                        "Nama Lengkap : {$nama_siswa}\n" .
+                        "Nama Panggilan: {$nama_panggilan}\n\n" .
+                        "*Data KIA*\n" .
+                        "NISN: {$Siswa->nisn}\n" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/ktp');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'nisn') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/nisn');
+                        "Nama Lengkap : {$nama_siswa}\n" .
+                        "Nama Panggilan: {$nama_panggilan}\n\n" .
+                        "*Data NISN*\n" .
+                        "NISN: {$Siswa->nisn}\n" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/nisn');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'bantuan 1') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/bantuan_1');
+                        "Berikut Data Bantuan PIP :" .
+                        "Nama : {$Siswa->nama_siswa}" .
+                        "Kelas : {$Siswa->KelasOne->kelas}" .
+                        "No Kartu : {$Siswa->bantuan_1}" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/bantuan_1');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'bantuan 2') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/bantuan_2');
+                        "Berikut Data Bantuan PIP :" .
+                        "Nama : {$Siswa->nama_siswa}" .
+                        "Kelas : {$Siswa->KelasOne->kelas}" .
+                        "No Kartu : {$Siswa->bantuan_2}" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/bantuan_2');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'bantuan 3') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/bantuan_3');
+                        $caption =
+                        "Berikut Data Bantuan PIP :" .
+                        "Nama : {$Siswa->nama_siswa}" .
+                        "Kelas : {$Siswa->KelasOne->kelas}" .
+                        "No Kartu : {$Siswa->bantuan_3}" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/bantuan_3');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'bantuan 4') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/bantuan_4');
+                        $caption =
+                        "Berikut Data Bantuan PIP :" .
+                        "Nama : {$Siswa->nama_siswa}" .
+                        "Kelas : {$Siswa->KelasOne->kelas}" .
+                        "No Kartu : {$Siswa->bantuan_4}" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/bantuan_4');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else if ($dok === 'bantuan 5') {
                     $filename = $Siswa->nis . '.png';
                     $caption =
-                        "isi Caption";
-                    CopyFileWa($filename, 'img/bantuan_5');
+                        $caption =
+                        "Berikut Data Bantuan PIP :" .
+                        "Nama : {$Siswa->nama_siswa}" .
+                        "Kelas : {$Siswa->KelasOne->kelas}" .
+                        "No Kartu : {$Siswa->bantuan_5}" .
+                        "\n";
+                    CopyFileWa($filename, 'img/siswa/bantuan_5');
                     $filePath = base_path('whatsapp/uploads/' . $filename);
                     $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, $caption, $filePath); // Tambahkan movefiel ke folderwhatsapp karena hanya bisa kirim via folder whatsapp
                 } else {
@@ -564,6 +643,29 @@ if (!function_exists('Auto_reply_Data_Guru')) {
                 $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Tanggal Lahir', $Hasil));
                 // DokumenSiswa($sessions, $NoRequest, $message);
                 break;
+            case 'Dokumen pdf':
+                $nis = $data[3];
+                // Dokumen pdf / Guru / AS/ 230019 / kk:ijazah-sd:karpel
+                // Dokumen pdf / Guru / AS/ 230019 /karpel : foto : kk : nisn : ktp ayah : ktp ibu : ijazah : ijazah sd : kia : bantuan 1 : bantuan 2 : bantuan 3 : bantuan 4 : bantuan 5/cetak
+                $doc = explode(':', $data[4]);
+                $doc = array_map(fn($d) => trim(strtolower($d)), $doc);
+
+                // $path = gabung_gambar_ke_pdf($nis, $doc);
+                $path = dokumen_lengkap_siswa($nis, $doc, true);
+                sleep(10);
+                CopyFileWa($nis . '.pdf', 'temp/pdf'); // public/temp
+                $filename = $nis . '.pdf';
+                $filePath = base_path('whatsapp/uploads/' . $filename);
+                if (end($data) === 'cetak') {
+                    py_print($filePath);
+                }
+                $caption =
+                    "Dokumen siswa {$nis} sudah dibuat dan dikirim ✅\n" .
+                    "\n\n";
+                $kirim = \App\Models\Whatsapp\WhatsApp::sendMedia($sessions, $NoRequest, format_pesan_gb('Dokumen Siswa', $caption), $filePath);
+                hapusFileWhatsApp($filePath,  $filename);
+                break;
+
             default:
                 $pesanKiriman = "Kode Pesan anda *$Kode* Tidak ditemukan";
                 break;

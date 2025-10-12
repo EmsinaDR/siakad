@@ -8,9 +8,10 @@ use App\Models\Admin\Etapel;
 use App\Models\Admin\Identitas;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
+use App\Models\Whatsapp\WhatsApp;
 use Illuminate\Support\Facades\File;
 use App\Models\User\Siswa\Detailsiswa;
-use App\Models\Whatsapp\WhatsApp;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 /*
 |--------------------------------------------------------------------------
@@ -237,18 +238,23 @@ class Cobabuat extends Command
             250053
         ];
 
-        $cekKarpels = Detailsiswa::get();
-        foreach ($cekKarpels as $cekKarpel):
-            if (!in_array($cekKarpel->nis, $data)) {
-                $this->info("{$cekKarpel->nama_siswa} => {$cekKarpel->nis} => {$cekKarpel->kelasOne->kelas}");
-            };
-        endforeach;
+        // $cekKarpels = Detailsiswa::get();
+        // foreach ($cekKarpels as $cekKarpel):
+        //     if (!in_array($cekKarpel->nis, $data)) {
+        //         $this->info("{$cekKarpel->nama_siswa} => {$cekKarpel->nis} => {$cekKarpel->kelasOne->kelas}");
+        //     };
+        // endforeach;
 
 
+        // // OCR
+        // $basePath = public_path('img/siswa/kk');
+        // $data = extract_kk_all($basePath, 'KK_new.jpg');
+        // $data = extract_kk_all($basePath, 'kk.webp');
+        // dd($data);
 
-
-
-
+        // Membersihkan temp file bekas whatsapp dan log laravel
+        $file = 'executor\\pc\\cleaner-file.bat';
+        run_bating($file);
 
 
 

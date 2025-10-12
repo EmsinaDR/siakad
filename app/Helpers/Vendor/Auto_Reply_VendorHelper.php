@@ -218,14 +218,14 @@ if (!function_exists('Auto_Reply_VendorHelper')) {
                         $pesan =
                             "Karpel Bagian Depan\n" .
                             "\n";
-                        $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                        $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Generate Karpel Depan', $pesan));
                         $KarpelBelakang = generatekarpel_belakang($IdSiswa, $kodeKarpel, $folder);
                         $Carifilename = 'belakang_' . $KarpelBelakang['nis'] . '.png';
                         $copyFile = CopyDataSiswa($Carifilename, 'img/karpel/');
                         $pesan =
-                            "Karpel Bagian Depan\n" .
+                            "Karpel Bagian Belakang\n" .
                             "\n";
-                        $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Data Vendor', $pesan));
+                        $result = \App\Models\Whatsapp\WhatsApp::sendMessage($sessions, $NoRequest, format_pesan('Generate Karpel Belakang', $pesan));
                     }
                 } elseif ($dokumen === 'nisn') {
                 } else {

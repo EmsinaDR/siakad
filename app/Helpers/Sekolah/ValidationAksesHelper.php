@@ -50,26 +50,41 @@ if (!function_exists('validateWhatsappAccessGuruUmum')) {
         $DevNomor = config('whatsappSession.DevNomorTujuan');
         $SekolahNoTujuan = config('whatsappSession.SekolahNoTujuan');
         $NoHPAllGuru = Detailguru::pluck('no_hp')->toArray(); // pastikan array
-        // Loloskan nomor Dev
-        if ($NoRequest !== $DevNomor) {
-            if (!$Guru || (!in_array($NoRequest, $NoHPAllGuru) && $NoRequest !== config('whatsappSession.NoKepala'))) {
-                // Kirim pesan kalau tidak diijinkan
-                WhatsApp::sendMessage($sessions, $NoRequest, format_pesan(
-                    "❌ Informasi",
-                    "Maaf anda tidak berhak mengakses data ini!!!\n*NO HP tidak terdaftar*"
-                ));
+        $NoRequest = trim((string)$NoRequest);
+        $NoKepala  = trim((string)config('whatsappSession.NoKepala'));
+        $DevNomor  = trim((string)$DevNomor);
 
-                $PesanKirim = "Di informasikan bahwa ada akses tidak sah dari :\n" .
-                    "No HP : {$NoRequest}\n" .
-                    "Berusaha mencoba akses data Guru :\n" .
-                    "Nama : " . ($Guru->nama_guru ?? '-') . "\n";
-
-                WhatsApp::sendMessage($sessions, $SekolahNoTujuan, format_pesan('⚠️ Informasi Warning ⚠️', $PesanKirim));
-
-                return false;
-            }
+        // Langsung whitelist Developer
+        if ($NoRequest === $DevNomor) {
+            return true;
         }
 
+        // Cek apakah nomor ada di daftar guru
+        $GuruValid = in_array($NoRequest, $NoHPAllGuru);
+
+        // Kalau bukan guru, cek apakah nomor kepala sekolah
+        if (!$GuruValid) {
+            if ($NoRequest === $NoKepala) {
+                // Kepala sekolah diijinkan
+                return true;
+            }
+
+            // Selain itu, blokir dan kirim notifikasi
+            WhatsApp::sendMessage($sessions, $NoRequest, format_pesan(
+                "❌ Informasi",
+                "Maaf anda tidak berhak mengakses data ini!!!\n*NO HP tidak terdaftar*"
+            ));
+
+            $PesanKirim = "⚠️ Akses tidak sah!\n" .
+                "No HP : {$NoRequest}\n" .
+                "Nama Guru Target : " . ($Guru->nama_guru ?? '-') . "\n";
+
+            WhatsApp::sendMessage($sessions, $SekolahNoTujuan, format_pesan('⚠️ Informasi Warning ⚠️', $PesanKirim));
+
+            return false;
+        }
+
+        // Kalau lolos semua, lanjut (guru sah)
         return true;
     }
 }

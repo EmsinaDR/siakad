@@ -77,3 +77,6 @@ require_once __DIR__ . '/System/ScanHelper.php';
 require_once __DIR__ . '/System/JpgToPngHelper.php';
 //require_once __DIR__ . '/System/PdfToImageHelper.php';
 require_once __DIR__ . '/Update/UpdateDataViaWaHelper.php';
+require_once __DIR__ . '/Auto_Reply_Wali_KelasHelper.php';
+require_once __DIR__ . '/Auto_Reply_KurikulumHelper.php';
+require_once __DIR__ . '/Auto_Reply_Pembina_OsisHelper.php';
