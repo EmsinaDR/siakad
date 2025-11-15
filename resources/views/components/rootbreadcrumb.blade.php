@@ -1,0 +1,1 @@
+<root>{{ $slot }}</root>
